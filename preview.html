@@ -1,0 +1,1274 @@
+<!DOCTYPE html>
+<html lang="te">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="theme-color" content="#7e3204" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Telugu:wght@400;500;600;700&family=Noto+Serif+Telugu:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<title>శ్రీ శ్రీ శ్రీ వరధాంజనేయ స్వామి వారి దేవాలయం</title>
+<style>
+  :root {
+    --bg: #f7efe3;
+    --surface: rgba(255, 250, 244, 0.82);
+    --border: rgba(168, 92, 32, 0.18);
+    --text: #4a2b10;
+    --muted: #765638;
+    --brand: #a85414;
+    --brand-strong: #7e3204;
+    --brand-bright: #e09a20;
+    --font-body-en: "Segoe UI", "Trebuchet MS", sans-serif;
+    --font-body-te: "Noto Sans Telugu", "Nirmala UI", sans-serif;
+    --font-heading-en: "Palatino Linotype", "Book Antiqua", Georgia, serif;
+    --font-heading-te: "Noto Serif Telugu", "Noto Sans Telugu", "Nirmala UI", serif;
+    --shadow: 0 20px 45px rgba(107, 57, 14, 0.12);
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 8rem;
+  }
+
+  body {
+    font-family: var(--font-body-en);
+    margin: 0;
+    min-height: 100vh;
+    overflow-x: hidden;
+    background:
+      radial-gradient(circle at top right, rgba(233, 182, 84, 0.22), transparent 28%),
+      radial-gradient(circle at bottom left, rgba(168, 84, 20, 0.14), transparent 24%),
+      linear-gradient(180deg, #fffaf4 0%, var(--bg) 46%, #f5e4c8 100%);
+    color: var(--text);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    font-synthesis-weight: none;
+    position: relative;
+  }
+
+  html[lang="te"] body {
+    font-family: var(--font-body-te);
+  }
+
+  body::before,
+  body::after {
+    content: "";
+    position: fixed;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  body::before {
+    width: 420px;
+    height: 420px;
+    top: -120px;
+    right: -120px;
+    background: radial-gradient(circle, rgba(237, 182, 88, 0.2) 0%, rgba(237, 182, 88, 0) 72%);
+  }
+
+  body::after {
+    width: 340px;
+    height: 340px;
+    bottom: -120px;
+    left: -120px;
+    background: radial-gradient(circle, rgba(168, 84, 20, 0.12) 0%, rgba(168, 84, 20, 0) 72%);
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+    transition: transform 0.25s ease, background-color 0.25s ease, box-shadow 0.25s ease, color 0.25s ease;
+  }
+
+  img {
+    display: block;
+    max-width: 100%;
+  }
+
+  a:focus-visible,
+  button:focus-visible {
+    outline: 3px solid rgba(255, 226, 171, 0.9);
+    outline-offset: 3px;
+  }
+
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    width: min(1120px, calc(100% - 24px));
+    margin: 16px auto 0;
+    padding: 0.85rem 1rem 0.95rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    background: rgba(126, 50, 4, 0.88);
+    color: #fff8f0;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 28px;
+    box-shadow: 0 18px 40px rgba(79, 34, 3, 0.24);
+    backdrop-filter: blur(18px);
+  }
+
+  .header-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.85rem;
+  }
+
+  .brand {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    min-width: 0;
+  }
+
+  .brand-badge {
+    align-self: flex-start;
+    padding: 0.35rem 0.8rem;
+    border-radius: 999px;
+    background: rgba(255, 241, 220, 0.14);
+    border: 1px solid rgba(255, 241, 220, 0.25);
+    color: #ffe6bc;
+    font-size: 0.8rem;
+    letter-spacing: 0.08em;
+  }
+
+  header h1 {
+    margin: 0;
+    font-family: var(--font-heading-en);
+    font-size: clamp(1.35rem, 2.4vw, 2rem);
+    line-height: 1.2;
+    font-weight: 700;
+    color: #fffaf4;
+    text-shadow: 0 3px 18px rgba(0, 0, 0, 0.18);
+  }
+
+  .brand-subtitle {
+    margin: 0;
+    color: #ffe7c2;
+    font-size: 0.9rem;
+  }
+
+  nav {
+    display: flex;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  nav a {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.6rem 0.9rem;
+    border-radius: 999px;
+    background: rgba(255, 245, 232, 0.12);
+    border: 1px solid rgba(255, 245, 232, 0.16);
+    color: #fff8f0;
+    font-size: 0.88rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+  }
+
+  nav a:hover {
+    transform: translateY(-1px);
+    background: rgba(255, 245, 232, 0.2);
+  }
+
+  nav a.active {
+    background: linear-gradient(135deg, #ffd38a, #f2a623);
+    color: #4a2800;
+    box-shadow: 0 12px 24px rgba(242, 166, 35, 0.28);
+  }
+
+  nav a.active::after {
+    content: "";
+    position: absolute;
+    left: 16px;
+    right: 16px;
+    bottom: -6px;
+    height: 3px;
+    border-radius: 999px;
+    background: rgba(255, 248, 240, 0.55);
+  }
+
+  .lang-switch {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.3rem;
+    border-radius: 999px;
+    background: rgba(255, 241, 220, 0.14);
+    border: 1px solid rgba(255, 241, 220, 0.2);
+    color: #fff8f0;
+    user-select: none;
+  }
+
+  .header-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .lang-switch button {
+    border: none;
+    background: transparent;
+    color: #fff8f0;
+    font-weight: 700;
+    font-size: 0.88rem;
+    padding: 0.5rem 0.8rem;
+    border-radius: 999px;
+    cursor: pointer;
+  }
+
+  .lang-switch button:hover {
+    transform: translateY(-1px);
+    background: rgba(255, 245, 232, 0.12);
+  }
+
+  .lang-switch button.active {
+    background: #fff3dd;
+    color: #6a3202;
+    box-shadow: inset 0 0 0 1px rgba(106, 50, 2, 0.08);
+  }
+
+  .menu-toggle {
+    display: none;
+    align-items: center;
+    gap: 0.7rem;
+    padding: 0.55rem 0.85rem;
+    border: 1px solid rgba(255, 241, 220, 0.2);
+    border-radius: 999px;
+    background: rgba(255, 241, 220, 0.14);
+    color: #fff8f0;
+    cursor: pointer;
+    font: inherit;
+    font-weight: 700;
+    font-size: 0.88rem;
+  }
+
+  .menu-toggle:hover {
+    transform: translateY(-1px);
+    background: rgba(255, 245, 232, 0.2);
+  }
+
+  .menu-toggle-bars {
+    display: inline-flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .menu-toggle-bars span {
+    width: 18px;
+    height: 2px;
+    border-radius: 999px;
+    background: currentColor;
+    transition: transform 0.25s ease, opacity 0.25s ease;
+  }
+
+  .menu-toggle[aria-expanded="true"] .menu-toggle-bars span:nth-child(1) {
+    transform: translateY(6px) rotate(45deg);
+  }
+
+  .menu-toggle[aria-expanded="true"] .menu-toggle-bars span:nth-child(2) {
+    opacity: 0;
+  }
+
+  .menu-toggle[aria-expanded="true"] .menu-toggle-bars span:nth-child(3) {
+    transform: translateY(-6px) rotate(-45deg);
+  }
+
+  .event-banner {
+    position: relative;
+    z-index: 1;
+    width: min(1120px, calc(100% - 24px));
+    margin: 0.7rem auto 0;
+    overflow: hidden;
+    border-radius: 16px;
+    background: linear-gradient(90deg, rgba(255, 247, 232, 0.92), rgba(255, 241, 220, 0.86));
+    border: 1px solid rgba(168, 92, 32, 0.16);
+    box-shadow: 0 10px 26px rgba(107, 57, 14, 0.08);
+  }
+
+  .event-banner::before,
+  .event-banner::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 48px;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  .event-banner::before {
+    left: 0;
+    background: linear-gradient(90deg, rgba(255, 248, 236, 0.98), rgba(255, 248, 236, 0));
+  }
+
+  .event-banner::after {
+    right: 0;
+    background: linear-gradient(270deg, rgba(255, 243, 225, 0.98), rgba(255, 243, 225, 0));
+  }
+
+  .event-banner-marquee {
+    display: flex;
+    width: max-content;
+    animation: event-scroll 28s linear infinite;
+  }
+
+  .event-banner:hover .event-banner-marquee,
+  .event-banner:focus-within .event-banner-marquee {
+    animation-play-state: paused;
+  }
+
+  .event-banner-track {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    flex-shrink: 0;
+    padding: 0.7rem 0.8rem;
+    white-space: nowrap;
+  }
+
+  .event-banner-label {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.38rem 0.8rem;
+    border-radius: 999px;
+    background: rgba(126, 50, 4, 0.1);
+    color: var(--brand-strong);
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+  }
+
+  .event-banner-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    color: var(--muted);
+    font-size: 0.88rem;
+    font-weight: 600;
+  }
+
+  .event-banner-item::before {
+    content: "";
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--brand), var(--brand-bright));
+    box-shadow: 0 0 0 4px rgba(224, 154, 32, 0.12);
+    flex-shrink: 0;
+  }
+
+  @keyframes event-scroll {
+    from {
+      transform: translateX(0);
+    }
+
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  main {
+    position: relative;
+    z-index: 1;
+    max-width: 1120px;
+    margin: 1.1rem auto 3rem;
+    padding: 0 0.9rem;
+  }
+
+  .hero {
+    position: relative;
+    overflow: hidden;
+    min-height: 340px;
+    border-radius: 26px;
+    padding: clamp(1.5rem, 3vw, 2.6rem);
+    background: linear-gradient(115deg, rgba(50, 23, 5, 0.72), rgba(126, 50, 4, 0.3)), url('t1.jpg') center/cover no-repeat;
+    box-shadow: var(--shadow);
+    display: flex;
+    align-items: flex-end;
+    isolation: isolate;
+  }
+
+  .hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(40, 18, 2, 0.2));
+    z-index: -1;
+  }
+
+  .hero::after {
+    content: "";
+    position: absolute;
+    width: 260px;
+    height: 260px;
+    top: -60px;
+    right: -60px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 225, 164, 0.34) 0%, rgba(255, 225, 164, 0) 72%);
+  }
+
+  .hero-content {
+    max-width: 680px;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .hero-kicker {
+    margin: 0;
+    width: fit-content;
+    padding: 0.35rem 0.75rem;
+    border-radius: 999px;
+    background: rgba(255, 247, 232, 0.12);
+    border: 1px solid rgba(255, 247, 232, 0.25);
+    color: #fff0d1;
+    font-size: 0.76rem;
+    letter-spacing: 0.08em;
+  }
+
+  .hero-title {
+    margin: 0;
+    font-family: var(--font-heading-en);
+    font-size: clamp(1.0rem, 2.5vw, 2.5rem);
+    line-height: 1.12;
+    color: #fffaf0;
+    text-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  }
+
+  .hero-subtitle {
+    margin: 0;
+    max-width: 52ch;
+    font-size: 0.96rem;
+    line-height: 1.7;
+    color: #fff4e5;
+  }
+
+  .hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.7rem;
+    padding-top: 0.25rem;
+  }
+
+  .hero-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.8rem 1.1rem;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 0.92rem;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.14);
+  }
+
+  .hero-button:hover {
+    transform: translateY(-2px);
+  }
+
+  .hero-button.primary {
+    background: linear-gradient(135deg, #ffd38a, #f0a91a);
+    color: #542d00;
+  }
+
+  .hero-button.secondary {
+    background: rgba(255, 248, 240, 0.14);
+    border: 1px solid rgba(255, 248, 240, 0.22);
+    color: #fffaf4;
+  }
+
+  section {
+    margin-top: 1.2rem;
+    padding: 1.25rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(10px);
+    scroll-margin-top: 7.5rem;
+  }
+
+  section h2 {
+    margin: 0 0 0.75rem;
+    font-family: var(--font-heading-en);
+    font-size: clamp(1.2rem, 2.5vw, 1.65rem);
+    color: var(--brand-strong);
+    letter-spacing: 0.02em;
+  }
+
+  html[lang="te"] header h1,
+  html[lang="te"] .hero-title,
+  html[lang="te"] section h2 {
+    font-family: var(--font-heading-te);
+    letter-spacing: 0;
+  }
+
+  html[lang="te"] header h1,
+  html[lang="te"] .hero-title {
+    line-height: 1.28;
+  }
+
+  html[lang="te"] .brand-subtitle,
+  html[lang="te"] .hero-subtitle,
+  html[lang="te"] .content-p,
+  html[lang="te"] section p,
+  html[lang="te"] li,
+  html[lang="te"] .event-banner-item {
+    line-height: 1.8;
+  }
+
+  html[lang="te"] nav a,
+  html[lang="te"] .lang-switch button,
+  html[lang="te"] .hero-button,
+  html[lang="te"] .event-banner-label,
+  html[lang="te"] .hero-kicker,
+  html[lang="te"] #menuToggleLabel {
+    letter-spacing: 0;
+    line-height: 1.4;
+  }
+
+  section h2::after {
+    content: "";
+    display: block;
+    width: 82px;
+    height: 4px;
+    margin-top: 0.45rem;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--brand), var(--brand-bright));
+  }
+
+  .content-p,
+  section p {
+    margin: 0;
+    font-size: 0.97rem;
+    color: var(--muted);
+  }
+
+  .content-p {
+    white-space: pre-line;
+  }
+
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 0.8rem;
+  }
+
+  li {
+    padding: 0.9rem 0.95rem 0.9rem 1rem;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.85), rgba(255, 246, 232, 0.92));
+    border: 1px solid rgba(168, 92, 32, 0.14);
+    border-radius: 16px;
+    box-shadow: 0 12px 24px rgba(120, 75, 24, 0.08);
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 0.85rem;
+  }
+
+  .gallery-item {
+    padding: 0;
+    border: none;
+    background: transparent;
+    border-radius: 16px;
+    cursor: pointer;
+    overflow: hidden;
+  }
+
+  .gallery img {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    border-radius: 16px;
+    box-shadow: 0 16px 30px rgba(85, 53, 16, 0.12);
+    transition: transform 0.3s ease, box-shadow 0.3s ease, filter 0.3s ease;
+    filter: saturate(1.02);
+  }
+
+  .gallery img:hover {
+    transform: translateY(-6px) scale(1.01);
+    box-shadow: 0 24px 36px rgba(85, 53, 16, 0.18);
+  }
+
+  .gallery-item:focus-visible img {
+    transform: translateY(-4px) scale(1.01);
+    box-shadow: 0 0 0 4px rgba(255, 226, 171, 0.6), 0 24px 36px rgba(85, 53, 16, 0.18);
+  }
+
+  .lightbox {
+    position: fixed;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: 1rem;
+    background: rgba(28, 13, 2, 0.82);
+    backdrop-filter: blur(10px);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.25s ease, visibility 0.25s ease;
+    z-index: 300;
+  }
+
+  .lightbox.is-open {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+
+  .lightbox-dialog {
+    position: relative;
+    width: min(920px, 100%);
+    padding: 0.85rem;
+    border-radius: 22px;
+    background: linear-gradient(180deg, rgba(255, 250, 244, 0.98), rgba(247, 239, 227, 0.94));
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    box-shadow: 0 28px 60px rgba(0, 0, 0, 0.28);
+  }
+
+  .lightbox-close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 44px;
+    height: 44px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(126, 50, 4, 0.1);
+    color: var(--brand-strong);
+    cursor: pointer;
+    font-size: 1.5rem;
+    line-height: 1;
+  }
+
+  .lightbox-image {
+    width: 100%;
+    max-height: min(72vh, 760px);
+    object-fit: contain;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.55);
+  }
+
+  .lightbox-caption {
+    margin: 0.85rem 0 0;
+    padding-right: 3rem;
+    color: var(--brand-strong);
+    font-size: 0.92rem;
+    font-weight: 600;
+  }
+
+  .map-container {
+    margin-top: 1rem;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 18px 36px rgba(85, 53, 16, 0.16);
+    border: 1px solid rgba(168, 92, 32, 0.14);
+  }
+
+  iframe {
+    width: 100%;
+    height: 340px;
+    border: none;
+    display: block;
+  }
+
+  footer {
+    width: min(1120px, calc(100% - 24px));
+    margin: 0 auto 24px;
+    padding: 1rem 1.1rem;
+    border-radius: 18px;
+    background: linear-gradient(135deg, #7e3204, #a85414);
+    color: #fff7ee;
+    text-align: center;
+    box-shadow: 0 16px 30px rgba(79, 34, 3, 0.18);
+  }
+
+  footer p {
+    margin: 0;
+    font-size: 0.88rem;
+    font-weight: 600;
+  }
+
+  @media (max-width: 900px) {
+    html {
+      scroll-padding-top: 7.2rem;
+    }
+
+    header {
+      width: calc(100% - 20px);
+      margin-top: 10px;
+      border-radius: 22px;
+    }
+
+    main {
+      margin-top: 0.9rem;
+      padding: 0 0.75rem;
+    }
+
+    .hero {
+      min-height: 300px;
+    }
+
+    section {
+      scroll-margin-top: 6.8rem;
+    }
+  }
+
+  @media (max-width: 860px) {
+    header {
+      padding: 0.85rem;
+    }
+
+    .header-top {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .lang-switch {
+      align-self: flex-start;
+    }
+
+    nav {
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      padding-bottom: 0.15rem;
+      scrollbar-width: none;
+    }
+
+    nav::-webkit-scrollbar {
+      display: none;
+    }
+
+    main {
+      margin-top: 1rem;
+    }
+
+    .hero {
+      min-height: 280px;
+    }
+  }
+
+  @media (max-width: 600px) {
+    html {
+      scroll-padding-top: 7.5rem;
+    }
+
+    header {
+      width: calc(100% - 12px);
+      margin-top: 6px;
+      padding: 0.75rem;
+      border-radius: 18px;
+    }
+
+    header h1 {
+      font-size: 1.22rem;
+    }
+
+    .header-controls {
+      width: 100%;
+      justify-content: space-between;
+      gap: 0.45rem;
+    }
+
+    .brand-badge,
+    .hero-kicker {
+      font-size: 0.7rem;
+    }
+
+    .brand-subtitle {
+      font-size: 0.84rem;
+    }
+
+    .lang-switch {
+      padding: 0.2rem;
+    }
+
+    .lang-switch button {
+      padding: 0.42rem 0.62rem;
+      font-size: 0.82rem;
+    }
+
+    .menu-toggle {
+      display: inline-flex;
+      padding: 0.48rem 0.72rem;
+      font-size: 0.82rem;
+    }
+
+    nav {
+      display: grid;
+      grid-template-columns: 1fr;
+      max-height: 0;
+      overflow: hidden;
+        max-height: 320px;
+      padding-bottom: 0;
+      transition: max-height 0.3s ease, opacity 0.25s ease, margin-top 0.25s ease;
+    }
+
+    header.nav-open nav {
+      max-height: 340px;
+      opacity: 1;
+        padding: 0.72rem 0.9rem;
+        font-size: 0.86rem;
+
+    nav a {
+      width: 100%;
+      justify-content: flex-start;
+      padding: 0.8rem 1rem;
+      font-size: 0.9rem;
+    }
+        min-height: 260px;
+        padding: 1.15rem;
+        border-radius: 20px;
+    }
+
+    .hero {
+        font-size: 1.95rem;
+      }
+
+      .hero-subtitle {
+        font-size: 0.92rem;
+      }
+
+      .hero-actions {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .hero-button {
+        width: 100%;
+        font-size: 0.88rem;
+        padding: 0.72rem 0.95rem;
+      padding: 1.5rem;
+      border-radius: 26px;
+    }
+        margin-top: 0.95rem;
+        padding: 1rem;
+        border-radius: 16px;
+        scroll-margin-top: 7rem;
+      }
+
+      section h2 {
+        font-size: 1.15rem;
+      }
+
+      .content-p,
+      section p,
+      li {
+        font-size: 0.92rem;
+      }
+
+      ul {
+        grid-template-columns: 1fr;
+        gap: 0.7rem;
+      }
+
+      .gallery {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.7rem;
+      font-size: 2.4rem;
+    }
+
+        height: 260px;
+      padding: 1.25rem;
+      border-radius: 20px;
+    }
+        padding: 0.7rem;
+        border-radius: 18px;
+      height: 300px;
+    }
+
+        padding-right: 2.25rem;
+        font-size: 0.88rem;
+      padding: 0.8rem;
+      border-radius: 22px;
+    }
+        width: calc(100% - 12px);
+        margin-bottom: 12px;
+        padding: 0.9rem 0.95rem;
+        border-radius: 14px;
+      }
+
+      footer p {
+        font-size: 0.8rem;
+      }
+    }
+
+    @media (max-width: 420px) {
+      header h1 {
+        font-size: 1.12rem;
+      }
+
+      .hero {
+        min-height: 240px;
+      }
+
+      .hero-title {
+        font-size: 1.7rem;
+      }
+
+      .gallery {
+        grid-template-columns: 1fr;
+    }
+
+      iframe {
+        height: 230px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-top">
+    <div class="brand">
+      <h1 data-telugu="శ్రీ శ్రీ శ్రీ వరధాంజనేయ స్వామి వారి దేవాలయం" data-english="Sri Sri Sri Varadhanjaneya Swamy Temple">శ్రీ శ్రీ శ్రీ వరధాంజనేయ స్వామి వారి దేవాలయం</h1>
+      <p class="brand-subtitle" data-telugu="దానాపురం, ఎల్. బి. నగర్, హైదరాబాదు-74, తెలంగాణ" data-english="Danapuram, L. B. Nagar, Hyderabad-74, Telangana">దానాపురం, ఎల్. బి. నగర్, హైదరాబాదు-74, తెలంగాణ</p>
+    </div>
+    <div class="header-controls">
+      <div class="lang-switch" aria-label="Language Switcher" role="group">
+        <button id="teluguBtn" class="active" aria-pressed="true">తెలుగు</button>
+        <button id="englishBtn" aria-pressed="false">English</button>
+      </div>
+      <button id="menuToggle" class="menu-toggle" type="button" aria-expanded="false" aria-controls="primaryNav">
+        <span class="menu-toggle-bars" aria-hidden="true">
+          <span></span>
+          <span></span>
+          <span></span>
+        </span>
+        <span id="menuToggleLabel" data-telugu="మెనూ" data-english="Menu">మెనూ</span>
+      </button>
+    </div>
+  </div>
+  <nav id="primaryNav" aria-label="Primary navigation">
+    <a href="#about" class="nav-link active" data-section="about">ఆలయం గురించి</a>
+    <a href="#pooja" class="nav-link" data-section="pooja">పూజలు</a>
+    <a href="#festivals" class="nav-link" data-section="festivals">పండుగలు</a>
+    <a href="#gallery" class="nav-link" data-section="gallery">గ్యాలరీ</a>
+    <a href="#location" class="nav-link" data-section="location">లోకేషన్</a>
+  </nav>
+</header>
+
+<div class="event-banner" aria-label="Upcoming events banner">
+  <div class="event-banner-marquee">
+    <div class="event-banner-track">
+      <span class="event-banner-label" data-telugu="రాబోయే కార్యక్రమాలు" data-english="Upcoming Events">రాబోయే కార్యక్రమాలు</span>
+      <span class="event-banner-item" data-telugu="ప్రతి శనివారం సాయంత్రం 6:00 కు హనుమాన్ చాలీసా పారాయణం" data-english="Every Saturday at 6:00 PM, Hanuman Chalisa recital">ప్రతి శనివారం సాయంత్రం 6:00 కు హనుమాన్ చాలీసా పారాయణం</span>
+      <span class="event-banner-item" data-telugu="ప్రతి మంగళవారం భక్తులకు అన్నదానం మధ్యాహ్నం 12:30 కు" data-english="Annadanam for devotees every Tuesday at 12:30 PM">ప్రతి మంగళవారం భక్తులకు అన్నదానం మధ్యాహ్నం 12:30 కు</span>
+    </div>
+    <div class="event-banner-track" aria-hidden="true">
+      <span class="event-banner-label" data-telugu="రాబోయే కార్యక్రమాలు" data-english="Upcoming Events">రాబోయే కార్యక్రమాలు</span>
+      <span class="event-banner-item" data-telugu="ప్రతి శనివారం సాయంత్రం 6:00 కు హనుమాన్ చాలీసా పారాయణం" data-english="Every Saturday at 6:00 PM, Hanuman Chalisa recital">ప్రతి శనివారం సాయంత్రం 6:00 కు హనుమాన్ చాలీసా పారాయణం</span>
+      <span class="event-banner-item" data-telugu="ప్రతి మంగళవారం భక్తులకు అన్నదానం మధ్యాహ్నం 12:30 కు" data-english="Annadanam for devotees every Tuesday at 12:30 PM">ప్రతి మంగళవారం భక్తులకు అన్నదానం మధ్యాహ్నం 12:30 కు</span>
+    </div>
+  </div>
+</div>
+
+<main>
+
+  <!-- Hero Section -->
+  <div class="hero" aria-label="Temple welcome banner">
+    <div class="hero-content">
+      <p class="hero-kicker" data-telugu="శ్రీ ఆంజనేయ స్వామి ఆశీస్సులతో" data-english="With the blessings of Sri Anjaneya Swamy">శ్రీ ఆంజనేయ స్వామి ఆశీస్సులతో</p>
+      <h2 class="hero-title" data-telugu="జై శ్రీ రామ్" data-english="Jai Sri Ram">జై శ్రీ రామ్</h2>
+      <p class="hero-subtitle" data-telugu="భక్తి, శాంతి, సేవలతో ఆలయ దర్శనాన్ని మరింత ఆహ్లాదకరంగా అనుభవించండి." data-english="Experience temple darshan in a calmer, more welcoming space for devotion and seva.">భక్తి, శాంతి, సేవలతో ఆలయ దర్శనాన్ని మరింత ఆహ్లాదకరంగా అనుభవించండి.</p>
+      <div class="hero-actions">
+        <a class="hero-button primary" href="#about" data-telugu="ఆలయం గురించి" data-english="Explore Temple">ఆలయం గురించి</a>
+        <a class="hero-button secondary" href="#location" data-telugu="లోకేషన్" data-english="Find Location">లోకేషన్</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- About -->
+  <section id="about">
+    <h2 data-telugu="ఆలయం గురించి" data-english="About Temple">ఆలయం గురించి</h2>
+    <p class="content-p" data-telugu="శ్రీ శ్రీ శ్రీ వరధాంజనేయ స్వామి వారి దేవాలయం పెనుగొండ సమీపంలో ఉన్న పవిత్రమైన ఆంజనేయ స్వామి ఆలయం.ఈ ఆలయానికి భక్తులు దూర ప్రాంతాల నుండి దర్శనం కోసం వస్తారు."
+       data-english="Sri Sri Sri Varadhan Janeya Swamy Temple is a sacred Hanuman temple located in L.B. Nagar, Hyderabad. Devotees come from distant places to seek blessings and darshan.">
+      శ్రీ శ్రీ శ్రీ వరధాంజనేయ స్వామి వారి దేవాలయం పెనుగొండ సమీపంలో ఉన్న పవిత్రమైన ఆంజనేయ స్వామి ఆలయం.
+      ఈ ఆలయానికి భక్తులు దూర ప్రాంతాల నుండి దర్శనం కోసం వస్తారు.
+    </p>
+  </section>
+
+  <!-- Pooja Services -->
+  <section id="pooja">
+    <h2 data-telugu="పూజలు మరియు సేవలు" data-english="Pooja & Services">పూజలు మరియు సేవలు</h2>
+    <ul>
+      <li data-telugu="అర్చన" data-english="Archana">అర్చన</li>
+      <li data-telugu="అభిషేకం" data-english="Abhishekam">అభిషేకం</li>
+      <li data-telugu="హనుమాన్ చాలీసా పారాయణం" data-english="Hanuman Chalisa Recitation">హనుమాన్ చాలీసా పారాయణం</li>
+      <li data-telugu="ప్రత్యేక పూజలు" data-english="Special Poojas">ప్రత్యేక పూజలు</li>
+    </ul>
+  </section>
+
+  <!-- Festivals -->
+  <section id="festivals">
+    <h2 data-telugu="పండుగలు" data-english="Festivals">పండుగలు</h2>
+    <ul>
+      <li data-telugu="ఉగాది" data-english="Ugadi">ఉగాది</li>
+      <li data-telugu="నవరాత్రులు" data-english="Navaratri">నవరాత్రులు</li>
+      <li data-telugu="శివరాత్రి" data-english="Shivaratri">శివరాత్రి</li>
+    </ul>
+  </section>
+
+  <!-- Gallery -->
+  <section id="gallery">
+    <h2 data-telugu="గ్యాలరీ" data-english="Gallery">గ్యాలరీ</h2>
+    <div class="gallery" role="list">
+      <button class="gallery-item" type="button" role="listitem">
+        <img src="t1.jpg" alt="Temple front view" data-telugu-alt="ఆలయ ముఖద్వారం" data-english-alt="Temple front view" loading="lazy" />
+      </button>
+      <button class="gallery-item" type="button" role="listitem">
+        <img src="t2.jpg" alt="Temple sanctum sanctorum" data-telugu-alt="గర్భగుడి దర్శనం" data-english-alt="Temple sanctum sanctorum" loading="lazy" />
+      </button>
+      <button class="gallery-item" type="button" role="listitem">
+        <img src="t3.jpg" alt="Temple festival celebration" data-telugu-alt="ఉత్సవ వేడుకల దృశ్యం" data-english-alt="Temple festival celebration" loading="lazy" />
+      </button>
+      <button class="gallery-item" type="button" role="listitem">
+        <img src="t4.jpg" alt="Devotees at temple" data-telugu-alt="ఆలయానికి వచ్చిన భక్తులు" data-english-alt="Devotees at temple" loading="lazy" />
+      </button>
+    </div>
+  </section>
+
+  <!-- Location -->
+  <section id="location">
+    <h2 data-telugu="లోకేషన్" data-english="Location">లోకేషన్</h2>
+    <p data-telugu="Google Maps లో ఆలయ లోకేషన్:" data-english="Temple location on Google Maps:">
+      Google Maps లో ఆలయ లోకేషన్:
+    </p>
+    <div class="map-container" aria-label="Google Maps location">
+      <iframe
+        src="https://www.google.com/maps/embed?pb=!4v1773663864543!6m8!1m7!1slhY6nLO3e3UQ1_BR-xsrOQ!2m2!1d17.34735869871594!2d78.54541810982921!3f72.51916712319913!4f8.639370225822333!5f0.7820865974627469"
+        loading="lazy"
+        allowfullscreen
+        referrerpolicy="no-referrer-when-downgrade"
+        title="Sri Sri Sri Varadhan Janeya Swamy Temple Location">
+      </iframe>
+    </div>
+  </section>
+
+</main>
+
+<div id="lightbox" class="lightbox" aria-hidden="true">
+  <div class="lightbox-dialog" role="dialog" aria-modal="true" aria-labelledby="lightboxCaption">
+    <button id="lightboxClose" class="lightbox-close" type="button" aria-label="Close image viewer">×</button>
+    <img id="lightboxImage" class="lightbox-image" src="" alt="" />
+    <p id="lightboxCaption" class="lightbox-caption"></p>
+  </div>
+</div>
+
+<footer>
+  <p data-telugu="© 2026 శ్రీ శ్రీ శ్రీ వరధాంజనేయ స్వామి వారి దేవాలయం | దానాపురం, ఎల్. బి. నగర్, హైదరాబాదు-74, తెలంగాణ | ఫోన్: 040-12345678" data-english="© 2026 Sri Sri Sri Varadhan Janeya Swamy Temple | Danapuram, L. B. Nagar, Hyderabad-74, Telangana | Phone: 040-12345678">© 2026 శ్రీ శ్రీ శ్రీ వరధాంజనేయ స్వామి వారి దేవాలయం | దానాపురం, ఎల్. బి. నగర్, హైదరాబాదు-74, తెలంగాణ | ఫోన్: 040-12345678</p>
+</footer>
+
+<script>
+  const header = document.querySelector('header');
+  const teluguBtn = document.getElementById('teluguBtn');
+  const englishBtn = document.getElementById('englishBtn');
+  const menuToggle = document.getElementById('menuToggle');
+  const menuToggleLabel = document.getElementById('menuToggleLabel');
+  const navLinks = document.querySelectorAll('header nav a.nav-link');
+  const sections = document.querySelectorAll('main section[id]');
+  const allTextElements = document.querySelectorAll('[data-telugu]');
+  const galleryImages = document.querySelectorAll('.gallery img');
+  const galleryButtons = document.querySelectorAll('.gallery-item');
+  const lightbox = document.getElementById('lightbox');
+  const lightboxImage = document.getElementById('lightboxImage');
+  const lightboxCaption = document.getElementById('lightboxCaption');
+  const lightboxClose = document.getElementById('lightboxClose');
+  let currentLang = 'telugu';
+  let lastFocusedGalleryButton = null;
+  const pageTitles = {
+    telugu: 'శ్రీ శ్రీ శ్రీ వరధాంజనేయ స్వామి వారి దేవాలయం',
+    english: 'Sri Sri Sri Varadhan Janeya Swamy Temple'
+  };
+  const navLabels = {
+    telugu: {
+      about: 'ఆలయం గురించి',
+      pooja: 'పూజలు',
+      festivals: 'పండుగలు',
+      gallery: 'గ్యాలరీ',
+      location: 'లోకేషన్'
+    },
+    english: {
+      about: 'About',
+      pooja: 'Services',
+      festivals: 'Festivals',
+      gallery: 'Gallery',
+      location: 'Location'
+    }
+  };
+
+  function updateMenuState(isOpen) {
+    header.classList.toggle('nav-open', isOpen);
+    menuToggle.setAttribute('aria-expanded', String(isOpen));
+  }
+
+  function closeMenu() {
+    updateMenuState(false);
+  }
+
+  function getImageCaption(image) {
+    return currentLang === 'telugu' ? image.dataset.teluguAlt : image.dataset.englishAlt;
+  }
+
+  function openLightbox(image, triggerButton) {
+    lastFocusedGalleryButton = triggerButton;
+    lightboxImage.src = image.src;
+    lightboxImage.dataset.teluguAlt = image.dataset.teluguAlt;
+    lightboxImage.dataset.englishAlt = image.dataset.englishAlt;
+    lightboxImage.alt = getImageCaption(image);
+    lightboxCaption.textContent = getImageCaption(image);
+    lightbox.classList.add('is-open');
+    lightbox.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+    lightboxClose.focus();
+  }
+
+  function closeLightbox() {
+    lightbox.classList.remove('is-open');
+    lightbox.setAttribute('aria-hidden', 'true');
+    lightboxImage.src = '';
+    lightboxImage.alt = '';
+    delete lightboxImage.dataset.teluguAlt;
+    delete lightboxImage.dataset.englishAlt;
+    lightboxCaption.textContent = '';
+    document.body.style.overflow = '';
+
+    if (lastFocusedGalleryButton) {
+      lastFocusedGalleryButton.focus();
+    }
+  }
+
+  function setActiveLink(sectionId) {
+    navLinks.forEach(link => {
+      const isActive = link.dataset.section === sectionId;
+      link.classList.toggle('active', isActive);
+
+      if (isActive) {
+        link.setAttribute('aria-current', 'page');
+      } else {
+        link.removeAttribute('aria-current');
+      }
+    });
+  }
+
+  function switchLanguage(lang) {
+    currentLang = lang;
+
+    allTextElements.forEach(el => {
+      el.textContent = lang === 'telugu' ? el.dataset.telugu : el.dataset.english;
+    });
+
+    galleryImages.forEach(image => {
+      image.alt = lang === 'telugu' ? image.dataset.teluguAlt : image.dataset.englishAlt;
+    });
+
+    navLinks.forEach(link => {
+      const section = link.dataset.section;
+      if (section && navLabels[lang][section]) {
+        link.textContent = navLabels[lang][section];
+      }
+    });
+
+    document.documentElement.lang = lang === 'telugu' ? 'te' : 'en';
+    document.title = pageTitles[lang];
+
+    if (lang === 'telugu') {
+      teluguBtn.classList.add('active');
+      teluguBtn.setAttribute('aria-pressed', 'true');
+      englishBtn.classList.remove('active');
+      englishBtn.setAttribute('aria-pressed', 'false');
+    } else {
+      englishBtn.classList.add('active');
+      englishBtn.setAttribute('aria-pressed', 'true');
+      teluguBtn.classList.remove('active');
+      teluguBtn.setAttribute('aria-pressed', 'false');
+    }
+
+    if (lightbox.classList.contains('is-open')) {
+      lightboxImage.alt = getImageCaption(lightboxImage);
+      lightboxCaption.textContent = getImageCaption(lightboxImage);
+    }
+  }
+
+  const observer = new IntersectionObserver(entries => {
+    const visibleSection = entries
+      .filter(entry => entry.isIntersecting)
+      .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+
+    if (visibleSection) {
+      setActiveLink(visibleSection.target.id);
+    }
+  }, {
+    rootMargin: '-35% 0px -45% 0px',
+    threshold: [0.2, 0.45, 0.7]
+  });
+
+  sections.forEach(section => observer.observe(section));
+  navLinks.forEach(link => {
+    link.addEventListener('click', () => {
+      setActiveLink(link.dataset.section);
+      closeMenu();
+    });
+  });
+
+  galleryButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      const image = button.querySelector('img');
+      openLightbox(image, button);
+    });
+  });
+
+  menuToggle.addEventListener('click', () => {
+    updateMenuState(menuToggle.getAttribute('aria-expanded') !== 'true');
+  });
+  teluguBtn.addEventListener('click', () => switchLanguage('telugu'));
+  englishBtn.addEventListener('click', () => switchLanguage('english'));
+  lightboxClose.addEventListener('click', closeLightbox);
+  lightbox.addEventListener('click', event => {
+    if (event.target === lightbox) {
+      closeLightbox();
+    }
+  });
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape') {
+      closeMenu();
+
+      if (lightbox.classList.contains('is-open')) {
+        closeLightbox();
+      }
+    }
+  });
+  window.addEventListener('resize', () => {
+    if (window.innerWidth > 600) {
+      closeMenu();
+    }
+  });
+  switchLanguage('telugu');
+  updateMenuState(false);
+  setActiveLink('about');
+</script>
+
+</body>
+</html>

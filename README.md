@@ -37,12 +37,18 @@ No build tools, npm packages, or external JavaScript frameworks are required.
 
 ```
 app/
-├── main.html   # Single-page application entry point
-├── t1.jpg      # Temple front view
-├── t2.jpg      # Sanctum sanctorum (Garbhagudi)
-├── t3.jpg      # Festival celebration
-├── t4.jpg      # Devotees at temple
-└── README.md
+├── index.html            # Single-page application entry point
+├── README.md
+├── assets/
+│   └── images/
+│       ├── t1.jpg        # Temple front view
+│       ├── t2.jpg        # Sanctum sanctorum (Garbhagudi)
+│       ├── t3.jpg        # Festival celebration
+│       └── t4.jpg        # Devotees at temple
+├── css/
+│   └── style.css         # All styles
+└── js/
+    └── main.js           # All JavaScript (language switch, gallery, lightbox, nav)
 ```
 
 ---
@@ -95,12 +101,12 @@ Edit both attribute values and the visible inner text (which should match the de
 
 ### Add a gallery image
 
-1. Place your image file (e.g., `t5.jpg`) in the `app/` folder.
-2. Add a new `<button>` block inside the `<div class="gallery">` element:
+1. Place your image file (e.g., `t5.jpg`) in the `assets/images/` folder.
+2. Add a new `<button>` block inside the `<div class="gallery">` element in `index.html`:
 
 ```html
 <button class="gallery-item" type="button" role="listitem">
-  <img src="t5.jpg" alt="Description"
+  <img src="assets/images/t5.jpg" alt="Description"
        data-telugu-alt="తెలుగు వివరణ"
        data-english-alt="English description"
        loading="lazy" />

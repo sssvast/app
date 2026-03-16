@@ -41,6 +41,10 @@
     position: relative;
   }
 
+  body.is-loading {
+    overflow: hidden;
+  }
+
   html[lang="te"] body {
     font-family: var(--font-body-te);
   }
@@ -68,6 +72,82 @@
     bottom: -120px;
     left: -120px;
     background: radial-gradient(circle, rgba(168, 84, 20, 0.12) 0%, rgba(168, 84, 20, 0) 72%);
+  }
+
+  .page-loader {
+    position: fixed;
+    inset: 0;
+    z-index: 500;
+    display: grid;
+    place-items: center;
+    padding: 1rem;
+    background:
+      radial-gradient(circle at top, rgba(255, 217, 153, 0.34), transparent 34%),
+      linear-gradient(180deg, rgba(255, 248, 236, 0.96), rgba(247, 239, 227, 0.98));
+    backdrop-filter: blur(8px);
+    transition: opacity 0.35s ease, visibility 0.35s ease;
+  }
+
+  .page-loader.is-hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  .page-loader-panel {
+    width: min(100%, 360px);
+    padding: 1.4rem 1.2rem;
+    border-radius: 24px;
+    border: 1px solid rgba(168, 92, 32, 0.18);
+    background: rgba(255, 252, 247, 0.9);
+    box-shadow: 0 24px 48px rgba(107, 57, 14, 0.12);
+    text-align: center;
+  }
+
+  .page-loader-kicker {
+    margin: 0;
+    color: var(--brand);
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+  }
+
+  .page-loader-title {
+    margin: 0.45rem 0 0;
+    color: var(--brand-strong);
+    font-family: var(--font-heading-en);
+    font-size: 1.15rem;
+    font-weight: 700;
+  }
+
+  html[lang="te"] .page-loader-title {
+    font-family: var(--font-heading-te);
+  }
+
+  .page-loader-countdown-wrap {
+    width: 76px;
+    height: 76px;
+    margin: 1rem auto 0;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(255, 214, 142, 0.8), rgba(240, 169, 26, 0.28));
+    border: 1px solid rgba(168, 92, 32, 0.16);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  }
+
+  .page-loader-countdown {
+    color: var(--brand-strong);
+    font-size: 2rem;
+    font-weight: 800;
+    line-height: 1;
+  }
+
+  .page-loader-status {
+    margin: 0.9rem 0 0;
+    color: var(--muted);
+    font-size: 0.92rem;
+    font-weight: 600;
   }
 
   a {
@@ -491,6 +571,16 @@
     scroll-margin-top: 7.5rem;
   }
 
+  @supports (content-visibility: auto) {
+    #festivals,
+    #seva-booking,
+    #gallery,
+    #location {
+      content-visibility: auto;
+      contain-intrinsic-size: 1px 560px;
+    }
+  }
+
   section h2 {
     margin: 0 0 0.75rem;
     font-family: var(--font-heading-en);
@@ -569,6 +659,176 @@
     font-size: 0.95rem;
     font-weight: 600;
     color: var(--text);
+  }
+
+  .seva-booking-layout {
+    margin-top: 0.9rem;
+    display: grid;
+    grid-template-columns: 1.08fr 0.92fr;
+    gap: 1rem;
+    align-items: start;
+  }
+
+  .seva-subtitle {
+    margin: 0 0 0.65rem;
+    font-family: var(--font-heading-en);
+    font-size: 1.05rem;
+    color: var(--brand-strong);
+  }
+
+  .seva-list {
+    grid-template-columns: 1fr;
+    gap: 0.7rem;
+  }
+
+  .seva-card {
+    padding: 0.85rem 0.95rem;
+  }
+
+  .seva-option {
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+  }
+
+  .seva-option:hover {
+    transform: translateY(-1px);
+    border-color: rgba(168, 92, 32, 0.26);
+    box-shadow: 0 14px 26px rgba(120, 75, 24, 0.12);
+  }
+
+  .seva-option:focus-visible {
+    outline: 3px solid rgba(255, 226, 171, 0.9);
+    outline-offset: 2px;
+  }
+
+  .seva-option.is-selected {
+    border-color: rgba(126, 50, 4, 0.45);
+    background: linear-gradient(180deg, rgba(255, 236, 200, 0.96), rgba(255, 246, 232, 0.98));
+    box-shadow: 0 16px 28px rgba(120, 75, 24, 0.16);
+  }
+
+  .seva-card h4 {
+    margin: 0;
+    color: var(--brand-strong);
+    font-size: 0.96rem;
+  }
+
+  .seva-card p {
+    margin-top: 0.4rem;
+    color: var(--muted);
+    font-size: 0.88rem;
+    font-weight: 600;
+  }
+
+  .seva-booking-form {
+    padding: 1rem;
+    border-radius: 16px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(255, 246, 232, 0.88));
+    border: 1px solid rgba(168, 92, 32, 0.14);
+    box-shadow: 0 12px 24px rgba(120, 75, 24, 0.08);
+  }
+
+  .seva-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+  }
+
+  .seva-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .seva-field span {
+    color: var(--brand-strong);
+    font-size: 0.85rem;
+    font-weight: 700;
+  }
+
+  .seva-field.full-width {
+    grid-column: 1 / -1;
+  }
+
+  .seva-field input,
+  .seva-field select {
+    width: 100%;
+    border: 1px solid rgba(168, 92, 32, 0.26);
+    border-radius: 10px;
+    padding: 0.58rem 0.68rem;
+    font: inherit;
+    font-size: 0.9rem;
+    color: var(--text);
+    background: rgba(255, 252, 247, 0.95);
+  }
+
+  .seva-field input:focus,
+  .seva-field select:focus {
+    outline: 2px solid rgba(224, 154, 32, 0.45);
+    outline-offset: 1px;
+    border-color: rgba(168, 92, 32, 0.46);
+  }
+
+  .seva-meta {
+    margin-top: 0.7rem;
+    color: var(--brand-strong);
+    font-size: 0.9rem;
+    font-weight: 700;
+  }
+
+  .seva-selected {
+    margin-top: 0;
+    margin-bottom: 0.2rem;
+  }
+
+  .book-seva-btn {
+    margin-top: 0.55rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: 999px;
+    padding: 0.65rem 1rem;
+    background: linear-gradient(135deg, #a85414, #7e3204);
+    color: #fff7ee;
+    font: inherit;
+    font-size: 0.88rem;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 10px 20px rgba(107, 57, 14, 0.22);
+    transition: transform 0.25s ease, box-shadow 0.25s ease, opacity 0.25s ease;
+  }
+
+  .book-seva-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 14px 24px rgba(107, 57, 14, 0.3);
+  }
+
+  .book-seva-btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+
+  .seva-booking-message {
+    margin: 0.65rem 0 0;
+    min-height: 1.3rem;
+    font-size: 0.88rem;
+    font-weight: 700;
+  }
+
+  .seva-booking-message.success {
+    color: #2d6b1f;
+  }
+
+  .seva-booking-message.error {
+    color: #9f2c06;
+  }
+
+  html[lang="te"] .seva-subtitle,
+  html[lang="te"] .seva-card h4 {
+    font-family: var(--font-heading-te);
   }
 
   .gallery {
@@ -745,6 +1005,10 @@
     section {
       scroll-margin-top: 6.8rem;
     }
+
+    .seva-booking-layout {
+      grid-template-columns: 1fr;
+    }
   }
 
   @media (max-width: 860px) {
@@ -896,6 +1160,14 @@
     ul {
       grid-template-columns: 1fr;
       gap: 0.7rem;
+    }
+
+    .seva-form-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .book-seva-btn {
+      width: 100%;
     }
 
     .gallery {

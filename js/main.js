@@ -831,12 +831,22 @@ function deepMergeContent(base, override) {
 
     const resumeMusic = () => {
       musicResumeHandlersBound = false;
+      document.removeEventListener('click', resumeMusic);
+      document.removeEventListener('keydown', resumeMusic);
+      document.removeEventListener('touchstart', resumeMusic);
+      // If the gesture that triggered this was the mute button itself, audio is
+      // already muted by the time this document-level handler fires. Don't waste
+      // the interaction — re-arm for the next user gesture instead.
+      if (backgroundMusic && backgroundMusic.muted) {
+        registerMusicResumeHandlers();
+        return;
+      }
       void tryPlayBackgroundMusic();
     };
 
-    document.addEventListener('click', resumeMusic, { once: true });
-    document.addEventListener('keydown', resumeMusic, { once: true });
-    document.addEventListener('touchstart', resumeMusic, { once: true });
+    document.addEventListener('click', resumeMusic);
+    document.addEventListener('keydown', resumeMusic);
+    document.addEventListener('touchstart', resumeMusic);
   }
 
   async function tryPlayBackgroundMusic() {

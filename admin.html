@@ -450,7 +450,7 @@
     white-space: nowrap;
   }
 
-  .btn-row-review {
+  .btn-row-action {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -458,22 +458,51 @@
     height: 1.64rem;
     padding: 0;
     border-radius: 50%;
-    border: 1px solid rgba(18, 140, 126, 0.38);
-    background: rgba(37, 211, 102, 0.1);
-    color: #128c7e;
+    border: 1px solid rgba(126, 50, 4, 0.3);
+    background: rgba(126, 50, 4, 0.08);
+    color: var(--brand-strong);
     cursor: pointer;
-    box-shadow: 0 2px 7px rgba(18, 140, 126, 0.15);
+    box-shadow: 0 2px 7px rgba(107, 57, 14, 0.14);
     transition: transform 0.15s, box-shadow 0.2s, background 0.2s;
   }
 
-  .btn-row-review:hover {
+  .btn-row-action:hover {
     transform: translateY(-1px);
-    background: rgba(37, 211, 102, 0.16);
-    box-shadow: 0 4px 10px rgba(18, 140, 126, 0.2);
+    box-shadow: 0 4px 10px rgba(107, 57, 14, 0.2);
   }
 
-  .btn-row-review:active {
+  .btn-row-action:active {
     transform: translateY(0);
+  }
+
+  .btn-row-reviewed {
+    border-color: rgba(18, 140, 126, 0.38);
+    background: rgba(37, 211, 102, 0.1);
+    color: #128c7e;
+  }
+
+  .btn-row-reviewed:hover {
+    background: rgba(37, 211, 102, 0.16);
+  }
+
+  .btn-row-confirmed {
+    border-color: rgba(27, 94, 32, 0.34);
+    background: rgba(27, 94, 32, 0.12);
+    color: #1b5e20;
+  }
+
+  .btn-row-confirmed:hover {
+    background: rgba(27, 94, 32, 0.18);
+  }
+
+  .btn-row-cancelled {
+    border-color: rgba(176, 51, 33, 0.32);
+    background: rgba(176, 51, 33, 0.11);
+    color: #9c2618;
+  }
+
+  .btn-row-cancelled:hover {
+    background: rgba(176, 51, 33, 0.17);
   }
 
   .process-icon {
@@ -484,6 +513,26 @@
     background-position: center;
     background-size: contain;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23128c7e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M21 12a9 9 0 1 1-2.64-6.36'/%3E%3Cpath d='M21 4v6h-6'/%3E%3C/svg%3E");
+  }
+
+  .confirm-icon {
+    width: 0.72rem;
+    height: 0.72rem;
+    display: inline-block;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231b5e20' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6L9 17l-5-5'/%3E%3C/svg%3E");
+  }
+
+  .cancel-icon {
+    width: 0.72rem;
+    height: 0.72rem;
+    display: inline-block;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239c2618' stroke-width='2.4' stroke-linecap='round'%3E%3Cpath d='M18 6L6 18M6 6l12 12'/%3E%3C/svg%3E");
   }
 
   .ref-state-icon {
@@ -510,6 +559,12 @@
     border: 1px solid rgba(27, 94, 32, 0.3);
   }
 
+  .ref-state-cancelled {
+    color: #9c2618;
+    background: rgba(176, 51, 33, 0.12);
+    border: 1px solid rgba(176, 51, 33, 0.3);
+  }
+
   .no-rows {
     padding: 1.5rem 1.25rem;
     color: var(--muted);
@@ -531,6 +586,7 @@
   .badge-submitted { background: rgba(168, 84, 20, 0.11); color: #7e3204; }
   .badge-reviewed  { background: rgba(25, 118, 210, 0.11); color: #1565c0; }
   .badge-confirmed { background: rgba(46, 125, 50, 0.11);  color: #1b5e20; }
+  .badge-cancelled { background: rgba(176, 51, 33, 0.12); color: #9c2618; }
   .badge-unknown   { background: rgba(100, 100, 100, 0.1); color: #555; }
 
   /* ── Reviewed transition modal ───────────────────────────── */
@@ -690,6 +746,31 @@
     padding: 0.2rem;
   }
 
+  .modal-check {
+    border: 1px solid rgba(126, 50, 4, 0.18);
+    border-radius: 12px;
+    background: rgba(126, 50, 4, 0.05);
+    padding: 0.72rem 0.78rem;
+  }
+
+  .modal-check label {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.55rem;
+    color: var(--text);
+    font-size: 0.86rem;
+    line-height: 1.45;
+    cursor: pointer;
+  }
+
+  .modal-check input[type='checkbox'] {
+    width: 1rem;
+    height: 1rem;
+    margin-top: 0.12rem;
+    accent-color: #1b5e20;
+    flex-shrink: 0;
+  }
+
   .modal-actions {
     display: flex;
     justify-content: flex-end;
@@ -800,11 +881,12 @@
 
     .ref-with-action {
       width: 100%;
-      justify-content: space-between;
+      justify-content: flex-start;
+      flex-wrap: wrap;
       gap: 0.45rem;
     }
 
-    .btn-row-review {
+    .btn-row-action {
       width: 1.82rem;
       height: 1.82rem;
     }
@@ -932,16 +1014,23 @@
         <textarea id="reviewMessage" placeholder="Optional additional note for the devotee"></textarea>
       </div>
 
-      <div class="field">
+      <div class="field" id="reviewQrSection">
         <label for="reviewQrInput">QR Code Image</label>
         <input id="reviewQrInput" type="file" accept="image/*" />
         <div id="reviewQrMeta" class="qr-meta">Please upload the QR image to send with this WhatsApp message.</div>
         <img id="reviewQrPreview" class="qr-preview" alt="QR preview" />
       </div>
 
+      <div id="reviewPaymentWrap" class="modal-check" style="display:none">
+        <label for="reviewPaymentAck">
+          <input id="reviewPaymentAck" type="checkbox" />
+          <span>I confirm payment receipt has been received for this booking.</span>
+        </label>
+      </div>
+
       <div id="reviewModalError" class="alert alert-error" role="alert"></div>
       <div id="reviewModalStatus" class="modal-status" role="status"></div>
-      <div class="modal-note">When submitted, this sends WhatsApp with booking reference + uploaded QR image and updates status to Reviewed.</div>
+      <div id="reviewModalNote" class="modal-note">When submitted, this sends WhatsApp with booking reference + uploaded QR image and updates status to Reviewed.</div>
 
       <div class="modal-actions">
         <button type="button" class="btn-modal-cancel" id="reviewCancelBtn">Close</button>
@@ -974,9 +1063,11 @@ let webhookUrl      = '';
 let adminCredential = '';
 let bookingLookup   = {};
 let reviewContext   = null;
+let reviewMode      = 'reviewed';
 let reviewQrDataUrl = '';
 let reviewQrFileName = '';
 let reviewWired     = false;
+let reviewRefreshPending = false;
 
 // ── Boot ───────────────────────────────────────────────────────────────────────
 (async function boot() {
@@ -1203,15 +1294,21 @@ function renderBookings(bookings) {
   });
 
   // Compute summary totals.
-  let total = 0, submitted = 0, reviewed = 0, confirmed = 0, amount = 0;
+  let total = 0, submitted = 0, reviewed = 0, confirmed = 0, cancelled = 0, amount = 0;
   bookings.forEach(function (group) {
     group.rows.forEach(function (r) {
       total++;
       amount += Number(r.totalAmount) || 0;
       const s = String(r.status || '').toLowerCase();
-      if (s === 'confirmed')   confirmed++;
-      else if (s === 'reviewed') reviewed++;
-      else                       submitted++;
+      if (s === 'confirmed') {
+        confirmed++;
+      } else if (s === 'reviewed') {
+        reviewed++;
+      } else if (s === 'cancelled') {
+        cancelled++;
+      } else {
+        submitted++;
+      }
     });
   });
 
@@ -1221,7 +1318,8 @@ function renderBookings(bookings) {
     summaryCard('\u20B9' + amount.toLocaleString('en-IN'), 'Total Amount') +
     summaryCard(submitted,  'Submitted') +
     summaryCard(reviewed,   'Reviewed') +
-    summaryCard(confirmed,  'Confirmed');
+    summaryCard(confirmed,  'Confirmed') +
+    summaryCard(cancelled,  'Cancelled');
   bar.style.display = 'flex';
 
   const html = bookings.map(function (group, i) {
@@ -1267,7 +1365,7 @@ function renderDateGroup(group, isOpen) {
   const expandedVal = isOpen ? 'true' : 'false';
 
   // Mini status counts for header badges.
-  const counts = { Submitted: 0, Reviewed: 0, Confirmed: 0 };
+  const counts = { Submitted: 0, Reviewed: 0, Confirmed: 0, Cancelled: 0 };
   group.rows.forEach(function (r) {
     if (Object.prototype.hasOwnProperty.call(counts, r.status)) counts[r.status]++;
   });
@@ -1304,7 +1402,7 @@ function renderDateGroup(group, isOpen) {
 
 function renderRow(selectedDate, r, idx) {
   const s   = String(r.status || '').toLowerCase() || 'unknown';
-  const cls = 'badge badge-' + (s === 'submitted' || s === 'reviewed' || s === 'confirmed' ? s : 'unknown');
+  const cls = 'badge badge-' + (s === 'submitted' || s === 'reviewed' || s === 'confirmed' || s === 'cancelled' ? s : 'unknown');
   const amt = Number(r.totalAmount) || 0;
   const refWithAction = renderRowAction(selectedDate, r, s);
 
@@ -1325,21 +1423,27 @@ function renderRow(selectedDate, r, idx) {
 
 function renderRowAction(selectedDate, row, statusLower) {
   const bookingRef = esc(row && row.bookingRef ? row.bookingRef : '\u2014');
+  const key = row && row.bookingRef ? buildBookingKey(selectedDate, row.bookingRef) : '';
+
+  const makeButton = function (mode, title, iconClass) {
+    return '<button type="button" class="btn-row-action btn-row-' + esc(mode) + '" data-booking-key="' + esc(key) + '" data-transition-mode="' + esc(mode) + '" aria-label="' + esc(title) + '" title="' + esc(title) + '">' +
+      '<span class="' + iconClass + '" aria-hidden="true"></span>' +
+      '</button>';
+  };
 
   if (statusLower === 'submitted' && row && row.bookingRef) {
-    const key = buildBookingKey(selectedDate, row.bookingRef);
     return '<div class="ref-with-action">' +
       '<span class="ref-code">' + bookingRef + '</span>' +
-      '<button type="button" class="btn-row-review" data-booking-key="' + esc(key) + '" aria-label="Open review process" title="Review and send WhatsApp">' +
-      '<span class="process-icon" aria-hidden="true"></span>' +
-      '</button>' +
+      makeButton('reviewed', 'Review and send payment QR on WhatsApp', 'process-icon') +
+      makeButton('cancelled', 'Cancel booking and notify on WhatsApp', 'cancel-icon') +
       '</div>';
   }
 
-  if (statusLower === 'reviewed') {
+  if (statusLower === 'reviewed' && row && row.bookingRef) {
     return '<div class="ref-with-action">' +
       '<span class="ref-code">' + bookingRef + '</span>' +
-      '<span class="ref-state-icon ref-state-reviewed" title="Reviewed" aria-label="Reviewed">✓</span>' +
+      makeButton('confirmed', 'Confirm booking and send final WhatsApp message', 'confirm-icon') +
+      makeButton('cancelled', 'Cancel booking and notify on WhatsApp', 'cancel-icon') +
       '</div>';
   }
 
@@ -1347,6 +1451,13 @@ function renderRowAction(selectedDate, row, statusLower) {
     return '<div class="ref-with-action">' +
       '<span class="ref-code">' + bookingRef + '</span>' +
       '<span class="ref-state-icon ref-state-confirmed" title="Confirmed" aria-label="Confirmed">✓</span>' +
+      '</div>';
+  }
+
+  if (statusLower === 'cancelled') {
+    return '<div class="ref-with-action">' +
+      '<span class="ref-code">' + bookingRef + '</span>' +
+      '<span class="ref-state-icon ref-state-cancelled" title="Cancelled" aria-label="Cancelled">✕</span>' +
       '</div>';
   }
 
@@ -1359,10 +1470,13 @@ function buildBookingKey(selectedDate, bookingRef) {
 
 function bindReviewActionButtons() {
   document.getElementById('bookingContent')
-    .querySelectorAll('.btn-row-review')
+    .querySelectorAll('.btn-row-action')
     .forEach(function (btn) {
       btn.addEventListener('click', function () {
-        openReviewModalByKey(btn.getAttribute('data-booking-key') || '');
+        openReviewModalByKey(
+          btn.getAttribute('data-booking-key') || '',
+          btn.getAttribute('data-transition-mode') || 'reviewed'
+        );
       });
     });
 }
@@ -1388,11 +1502,120 @@ function wireReviewModalEvents() {
   reviewWired = true;
 }
 
-function openReviewModalByKey(key) {
+function normalizeReviewMode(mode) {
+  const normalized = String(mode || '').trim().toLowerCase();
+  if (normalized === 'confirmed') {
+    return 'confirmed';
+  }
+
+  if (normalized === 'cancelled' || normalized === 'canceled') {
+    return 'cancelled';
+  }
+
+  return 'reviewed';
+}
+
+function getReviewModeConfig(mode) {
+  const normalized = normalizeReviewMode(mode);
+
+  if (normalized === 'confirmed') {
+    return {
+      mode: normalized,
+      title: 'Reviewed -> Confirmed',
+      submitText: 'Send WhatsApp & Mark Confirmed',
+      sendingText: 'Sending...',
+      completedText: 'Transition Complete ✓',
+      successText: '✓ Booking transitioned to Confirmed and final WhatsApp message sent successfully.',
+      note: 'Confirm only after payment receipt is received. This sends final confirmation on WhatsApp.',
+      action: 'admin-transition-status',
+      targetStatus: 'Confirmed',
+      requiresQr: false,
+      requiresPaymentAck: true,
+      qrMeta: 'QR image is not required for this transition.',
+      missingQrError: '',
+      paymentRequiredError: 'Please confirm payment receipt before marking as Confirmed.',
+      whatsappHelp: 'Verify WhatsApp token and phone number ID.'
+    };
+  }
+
+  if (normalized === 'cancelled') {
+    return {
+      mode: normalized,
+      title: 'Mark Booking as Cancelled',
+      submitText: 'Send WhatsApp & Mark Cancelled',
+      sendingText: 'Sending...',
+      completedText: 'Transition Complete ✓',
+      successText: '✓ Booking transitioned to Cancelled and WhatsApp message sent successfully.',
+      note: 'This sends cancellation information on WhatsApp and updates booking status to Cancelled.',
+      action: 'admin-transition-status',
+      targetStatus: 'Cancelled',
+      requiresQr: false,
+      requiresPaymentAck: false,
+      qrMeta: 'QR image is not required for this transition.',
+      missingQrError: '',
+      paymentRequiredError: '',
+      whatsappHelp: 'Verify WhatsApp token and phone number ID.'
+    };
+  }
+
+  return {
+    mode: 'reviewed',
+    title: 'Submitted -> Reviewed',
+    submitText: 'Send WhatsApp & Mark Reviewed',
+    sendingText: 'Sending...',
+    completedText: 'Transition Complete ✓',
+    successText: '✓ Booking transitioned to Reviewed and WhatsApp message sent successfully.',
+    note: 'When submitted, this sends WhatsApp with booking reference + uploaded QR image and updates status to Reviewed.',
+    action: 'admin-transition-reviewed',
+    targetStatus: 'Reviewed',
+    requiresQr: true,
+    requiresPaymentAck: false,
+    qrMeta: 'Please upload the QR image to send with this WhatsApp message.',
+    missingQrError: 'Please upload the QR code image.',
+    paymentRequiredError: '',
+    whatsappHelp: 'Verify WhatsApp token, phone number ID, and QR image.'
+  };
+}
+
+function applyReviewModeConfig(mode) {
+  const config = getReviewModeConfig(mode);
+
+  document.getElementById('reviewModalTitle').textContent = config.title;
+  document.getElementById('reviewModalNote').textContent = config.note;
+
+  const qrSection = document.getElementById('reviewQrSection');
+  const qrMeta = document.getElementById('reviewQrMeta');
+  const qrInput = document.getElementById('reviewQrInput');
+  const qrPreview = document.getElementById('reviewQrPreview');
+
+  qrSection.style.display = config.requiresQr ? 'grid' : 'none';
+  qrMeta.textContent = config.qrMeta;
+
+  if (!config.requiresQr) {
+    reviewQrDataUrl = '';
+    reviewQrFileName = '';
+    qrInput.value = '';
+    qrPreview.style.display = 'none';
+    qrPreview.src = '';
+  }
+
+  const paymentWrap = document.getElementById('reviewPaymentWrap');
+  const paymentAck = document.getElementById('reviewPaymentAck');
+  paymentWrap.style.display = config.requiresPaymentAck ? 'block' : 'none';
+  if (!config.requiresPaymentAck) {
+    paymentAck.checked = false;
+  }
+
+  return config;
+}
+
+function openReviewModalByKey(key, mode) {
   const item = bookingLookup[key];
   if (!item || !item.row) {
     return;
   }
+
+  reviewMode = normalizeReviewMode(mode);
 
   reviewContext = {
     selectedDate: String(item.selectedDate || ''),
@@ -1400,31 +1623,36 @@ function openReviewModalByKey(key) {
     devoteeName: String(item.row.devoteeName || ''),
     phone: String(item.row.phone || ''),
     sevaName: String(item.row.sevaName || ''),
-    sevaDate: String(item.row.sevaDate || item.selectedDate || '')
+    sevaDate: String(item.row.sevaDate || item.selectedDate || ''),
+    totalAmount: Number(item.row.totalAmount) || 0
   };
 
   reviewQrDataUrl = '';
   reviewQrFileName = '';
+  reviewRefreshPending = false;
+
+  const modeConfig = applyReviewModeConfig(reviewMode);
 
   document.getElementById('reviewBookingRef').textContent = reviewContext.bookingRef || '-';
   document.getElementById('reviewDevotee').textContent = reviewContext.devoteeName || '-';
   document.getElementById('reviewSevaDate').textContent = fmtSevaDateSimple(reviewContext.sevaDate);
   document.getElementById('reviewPhone').value = reviewContext.phone || '';
   document.getElementById('reviewLanguage').value = 'te';
-  document.getElementById('reviewMessage').value = buildDefaultReviewMessage('te', reviewContext);
+  document.getElementById('reviewMessage').value = buildDefaultReviewMessage(reviewMode, 'te', reviewContext);
   document.getElementById('reviewQrInput').value = '';
+  document.getElementById('reviewPaymentAck').checked = false;
 
   const preview = document.getElementById('reviewQrPreview');
   preview.style.display = 'none';
   preview.src = '';
-  document.getElementById('reviewQrMeta').textContent = 'Please upload the QR image to send with this WhatsApp message.';
+  document.getElementById('reviewQrMeta').textContent = modeConfig.qrMeta;
 
   setReviewModalError('');
   setReviewModalStatus('');
 
   const submit = document.getElementById('reviewSubmitBtn');
   submit.disabled = false;
-  submit.textContent = 'Send WhatsApp & Mark Reviewed';
+  submit.textContent = modeConfig.submitText;
 
   const modal = document.getElementById('reviewModal');
   modal.style.display = 'flex';
@@ -1432,11 +1660,15 @@ function openReviewModalByKey(key) {
 }
 
 function closeReviewModal() {
+  const shouldRefresh = reviewRefreshPending;
+  reviewRefreshPending = false;
+
   const modal = document.getElementById('reviewModal');
   modal.style.display = 'none';
   modal.setAttribute('aria-hidden', 'true');
 
   reviewContext = null;
+  reviewMode = 'reviewed';
   reviewQrDataUrl = '';
   reviewQrFileName = '';
 
@@ -1446,13 +1678,23 @@ function closeReviewModal() {
   }
 
   const submit = document.getElementById('reviewSubmitBtn');
+  const modeConfig = applyReviewModeConfig(reviewMode);
   if (submit) {
     submit.disabled = false;
-    submit.textContent = 'Send WhatsApp & Mark Reviewed';
+    submit.textContent = modeConfig.submitText;
+  }
+
+  const paymentAck = document.getElementById('reviewPaymentAck');
+  if (paymentAck) {
+    paymentAck.checked = false;
   }
 
   setReviewModalError('');
   setReviewModalStatus('');
+
+  if (shouldRefresh && adminCredential && document.getElementById('dashboardView').style.display === 'flex') {
+    loadBookings(true);
+  }
 }
 
 function onReviewLanguageChange(event) {
@@ -1461,11 +1703,79 @@ function onReviewLanguageChange(event) {
   }
 
   const language = event && event.target && event.target.value === 'te' ? 'te' : 'en';
-  document.getElementById('reviewMessage').value = buildDefaultReviewMessage(language, reviewContext);
+  document.getElementById('reviewMessage').value = buildDefaultReviewMessage(reviewMode, language, reviewContext);
 }
 
-function buildDefaultReviewMessage(language, context) {
+function buildDefaultReviewMessage(mode, language, context) {
+  const activeMode = normalizeReviewMode(mode);
   const sevaDateText = fmtSevaDateSimple(context && context.sevaDate ? context.sevaDate : '');
+  const sevaAmountText = formatAmountInr(context && context.totalAmount);
+
+  if (activeMode === 'confirmed') {
+    if (language === 'te') {
+      return [
+        'నమస్తే, *' + (context && context.devoteeName ? context.devoteeName : '') + '*,',
+        '',
+        'మీ సేవ బుకింగ్ చెల్లింపును మేము స్వీకరించాము.',
+        '',
+        'బుకింగ్ రిఫరెన్స్: ' + (context && context.bookingRef ? context.bookingRef : ''),
+        'సేవ తేదీ: ' + sevaDateText,
+        'సేవ: ' + (context && context.sevaName ? context.sevaName : ''),
+        '',
+        '*మీ బుకింగ్ ఇప్పుడు ధృవీకరించబడింది.*',
+        'ఆలయానికి రానప్పుడు బుకింగ్ రిఫరెన్స్ చూపించండి.',
+        '',
+        '🙏 *జై శ్రీరామ్* 🙏'
+      ].join('\n');
+    }
+
+    return [
+      'Namaste, *' + (context && context.devoteeName ? context.devoteeName : '') + '*,',
+      '',
+      'We have received your payment for the seva booking.',
+      '',
+      'Booking reference: ' + (context && context.bookingRef ? context.bookingRef : ''),
+      'Seva Date: ' + sevaDateText,
+      'Seva: ' + (context && context.sevaName ? context.sevaName : ''),
+      '',
+      '*Your booking is now confirmed.*',
+      'Please carry this booking reference when you visit the temple.',
+      '',
+      '🙏 *Jai Sri Ram* 🙏'
+    ].join('\n');
+  }
+
+  if (activeMode === 'cancelled') {
+    if (language === 'te') {
+      return [
+        'నమస్తే, *' + (context && context.devoteeName ? context.devoteeName : '') + '*,',
+        '',
+        'మీ సేవ బుకింగ్ రద్దు చేయబడింది.',
+        '',
+        'బుకింగ్ రిఫరెన్స్: ' + (context && context.bookingRef ? context.bookingRef : ''),
+        'సేవ తేదీ: ' + sevaDateText,
+        'సేవ: ' + (context && context.sevaName ? context.sevaName : ''),
+        '',
+        'సహాయం కోసం ఆలయ కార్యాలయాన్ని సంప్రదించండి.',
+        '',
+        'ధన్యవాదాలు'
+      ].join('\n');
+    }
+
+    return [
+      'Namaste, *' + (context && context.devoteeName ? context.devoteeName : '') + '*,',
+      '',
+      'Your seva booking has been cancelled.',
+      '',
+      'Booking reference: ' + (context && context.bookingRef ? context.bookingRef : ''),
+      'Seva Date: ' + sevaDateText,
+      'Seva: ' + (context && context.sevaName ? context.sevaName : ''),
+      '',
+      'For assistance, please contact the temple office.',
+      '',
+      'Thank you'
+    ].join('\n');
+  }
 
   if (language === 'te') {
     return [
@@ -1476,7 +1786,7 @@ function buildDefaultReviewMessage(language, context) {
       'బుకింగ్ రిఫరెన్స్: ' + (context && context.bookingRef ? context.bookingRef : ''),
       'సేవ తేదీ: ' + sevaDateText,
       '',
-      '*_దయచేసి జత చేసిన QR కోడ్ ద్వారా సేవ రుసుము: రూ. ' + (context && context.sevaAmount ? context.sevaAmount : '') + ' చెల్లింపు పూర్తి చేయండి._*',
+      '*_దయచేసి జత చేసిన QR కోడ్ ద్వారా సేవ రుసుము: రూ. ' + sevaAmountText + ' చెల్లింపు పూర్తి చేయండి._*',
       '',
       'చెల్లింపు పూర్తయ్యాక, మేము మీ బుకింగ్‌ను ధృవీకరిస్తాము.',
       '',
@@ -1492,7 +1802,7 @@ function buildDefaultReviewMessage(language, context) {
     'Booking reference: ' + (context && context.bookingRef ? context.bookingRef : ''),
     'Seva Date: ' + sevaDateText,
     '',
-    '*_Please complete seva payment of Rs. ' + (context && context.sevaAmount ? context.sevaAmount : '') + ' using the attached QR code._*',
+    '*_Please complete seva payment of Rs. ' + sevaAmountText + ' using the attached QR code._*',
     '',
     'Share payment receipt/screenshot on WhatsApp, after receiving payment, we will confirm your booking.',
     '',
@@ -1500,7 +1810,17 @@ function buildDefaultReviewMessage(language, context) {
   ].join('\n');
 }
 
+function formatAmountInr(value) {
+  const amount = Number(value);
+  if (!Number.isFinite(amount) || amount <= 0) {
+    return '-';
+  }
+
+  return amount.toLocaleString('en-IN');
+}
+
 function onReviewQrInputChange(event) {
+  const modeConfig = getReviewModeConfig(reviewMode);
   const input = event && event.target ? event.target : null;
   const file = input && input.files && input.files[0] ? input.files[0] : null;
   const preview = document.getElementById('reviewQrPreview');
@@ -1511,22 +1831,27 @@ function onReviewQrInputChange(event) {
   preview.style.display = 'none';
   preview.src = '';
 
+  if (!modeConfig.requiresQr) {
+    meta.textContent = modeConfig.qrMeta;
+    return;
+  }
+
   if (!file) {
-    meta.textContent = 'Please upload the QR image to send with this WhatsApp message.';
+    meta.textContent = modeConfig.qrMeta;
     return;
   }
 
   if (!/^image\//.test(file.type || '')) {
     setReviewModalError('Please select an image file for the QR code.');
     input.value = '';
-    meta.textContent = 'Please upload the QR image to send with this WhatsApp message.';
+    meta.textContent = modeConfig.qrMeta;
     return;
   }
 
   if (file.size > 4 * 1024 * 1024) {
     setReviewModalError('QR image must be 4MB or smaller.');
     input.value = '';
-    meta.textContent = 'Please upload the QR image to send with this WhatsApp message.';
+    meta.textContent = modeConfig.qrMeta;
     return;
   }
 
@@ -1547,7 +1872,7 @@ function onReviewQrInputChange(event) {
 
   reader.onerror = function () {
     setReviewModalError('Could not read QR image. Please try again.');
-    meta.textContent = 'Please upload the QR image to send with this WhatsApp message.';
+    meta.textContent = modeConfig.qrMeta;
   };
 
   reader.readAsDataURL(file);
@@ -1569,8 +1894,15 @@ async function submitReviewTransition() {
     return;
   }
 
-  if (!reviewQrDataUrl) {
-    setReviewModalError('Please upload the QR code image.');
+  const modeConfig = getReviewModeConfig(reviewMode);
+  if (modeConfig.requiresQr && !reviewQrDataUrl) {
+    setReviewModalError(modeConfig.missingQrError || 'Please upload the QR code image.');
+    return;
+  }
+
+  const paymentAck = document.getElementById('reviewPaymentAck');
+  if (modeConfig.requiresPaymentAck && (!paymentAck || !paymentAck.checked)) {
+    setReviewModalError(modeConfig.paymentRequiredError || 'Please confirm payment receipt before proceeding.');
     return;
   }
 
@@ -1578,25 +1910,34 @@ async function submitReviewTransition() {
   const customMessage = String(document.getElementById('reviewMessage').value || '').trim();
   const submitBtn = document.getElementById('reviewSubmitBtn');
   submitBtn.disabled = true;
-  submitBtn.textContent = 'Sending...';
+  submitBtn.textContent = modeConfig.sendingText;
   setReviewModalError('');
   setReviewModalStatus('');
 
   try {
+    const payload = {
+      id_token: adminCredential,
+      selectedDate: reviewContext.selectedDate,
+      bookingRef: reviewContext.bookingRef,
+      phone: phone,
+      language: language,
+      customMessage: customMessage
+    };
+
+    if (modeConfig.action === 'admin-transition-reviewed') {
+      payload.action = 'admin-transition-reviewed';
+      payload.qrImageDataUrl = reviewQrDataUrl;
+      payload.qrFileName = reviewQrFileName;
+    } else {
+      payload.action = 'admin-transition-status';
+      payload.targetStatus = modeConfig.targetStatus;
+      payload.paymentReceived = modeConfig.requiresPaymentAck ? true : false;
+    }
+
     const response = await fetch(webhookUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
-      body: JSON.stringify({
-        action: 'admin-transition-reviewed',
-        id_token: adminCredential,
-        selectedDate: reviewContext.selectedDate,
-        bookingRef: reviewContext.bookingRef,
-        phone: phone,
-        language: language,
-        customMessage: customMessage,
-        qrImageDataUrl: reviewQrDataUrl,
-        qrFileName: reviewQrFileName
-      }),
+      body: JSON.stringify(payload),
       cache: 'no-store'
     });
 
@@ -1608,26 +1949,20 @@ async function submitReviewTransition() {
     if (!data.ok) {
       setReviewModalError(formatTransitionError(data));
       submitBtn.disabled = false;
-      submitBtn.textContent = 'Send WhatsApp & Mark Reviewed';
+      submitBtn.textContent = modeConfig.submitText;
       return;
     }
 
-    const transition = data && data.transition ? data.transition : {};
-    const whatsapp = transition && transition.whatsapp ? transition.whatsapp : {};
+    setReviewModalStatus(modeConfig.successText);
 
-    // Show simple success message
-    setReviewModalStatus('✓ Booking transitioned to Reviewed and WhatsApp message sent successfully.');
-
-    // Disable button after successful transition (prevent multiple submissions)
     submitBtn.disabled = true;
-    submitBtn.textContent = 'Transition Complete ✓';
+    submitBtn.textContent = modeConfig.completedText;
 
-    // Keep modal open - don't auto-close
-    // loadBookings(true);
+    reviewRefreshPending = true;
   } catch (error) {
     setReviewModalError('Transition failed: ' + String(error.message || 'Unknown error.'));
     submitBtn.disabled = false;
-    submitBtn.textContent = 'Send WhatsApp & Mark Reviewed';
+    submitBtn.textContent = modeConfig.submitText;
   }
 }
 
@@ -1639,13 +1974,30 @@ function formatTransitionError(data) {
     return 'Session expired. Please sign in again.';
   }
 
-  if (code === 'INVALID_TRANSITION' && data.currentStatus) {
-    return 'This booking is currently ' + data.currentStatus + '. Refresh and try a Submitted booking.';
+  if (code === 'INVALID_TRANSITION') {
+    const currentStatus = String(data && data.currentStatus || '').trim();
+    const targetStatus = String(data && data.targetStatus || '').trim();
+    if (currentStatus && targetStatus) {
+      return 'This booking is currently ' + currentStatus + '. It cannot be moved to ' + targetStatus + '.';
+    }
+
+    if (currentStatus) {
+      return 'This booking is currently ' + currentStatus + '. Refresh and try a valid transition.';
+    }
+
+    return String(data && data.error || 'This transition is not allowed.');
+  }
+
+  if (code === 'PAYMENT_CONFIRMATION_REQUIRED') {
+    return data && data.error
+      ? String(data.error)
+      : 'Please confirm payment receipt before marking as Confirmed.';
   }
 
   if (code === 'WHATSAPP_SEND_FAILED') {
     const reason = data.whatsappReason ? ' (' + data.whatsappReason + ')' : '';
-    return 'WhatsApp send failed' + reason + '. Verify WhatsApp token, phone number ID, and QR image.';
+    const modeConfig = getReviewModeConfig(reviewMode);
+    return 'WhatsApp send failed' + reason + '. ' + modeConfig.whatsappHelp;
   }
 
   if (code === 'INVALID_QR_IMAGE') {

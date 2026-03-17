@@ -11,6 +11,7 @@ const ADMIN_ALLOWED_EMAIL_KEY = 'ADMIN_ALLOWED_EMAIL';
 const BOOKING_STATUS_SUBMITTED = 'Submitted';
 const BOOKING_STATUS_REVIEWED = 'Reviewed';
 const BOOKING_STATUS_CONFIRMED = 'Confirmed';
+const BOOKING_STATUS_CANCELLED = 'Cancelled';
 
 // Column positions in date sheets (1-indexed, for use with the Sheets API).
 const BOOKING_COL_SEVA_DATE = 3;
@@ -91,6 +92,16 @@ function doPost(e) {
       const request = normalizeAdminReviewedTransitionRequest_(payload);
       const spreadsheet = SpreadsheetApp.openById(getSpreadsheetId_());
       const transition = transitionBookingToReviewed_(spreadsheet, request);
+      return jsonResponse_({ ok: true, email: tokenData.email, transition: transition });
+    }
+
+    // Admin: transition booking status with WhatsApp notify.
+    if (payload && payload.action === 'admin-transition-status') {
+      const idToken = String(payload.id_token || '').trim();
+      const tokenData = verifyAdminToken_(idToken);
+      const request = normalizeAdminStatusTransitionRequest_(payload);
+      const spreadsheet = SpreadsheetApp.openById(getSpreadsheetId_());
+      const transition = transitionBookingToStatus_(spreadsheet, request);
       return jsonResponse_({ ok: true, email: tokenData.email, transition: transition });
     }
 
@@ -311,6 +322,76 @@ function normalizeAdminReviewedTransitionRequest_(payload) {
   };
 }
 
+function normalizeAdminStatusTransitionRequest_(payload) {
+  const selectedDate = String(payload && payload.selectedDate || '').trim();
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(selectedDate)) {
+    throw createBookingError_('INVALID_ADMIN_REQUEST', 'selectedDate must be in YYYY-MM-DD format.');
+  }
+
+  const bookingRef = String(payload && payload.bookingRef || '').trim();
+  if (!bookingRef) {
+    throw createBookingError_('INVALID_ADMIN_REQUEST', 'bookingRef is required.');
+  }
+
+  const targetStatus = normalizeAdminTargetStatus_(payload && payload.targetStatus);
+  if (!targetStatus) {
+    throw createBookingError_('INVALID_ADMIN_REQUEST', 'targetStatus must be Confirmed or Cancelled.');
+  }
+
+  const languageRaw = String(payload && payload.language || 'en').trim().toLowerCase();
+  const language = languageRaw === 'te' ? 'te' : 'en';
+
+  const phone = String(payload && payload.phone || '').trim();
+  const customMessage = String(payload && payload.customMessage || '').trim();
+  const paymentReceived = normalizeBoolean_(payload && payload.paymentReceived);
+
+  return {
+    selectedDate,
+    bookingRef,
+    targetStatus,
+    language,
+    phone,
+    customMessage,
+    paymentReceived
+  };
+}
+
+function normalizeAdminTargetStatus_(status) {
+  const normalized = String(status || '').trim().toLowerCase();
+  if (normalized === 'confirmed') {
+    return BOOKING_STATUS_CONFIRMED;
+  }
+
+  if (normalized === 'cancelled' || normalized === 'canceled') {
+    return BOOKING_STATUS_CANCELLED;
+  }
+
+  return '';
+}
+
+function normalizeBoolean_(value) {
+  if (typeof value === 'boolean') {
+    return value;
+  }
+
+  if (typeof value === 'number') {
+    return value !== 0;
+  }
+
+  if (typeof value === 'string') {
+    const normalized = value.trim().toLowerCase();
+    if (normalized === 'true' || normalized === '1' || normalized === 'yes') {
+      return true;
+    }
+
+    if (normalized === 'false' || normalized === '0' || normalized === 'no') {
+      return false;
+    }
+  }
+
+  return false;
+}
+
 function transitionBookingToReviewed_(spreadsheet, request) {
   const lock = LockService.getScriptLock();
   lock.waitLock(20000);
@@ -382,6 +463,113 @@ function transitionBookingToReviewed_(spreadsheet, request) {
   } finally {
     lock.releaseLock();
   }
+}
+
+function transitionBookingToStatus_(spreadsheet, request) {
+  const lock = LockService.getScriptLock();
+  lock.waitLock(20000);
+
+  try {
+    const sheet = spreadsheet.getSheetByName(request.selectedDate);
+    if (!sheet || sheet.getLastRow() < 2) {
+      throw createBookingError_('BOOKING_NOT_FOUND', 'Booking could not be found for the selected date.');
+    }
+
+    const rowIndex = findBookingRowByRef_(sheet, request.bookingRef);
+    if (rowIndex < 2) {
+      throw createBookingError_('BOOKING_NOT_FOUND', 'Booking reference not found: ' + request.bookingRef);
+    }
+
+    const row = sheet.getRange(rowIndex, 1, 1, BOOKING_HEADERS.length).getValues()[0];
+    const currentStatus = String(row[BOOKING_COL_STATUS - 1] || BOOKING_STATUS_SUBMITTED).trim() || BOOKING_STATUS_SUBMITTED;
+
+    validateAdminStatusTransition_(currentStatus, request.targetStatus, request.paymentReceived);
+
+    const bookingData = {
+      sevaDate: String(row[BOOKING_COL_SEVA_DATE - 1] || request.selectedDate).trim(),
+      sevaName: String(row[BOOKING_COL_SEVA_NAME - 1] || '').trim(),
+      devoteeName: String(row[BOOKING_COL_DEVOTEE_NAME - 1] || '').trim(),
+      bookingRef: String(row[BOOKING_COL_BOOKING_REF - 1] || request.bookingRef).trim()
+    };
+
+    const toPhone = toWhatsappRecipient_(request.phone || String(row[BOOKING_COL_PHONE - 1] || ''));
+    if (!toPhone) {
+      throw createBookingError_('INVALID_PHONE', 'Devotee phone number is required to send WhatsApp message.');
+    }
+
+    const whatsapp = sendAdminStatusTransitionWhatsapp_({
+      phone: toPhone,
+      booking: bookingData,
+      targetStatus: request.targetStatus,
+      language: request.language,
+      customMessage: request.customMessage
+    });
+
+    if (!whatsapp.sent) {
+      const whatsappReason = String(whatsapp.reason || 'unknown');
+      const whatsappBody = summarizeWhatsappError_(whatsapp.body);
+      throw createBookingError_(
+        'WHATSAPP_SEND_FAILED',
+        'Failed to send WhatsApp status message.',
+        {
+          whatsappReason: whatsappBody
+            ? (whatsappReason + ' | ' + whatsappBody)
+            : whatsappReason,
+          targetStatus: request.targetStatus,
+          currentStatus: currentStatus
+        }
+      );
+    }
+
+    sheet.getRange(rowIndex, BOOKING_COL_STATUS).setValue(request.targetStatus);
+
+    return {
+      updated: true,
+      selectedDate: request.selectedDate,
+      bookingRef: bookingData.bookingRef,
+      fromStatus: currentStatus,
+      status: request.targetStatus,
+      whatsapp: whatsapp
+    };
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+function validateAdminStatusTransition_(currentStatus, targetStatus, paymentReceived) {
+  if (targetStatus === BOOKING_STATUS_CONFIRMED) {
+    if (currentStatus !== BOOKING_STATUS_REVIEWED) {
+      throw createBookingError_(
+        'INVALID_TRANSITION',
+        'Only Reviewed bookings can be moved to Confirmed.',
+        { currentStatus: currentStatus, targetStatus: targetStatus }
+      );
+    }
+
+    if (!paymentReceived) {
+      throw createBookingError_(
+        'PAYMENT_CONFIRMATION_REQUIRED',
+        'Please confirm that payment has been received before marking Confirmed.',
+        { currentStatus: currentStatus, targetStatus: targetStatus }
+      );
+    }
+
+    return;
+  }
+
+  if (targetStatus === BOOKING_STATUS_CANCELLED) {
+    if (currentStatus !== BOOKING_STATUS_SUBMITTED && currentStatus !== BOOKING_STATUS_REVIEWED) {
+      throw createBookingError_(
+        'INVALID_TRANSITION',
+        'Only Submitted or Reviewed bookings can be moved to Cancelled.',
+        { currentStatus: currentStatus, targetStatus: targetStatus }
+      );
+    }
+
+    return;
+  }
+
+  throw createBookingError_('INVALID_ADMIN_REQUEST', 'Unsupported target status: ' + targetStatus);
 }
 
 function findBookingRowByRef_(sheet, bookingRef) {
@@ -667,6 +855,97 @@ function sendReviewedTransitionWhatsapp_(options) {
   };
 }
 
+function sendAdminStatusTransitionWhatsapp_(options) {
+  const token = getWhatsappCloudToken_();
+  const phoneNumberId = getWhatsappPhoneNumberId_();
+  const toNumber = toWhatsappRecipient_(options && options.phone);
+
+  if (!token || !phoneNumberId) {
+    const missing = [];
+    if (!token) {
+      missing.push('token');
+    }
+    if (!phoneNumberId) {
+      missing.push('phone-number-id');
+    }
+
+    return {
+      sent: false,
+      reason: 'whatsapp-not-configured:' + missing.join(',')
+    };
+  }
+
+  if (!toNumber) {
+    return {
+      sent: false,
+      reason: 'whatsapp-invalid-to-number'
+    };
+  }
+
+  const endpoint = 'https://graph.facebook.com/v22.0/' + encodeURIComponent(phoneNumberId) + '/messages';
+  const payload = {
+    messaging_product: 'whatsapp',
+    to: toNumber,
+    type: 'text',
+    text: {
+      body: buildAdminStatusTransitionMessage_(
+        options.booking,
+        options.targetStatus,
+        options.language,
+        options.customMessage
+      )
+    }
+  };
+
+  const response = UrlFetchApp.fetch(endpoint, {
+    method: 'post',
+    contentType: 'application/json',
+    headers: {
+      Authorization: 'Bearer ' + token
+    },
+    payload: JSON.stringify(payload),
+    muteHttpExceptions: true
+  });
+
+  const status = response.getResponseCode();
+  const responseBody = response.getContentText();
+  const sendMeta = parseWhatsappSendResponse_(responseBody);
+
+  if (status >= 200 && status < 300 && sendMeta.errorMessage) {
+    return {
+      sent: false,
+      reason: 'whatsapp-http-' + status,
+      body: sendMeta.raw,
+      to: toNumber,
+      messageId: sendMeta.messageId,
+      messageStatus: sendMeta.messageStatus,
+      waId: sendMeta.waId
+    };
+  }
+
+  if (status >= 200 && status < 300) {
+    return {
+      sent: true,
+      status: status,
+      to: toNumber,
+      messageId: sendMeta.messageId,
+      messageStatus: sendMeta.messageStatus,
+      waId: sendMeta.waId,
+      body: sendMeta.raw
+    };
+  }
+
+  return {
+    sent: false,
+    reason: 'whatsapp-http-' + status,
+    body: sendMeta.raw,
+    to: toNumber,
+    messageId: sendMeta.messageId,
+    messageStatus: sendMeta.messageStatus,
+    waId: sendMeta.waId
+  };
+}
+
 function uploadWhatsappImageMedia_(phoneNumberId, token, imageBlob) {
   if (!imageBlob) {
     return {
@@ -749,14 +1028,110 @@ function buildReviewedTransitionMessage_(booking, language, customMessage) {
   const devotee = booking && booking.devoteeName ? booking.devoteeName : '-';
   const extra = String(customMessage || '').trim();
 
-  const lines = [];
-
   if (extra) {
-    lines.push(extra);
+    return extra.length > 1000 ? extra.slice(0, 1000) : extra;
   }
+
+  const lines = language === 'te'
+    ? [
+      'నమస్తే ' + devotee + ',',
+      '',
+      'మీ సేవ బుకింగ్ అభ్యర్థన పరిశీలించబడింది.',
+      'బుకింగ్ రిఫరెన్స్: ' + ref,
+      'సేవ తేదీ: ' + sevaDate,
+      'సేవ: ' + seva,
+      '',
+      'జత చేసిన QR కోడ్ ద్వారా సేవ రుసుము చెల్లించి రసీదు పంపించండి.',
+      '',
+      '*శ్రీ వరధాంజనేయ స్వామి ఆశీస్సులతో.*'
+    ]
+    : [
+      'Namaste ' + devotee + ',',
+      '',
+      'Your seva booking request has been reviewed.',
+      'Booking Reference: ' + ref,
+      'Seva Date: ' + sevaDate,
+      'Seva: ' + seva,
+      '',
+      'Please complete payment using the attached QR code and share payment receipt.',
+      '',
+      '*With blessings of Sri Varadhanjaneya Swamy.*'
+    ];
 
   const caption = lines.join('\n');
   return caption.length > 1000 ? caption.slice(0, 1000) : caption;
+}
+
+function buildAdminStatusTransitionMessage_(booking, targetStatus, language, customMessage) {
+  const extra = String(customMessage || '').trim();
+  if (extra) {
+    return extra.length > 1800 ? extra.slice(0, 1800) : extra;
+  }
+
+  const ref = booking && booking.bookingRef ? booking.bookingRef : '-';
+  const sevaDate = booking && booking.sevaDate ? booking.sevaDate : '-';
+  const seva = booking && booking.sevaName ? booking.sevaName : '-';
+  const devotee = booking && booking.devoteeName ? booking.devoteeName : '-';
+
+  let lines;
+  if (targetStatus === BOOKING_STATUS_CONFIRMED) {
+    lines = language === 'te'
+      ? [
+        'నమస్తే ' + devotee + ',',
+        '',
+        'మీ చెల్లింపు స్వీకరించాం.',
+        'బుకింగ్ రిఫరెన్స్: ' + ref,
+        'సేవ తేదీ: ' + sevaDate,
+        'సేవ: ' + seva,
+        '',
+        '*మీ సేవ బుకింగ్ ధృవీకరించబడింది.*',
+        'దయచేసి ఆలయ దర్శనానికి ఈ రిఫరెన్స్‌ను తీసుకురండి.',
+        '',
+        'జై శ్రీరామ్'
+      ]
+      : [
+        'Namaste ' + devotee + ',',
+        '',
+        'We have received your payment.',
+        'Booking Reference: ' + ref,
+        'Seva Date: ' + sevaDate,
+        'Seva: ' + seva,
+        '',
+        '*Your seva booking is now confirmed.*',
+        'Please carry this booking reference when you visit the temple.',
+        '',
+        'Jai Sri Ram'
+      ];
+  } else {
+    lines = language === 'te'
+      ? [
+        'నమస్తే ' + devotee + ',',
+        '',
+        'మీ సేవ బుకింగ్ రద్దు చేయబడింది.',
+        'బుకింగ్ రిఫరెన్స్: ' + ref,
+        'సేవ తేదీ: ' + sevaDate,
+        'సేవ: ' + seva,
+        '',
+        'ఏవైనా సందేహాలు ఉంటే ఆలయాన్ని సంప్రదించండి.',
+        '',
+        'ధన్యవాదాలు'
+      ]
+      : [
+        'Namaste ' + devotee + ',',
+        '',
+        'Your seva booking has been cancelled.',
+        'Booking Reference: ' + ref,
+        'Seva Date: ' + sevaDate,
+        'Seva: ' + seva,
+        '',
+        'For any questions, please contact the temple office.',
+        '',
+        'Thank you'
+      ];
+  }
+
+  const message = lines.join('\n');
+  return message.length > 1800 ? message.slice(0, 1800) : message;
 }
 
 function normalizeAvailabilityRequest_(params) {
@@ -1110,6 +1485,10 @@ function bookingErrorResponse_(error) {
 
   if (error && error.currentStatus) {
     payload.currentStatus = String(error.currentStatus);
+  }
+
+  if (error && error.targetStatus) {
+    payload.targetStatus = String(error.targetStatus);
   }
 
   if (error && error.whatsappReason) {

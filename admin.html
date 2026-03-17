@@ -903,10 +903,63 @@
     cursor: not-allowed;
   }
 
+  .btn-modal-close:disabled,
+  .btn-modal-cancel:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
   .modal-note {
     color: var(--muted);
     font-size: 0.8rem;
     line-height: 1.45;
+    padding: 0.12rem 0.18rem;
+    border-radius: 8px;
+    transform-origin: left center;
+    transition: color 0.2s, background 0.2s, border-color 0.2s;
+  }
+
+  .modal-note.is-warning {
+    color: #9c2618;
+    background: rgba(176, 51, 33, 0.1);
+    border: 1px solid rgba(176, 51, 33, 0.24);
+    font-weight: 600;
+  }
+
+  .modal-note.is-animating {
+    animation: modal-note-reveal 0.3s ease-out, modal-note-soft-blink 2.8s ease-in-out infinite;
+  }
+
+  .modal-note.is-warning.is-animating {
+    animation: modal-note-reveal 0.24s ease-out, modal-note-soft-blink 2.8s ease-in-out infinite;
+  }
+
+  @keyframes modal-note-reveal {
+    from {
+      opacity: 0;
+      transform: translateY(4px) scale(0.995);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  @keyframes modal-note-soft-blink {
+    from {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+
+    50% {
+      opacity: 0.58;
+      transform: translateY(0) scale(0.995);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
   }
 
   .modal-status {
@@ -1123,43 +1176,43 @@
 <div id="reviewModal" class="modal-overlay" aria-hidden="true">
   <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="reviewModalTitle">
     <div class="modal-head">
-      <h3 id="reviewModalTitle">Submitted -&gt; Reviewed</h3>
-      <button type="button" class="btn-modal-close" id="reviewCloseBtn" aria-label="మూసివేయి">&times;</button>
+      <h3 id="reviewModalTitle"></h3>
+      <button type="button" class="btn-modal-close" id="reviewCloseBtn" aria-label="">&times;</button>
     </div>
     <div class="modal-body">
       <div class="modal-grid">
         <div class="field">
-          <label for="reviewPhone" id="reviewLabelPhone"><span class="wa-icon wa-icon-small" aria-hidden="true"></span> <span id="reviewLabelPhoneText">వాట్సాప్ నంబర్</span></label>
-          <input id="reviewPhone" type="text" inputmode="tel" placeholder="బుకింగ్ నుండి ఆటో-ఫిల్ అవుతుంది" readonly disabled />
+          <label for="reviewPhone" id="reviewLabelPhone"><span class="wa-icon wa-icon-small" aria-hidden="true"></span> <span id="reviewLabelPhoneText"></span></label>
+          <input id="reviewPhone" type="text" inputmode="tel" placeholder="" readonly disabled />
         </div>
       </div>
 
       <div class="field">
-        <label for="reviewMessage" id="reviewLabelTextMessage">టెక్స్ట్ సందేశం</label>
-        <textarea id="reviewMessage" placeholder="Optional additional note for the devotee"></textarea>
+        <label for="reviewMessage" id="reviewLabelTextMessage"></label>
+        <textarea id="reviewMessage" placeholder=""></textarea>
       </div>
 
       <div class="field" id="reviewQrSection">
-        <label for="reviewQrInput" id="reviewLabelQrCode">QR కోడ్ చిత్రం</label>
+        <label for="reviewQrInput" id="reviewLabelQrCode"></label>
         <input id="reviewQrInput" type="file" accept="image/*" />
-        <div id="reviewQrMeta" class="qr-meta">ఈ వాట్సాప్ సందేశంతో పంపడానికి QR చిత్రం అప్లోడ్ చేయండి.</div>
+        <div id="reviewQrMeta" class="qr-meta"></div>
         <img id="reviewQrPreview" class="qr-preview" alt="QR preview" />
       </div>
 
       <div id="reviewPaymentWrap" class="modal-check" style="display:none">
         <label for="reviewPaymentAck">
           <input id="reviewPaymentAck" type="checkbox" />
-          <span id="reviewPaymentAckText">ఈ బుకింగ్‌కు చెల్లింపు రసీదు వచ్చినట్లు ధృవీకరిస్తున్నాను.</span>
+          <span id="reviewPaymentAckText"></span>
         </label>
       </div>
 
       <div id="reviewModalError" class="alert alert-error" role="alert"></div>
       <div id="reviewModalStatus" class="modal-status" role="status"></div>
-      <div id="reviewModalNote" class="modal-note">సబ్మిట్ చేసిన వెంటనే QRతో వాట్సాప్ పంపి స్టేటస్‌ను Reviewed కు అప్డేట్ చేస్తుంది.</div>
+      <div id="reviewModalNote" class="modal-note"></div>
 
       <div class="modal-actions">
-        <button type="button" class="btn-modal-cancel" id="reviewCancelBtn">మూసివేయి</button>
-        <button type="button" class="btn-modal-submit" id="reviewSubmitBtn">వాట్సాప్ పంపి Reviewed గా మార్చు</button>
+        <button type="button" class="btn-modal-cancel" id="reviewCancelBtn"></button>
+        <button type="button" class="btn-modal-submit" id="reviewSubmitBtn"></button>
       </div>
     </div>
   </div>
@@ -1263,33 +1316,8 @@ const DEFAULT_ADMIN_CONTENT = {
         close: 'మూసివేయి',
         sending: 'పంపిస్తోంది...',
         completed: 'ట్రాన్సిషన్ పూర్తయింది ✓',
-        refundLineConfirmedCancellation: 'చెల్లించిన మొత్తం తదుపరి 5 రోజుల్లో తిరిగి చెల్లించబడుతుంది.',
-        selectedFilePrefix: 'ఎంచుకున్నది:',
-        mode: {
-          reviewed: {
-            title: 'Submitted -> Reviewed',
-            submit: 'వాట్సాప్ పంపి Reviewed గా మార్చు',
-            success: '✓ బుకింగ్ Reviewed కి మార్చబడింది, వాట్సాప్ సందేశం విజయవంతంగా పంపబడింది.',
-            note: 'సబ్మిట్ చేసిన వెంటనే QRతో వాట్సాప్ పంపి స్టేటస్‌ను Reviewed కు అప్డేట్ చేస్తుంది.',
-            whatsappHelp: 'వాట్సాప్ టోకెన్, ఫోన్ నంబర్ ID, QR చిత్రం సరిచూడండి.',
-            missingQr: 'దయచేసి QR కోడ్ చిత్రం అప్లోడ్ చేయండి.'
-          },
-          confirmed: {
-            title: 'Reviewed -> Confirmed',
-            submit: 'వాట్సాప్ పంపి Confirmed గా మార్చు',
-            success: '✓ బుకింగ్ Confirmed కి మార్చబడింది, తుది వాట్సాప్ సందేశం విజయవంతంగా పంపబడింది.',
-            note: 'చెల్లింపు రసీదు వచ్చిన తర్వాత మాత్రమే Confirm చేయండి. ఇది తుది ధృవీకరణ వాట్సాప్ పంపుతుంది.',
-            whatsappHelp: 'వాట్సాప్ టోకెన్ మరియు ఫోన్ నంబర్ ID సరిచూడండి.',
-            paymentRequired: 'Confirmed గా మార్చే ముందు చెల్లింపు రసీదు ధృవీకరించండి.'
-          },
-          cancelled: {
-            title: 'బుకింగ్‌ను Cancelled గా మార్చు',
-            submit: 'వాట్సాప్ పంపి Cancelled గా మార్చు',
-            success: '✓ బుకింగ్ Cancelled కి మార్చబడింది, వాట్సాప్ సందేశం విజయవంతంగా పంపబడింది.',
-            note: 'ఇది రద్దు సమాచారం వాట్సాప్‌లో పంపి స్టేటస్‌ను Cancelled కి మార్చుతుంది. Confirmed బుకింగ్‌లు సేవ సమయానికి 14 గంటల ముందు మాత్రమే రద్దు చేయవచ్చు.',
-            whatsappHelp: 'వాట్సాప్ టోకెన్ మరియు ఫోన్ నంబర్ ID సరిచూడండి.'
-          }
-        }
+        refundLineConfirmedCancellation: 'చెల్లించిన మొత్తం {paymentAmount} తదుపరి 5 రోజుల్లో తిరిగి చెల్లించబడుతుంది.',
+        selectedFilePrefix: 'ఎంచుకున్నది:'
       },
       errors: {
         webhookNotConfigured: 'Webhook URL <code>assets/data/content.json</code> లో కాన్ఫిగర్ కాలేదు.',
@@ -1390,33 +1418,8 @@ const DEFAULT_ADMIN_CONTENT = {
         close: 'Close',
         sending: 'Sending...',
         completed: 'Transition Complete ✓',
-        refundLineConfirmedCancellation: 'Amount paid will be refunded in next 5 days.',
-        selectedFilePrefix: 'Selected:',
-        mode: {
-          reviewed: {
-            title: 'Submitted -> Reviewed',
-            submit: 'Send WhatsApp & Mark Reviewed',
-            success: '✓ Booking transitioned to Reviewed and WhatsApp message sent successfully.',
-            note: 'When submitted, this sends WhatsApp with booking reference + uploaded QR image and updates status to Reviewed.',
-            whatsappHelp: 'Verify WhatsApp token, phone number ID, and QR image.',
-            missingQr: 'Please upload the QR code image.'
-          },
-          confirmed: {
-            title: 'Reviewed -> Confirmed',
-            submit: 'Send WhatsApp & Mark Confirmed',
-            success: '✓ Booking transitioned to Confirmed and final WhatsApp message sent successfully.',
-            note: 'Confirm only after payment receipt is received. This sends final confirmation on WhatsApp.',
-            whatsappHelp: 'Verify WhatsApp token and phone number ID.',
-            paymentRequired: 'Please confirm payment receipt before marking as Confirmed.'
-          },
-          cancelled: {
-            title: 'Mark Booking as Cancelled',
-            submit: 'Send WhatsApp & Mark Cancelled',
-            success: '✓ Booking transitioned to Cancelled and WhatsApp message sent successfully.',
-            note: 'This sends cancellation information on WhatsApp and updates booking status to Cancelled. Confirmed bookings can be cancelled only when seva time is more than 14 hours away.',
-            whatsappHelp: 'Verify WhatsApp token and phone number ID.'
-          }
-        }
+        refundLineConfirmedCancellation: 'Amount paid {paymentAmount} will be refunded in next 5 days.',
+        selectedFilePrefix: 'Selected:'
       },
       errors: {
         webhookNotConfigured: 'Webhook URL not configured in <code>assets/data/content.json</code>.',
@@ -1440,106 +1443,6 @@ const DEFAULT_ADMIN_CONTENT = {
         transitionFailedPrefix: 'Transition failed:'
       }
     }
-  },
-  modalTemplates: {
-    reviewed: {
-      telugu: [
-        'నమస్తే, *{devoteeName}*,',
-        '',
-        'మేము మీ సేవ * {sevaName}* బుకింగ్ అభ్యర్థనను పరిశీలించాము.',
-        '',
-        'బుకింగ్ రిఫరెన్స్: {bookingRef}',
-        'సేవ తేదీ: {sevaDate}',
-        '',
-        '*_దయచేసి జత చేసిన QR కోడ్ ద్వారా సేవ రుసుము: {paymentAmount} చెల్లింపు పూర్తి చేయండి._*',
-        '',
-        'చెల్లింపు పూర్తయ్యాక, మేము మీ బుకింగ్‌ను ధృవీకరిస్తాము.',
-        '',
-        '🙏 *జై శ్రీరామ్* 🙏',
-        '*ధన్యవాదాలు మీ భక్తి మరియు శ్రీ వరధాంజనేయ స్వామి ఆలయానికి మద్దతుకు.*'
-      ],
-      english: [
-        'Namaste, *{devoteeName}*,',
-        '',
-        'We are pleased to inform you that your seva * {sevaName}* booking request has been reviewed.',
-        '',
-        'Booking reference: {bookingRef}',
-        'Seva Date: {sevaDate}',
-        '',
-        '*_Please complete seva payment of {paymentAmount} using the attached QR code._*',
-        '',
-        'Share payment receipt/screenshot on WhatsApp, after receiving payment, we will confirm your booking.',
-        '',
-        '🙏 *Jai Sri Ram* 🙏',
-        '*Thank you for your devotion and support to Sri Varadhanjaneya Swamy Temple.*'
-      ]
-    },
-    confirmed: {
-      telugu: [
-        'నమస్తే, *{devoteeName}*,',
-        '',
-        'మీ సేవ బుకింగ్ చెల్లింపును మేము స్వీకరించాము.',
-        '',
-        'బుకింగ్ రిఫరెన్స్: {bookingRef}',
-        'సేవ తేదీ: {sevaDate}',
-        'సేవ: {sevaName}',
-        '',
-        '*మీ బుకింగ్ ఇప్పుడు ధృవీకరించబడింది.*',
-        'ఆలయానికి వచ్చినప్పుడు బుకింగ్ రిఫరెన్స్ చూపించండి.',
-        '',
-        '🙏 *జై శ్రీరామ్* 🙏',
-        '*ధన్యవాదాలు మీ భక్తి మరియు శ్రీ వరధాంజనేయ స్వామి ఆలయానికి మద్దతుకు.*'
-      ],
-      english: [
-        'Namaste, *{devoteeName}*,',
-        '',
-        'We have received your payment for the seva booking.',
-        '',
-        'Booking reference: {bookingRef}',
-        'Seva Date: {sevaDate}',
-        'Seva: {sevaName}',
-        '',
-        '*Your booking is now confirmed.*',
-        'Please carry this booking reference when you visit the temple.',
-        '',
-        '🙏 *Jai Sri Ram* 🙏',
-        '*Thank you for your devotion and support to Sri Varadhanjaneya Swamy Temple.*'
-      ]
-    },
-    cancelled: {
-      telugu: [
-        'నమస్తే, *{devoteeName}*,',
-        '',
-        'మీ సేవ బుకింగ్ రద్దు చేయబడింది.',
-        '',
-        'బుకింగ్ రిఫరెన్స్: {bookingRef}',
-        'సేవ తేదీ: {sevaDate}',
-        'సేవ: {sevaName}',
-        '',
-        '{refundLine}',
-        '',
-        'అనుకోని పరిస్థితుల కారణంగా, మేము మీ బుకింగ్‌ను రద్దు చేయాల్సి వచ్చింది. అసౌకర్యానికి క్షమించండి.',
-        '',
-        '🙏 *జై శ్రీరామ్* 🙏',
-        '*ధన్యవాదాలు మీ భక్తి మరియు శ్రీ వరధాంజనేయ స్వామి ఆలయానికి మద్దతుకు.*'
-      ],
-      english: [
-        'Namaste, *{devoteeName}*,',
-        '',
-        'Your seva booking has been cancelled.',
-        '',
-        'Booking reference: {bookingRef}',
-        'Seva Date: {sevaDate}',
-        'Seva: {sevaName}',
-        '',
-        '{refundLine}',
-        '',
-        'Due to unforeseen circumstances, we had to cancel your booking. Sorry for the inconvenience caused.',
-        '',
-        '🙏 *Jai Sri Ram* 🙏',
-        '*Thank you for your devotion and support to Sri Varadhanjaneya Swamy Temple.*'
-      ]
-    }
   }
 };
 
@@ -1554,6 +1457,7 @@ let reviewQrDataUrl = '';
 let reviewQrFileName = '';
 let reviewWired     = false;
 let reviewRefreshPending = false;
+let reviewSubmitInProgress = false;
 let adminLoaderMode = 'open';
 let adminLoaderCountdownValue = 3;
 let adminLoaderTimer = 0;
@@ -1639,29 +1543,84 @@ function normalizeAdminContent_(incoming) {
   return deepMergeObjects_(DEFAULT_ADMIN_CONTENT, incoming && typeof incoming === 'object' ? incoming : {});
 }
 
-function deepMergeObjects_(base, incoming) {
-  if (!base || typeof base !== 'object' || Array.isArray(base)) {
-    return incoming;
+function cloneAdminContentValue_(value) {
+  if (Array.isArray(value)) {
+    return value.map(cloneAdminContentValue_);
   }
 
-  const result = Array.isArray(base) ? [] : {};
+  if (value && typeof value === 'object') {
+    const clone = {};
+    Object.keys(value).forEach(function (key) {
+      clone[key] = cloneAdminContentValue_(value[key]);
+    });
+    return clone;
+  }
+
+  return value;
+}
+
+function deepMergeObjects_(base, incoming) {
+  const baseIsObject = !!base && typeof base === 'object' && !Array.isArray(base);
+  const incomingIsObject = !!incoming && typeof incoming === 'object' && !Array.isArray(incoming);
+
+  if (Array.isArray(base)) {
+    return Array.isArray(incoming)
+      ? incoming.map(cloneAdminContentValue_)
+      : base.map(cloneAdminContentValue_);
+  }
+
+  if (!baseIsObject) {
+    return incoming !== undefined
+      ? cloneAdminContentValue_(incoming)
+      : cloneAdminContentValue_(base);
+  }
+
+  const result = {};
+  const incomingObject = incomingIsObject ? incoming : {};
+  const mergedKeys = {};
+
   Object.keys(base).forEach(function (key) {
-    const baseValue = base[key];
-    const incomingValue = incoming && Object.prototype.hasOwnProperty.call(incoming, key)
-      ? incoming[key]
-      : undefined;
+    mergedKeys[key] = true;
+  });
+  Object.keys(incomingObject).forEach(function (key) {
+    mergedKeys[key] = true;
+  });
 
-    if (Array.isArray(baseValue)) {
-      result[key] = Array.isArray(incomingValue) ? incomingValue : baseValue;
+  Object.keys(mergedKeys).forEach(function (key) {
+    const hasBaseValue = Object.prototype.hasOwnProperty.call(base, key);
+    const hasIncomingValue = Object.prototype.hasOwnProperty.call(incomingObject, key);
+    const baseValue = hasBaseValue ? base[key] : undefined;
+    const incomingValue = hasIncomingValue ? incomingObject[key] : undefined;
+
+    if (Array.isArray(baseValue) || Array.isArray(incomingValue)) {
+      if (Array.isArray(incomingValue)) {
+        result[key] = incomingValue.map(cloneAdminContentValue_);
+        return;
+      }
+
+      result[key] = Array.isArray(baseValue)
+        ? baseValue.map(cloneAdminContentValue_)
+        : [];
       return;
     }
 
-    if (baseValue && typeof baseValue === 'object') {
-      result[key] = deepMergeObjects_(baseValue, incomingValue && typeof incomingValue === 'object' ? incomingValue : {});
+    const baseChildIsObject = !!baseValue && typeof baseValue === 'object';
+    const incomingChildIsObject = !!incomingValue && typeof incomingValue === 'object';
+
+    if (baseChildIsObject || incomingChildIsObject) {
+      if (baseChildIsObject && !Array.isArray(baseValue)) {
+        result[key] = deepMergeObjects_(
+          baseValue,
+          incomingChildIsObject && !Array.isArray(incomingValue) ? incomingValue : {}
+        );
+        return;
+      }
+
+      result[key] = cloneAdminContentValue_(hasIncomingValue ? incomingValue : baseValue);
       return;
     }
 
-    result[key] = incomingValue !== undefined ? incomingValue : baseValue;
+    result[key] = hasIncomingValue ? incomingValue : baseValue;
   });
 
   return result;
@@ -1721,6 +1680,160 @@ function resolveTemplateLanguage_(value) {
   return normalized === 'en' || normalized === 'english' ? 'english' : 'telugu';
 }
 
+function getDefaultReviewModeCopy_(mode, language) {
+  const normalizedMode = normalizeReviewMode(mode);
+  const langKey = resolveTemplateLanguage_(language);
+
+  if (langKey === 'telugu') {
+    const statusText = normalizedMode === 'confirmed'
+      ? 'Confirmed'
+      : (normalizedMode === 'cancelled' ? 'Cancelled' : 'Reviewed');
+    const title = normalizedMode === 'reviewed'
+      ? 'Submitted -> Reviewed'
+      : (normalizedMode === 'confirmed' ? 'Reviewed -> Confirmed' : 'బుకింగ్‌ను Cancelled గా మార్చు');
+    const noteByMode = {
+      reviewed: 'సబ్మిట్ చేసిన వెంటనే QRతో వాట్సాప్ పంపి స్టేటస్‌ను Reviewed కు అప్డేట్ చేస్తుంది.',
+      confirmed: 'చెల్లింపు రసీదు వచ్చిన తర్వాత మాత్రమే Confirm చేయండి. ఇది తుది ధృవీకరణ వాట్సాప్ పంపుతుంది.',
+      cancelled: 'ఇది రద్దు సమాచారం వాట్సాప్‌లో పంపి స్టేటస్‌ను Cancelled కి మార్చుతుంది. Confirmed సేవ బుకింగ్‌లు 14 గంటల సమయానికి ముందు మాత్రమే రద్దు చేయవచ్చు.'
+    };
+
+    return {
+      title: title,
+      submit: 'వాట్సాప్ పంపి ' + statusText + ' గా మార్చు',
+      success: '✓ బుకింగ్ ' + statusText + ' కి మార్చబడింది, వాట్సాప్ సందేశం విజయవంతంగా పంపబడింది.',
+      note: noteByMode[normalizedMode],
+      whatsappHelp: normalizedMode === 'reviewed'
+        ? 'వాట్సాప్ టోకెన్, ఫోన్ నంబర్ ID, QR చిత్రం సరిచూడండి.'
+        : 'వాట్సాప్ టోకెన్ మరియు ఫోన్ నంబర్ ID సరిచూడండి.',
+      missingQr: 'దయచేసి QR కోడ్ చిత్రం అప్లోడ్ చేయండి.',
+      paymentRequired: 'Confirmed గా మార్చే ముందు చెల్లింపు రసీదు ధృవీకరించండి.'
+    };
+  }
+
+  const englishStatusText = normalizedMode === 'confirmed'
+    ? 'Confirmed'
+    : (normalizedMode === 'cancelled' ? 'Cancelled' : 'Reviewed');
+  const englishTitle = normalizedMode === 'reviewed'
+    ? 'Submitted -> Reviewed'
+    : (normalizedMode === 'confirmed' ? 'Reviewed -> Confirmed' : 'Mark Booking as Cancelled');
+  const englishNoteByMode = {
+    reviewed: 'When submitted, this sends WhatsApp with booking reference and uploaded QR image and updates status to Reviewed.',
+    confirmed: 'Confirm only after payment receipt is received. This sends final confirmation on WhatsApp.',
+    cancelled: 'This sends cancellation information on WhatsApp and updates booking status to Cancelled. Confirmed bookings can be cancelled only when seva time is more than 14 hours away.'
+  };
+
+  return {
+    title: englishTitle,
+    submit: 'Send WhatsApp & Mark ' + englishStatusText,
+    success: '✓ Booking transitioned to ' + englishStatusText + ' and WhatsApp message sent successfully.',
+    note: englishNoteByMode[normalizedMode],
+    whatsappHelp: normalizedMode === 'reviewed'
+      ? 'Verify WhatsApp token, phone number ID, and QR image.'
+      : 'Verify WhatsApp token and phone number ID.',
+    missingQr: 'Please upload the QR code image.',
+    paymentRequired: 'Please confirm payment receipt before marking as Confirmed.'
+  };
+}
+
+function getDefaultModalTemplateLines_(mode, language) {
+  const normalizedMode = normalizeReviewMode(mode);
+  const langKey = resolveTemplateLanguage_(language);
+
+  if (langKey === 'telugu') {
+    if (normalizedMode === 'reviewed') {
+      return [
+        'నమస్తే, *{devoteeName}*,',
+        '',
+        'మీ సేవ బుకింగ్ అభ్యర్థన పరిశీలించబడింది.',
+        'బుకింగ్ రిఫరెన్స్: {bookingRef}',
+        'సేవ తేదీ: {sevaDate}',
+        'సేవ: {sevaName}',
+        '',
+        '*_దయచేసి {paymentAmount} చెల్లించి రసీదు పంపించండి._*',
+        '',
+        '🙏 *జై శ్రీరామ్* 🙏'
+      ];
+    }
+
+    if (normalizedMode === 'confirmed') {
+      return [
+        'నమస్తే, *{devoteeName}*,',
+        '',
+        'మీ చెల్లింపు స్వీకరించాము.',
+        'బుకింగ్ రిఫరెన్స్: {bookingRef}',
+        'సేవ తేదీ: {sevaDate}',
+        'సేవ: {sevaName}',
+        'చెల్లించిన రుసుము: {paymentAmount}',
+        '',
+        '*మీ బుకింగ్ ఇప్పుడు ధృవీకరించబడింది.*',
+        '',
+        '🙏 *జై శ్రీరామ్* 🙏'
+      ];
+    }
+
+    return [
+      'నమస్తే, *{devoteeName}*,',
+      '',
+      'మీ సేవ బుకింగ్ రద్దు చేయబడింది.',
+      'బుకింగ్ రిఫరెన్స్: {bookingRef}',
+      'సేవ తేదీ: {sevaDate}',
+      'సేవ: {sevaName}',
+      '',
+      '{refundLine}',
+      '',
+      'అనుకోని పరిస్థితుల కారణంగా అసౌకర్యానికి క్షమించండి.',
+      '',
+      '🙏 *జై శ్రీరామ్* 🙏'
+    ];
+  }
+
+  if (normalizedMode === 'reviewed') {
+    return [
+      'Namaste, *{devoteeName}*,',
+      '',
+      'Your seva booking request has been reviewed.',
+      'Booking reference: {bookingRef}',
+      'Seva Date: {sevaDate}',
+      'Seva: {sevaName}',
+      '',
+      '*_Please complete payment of {paymentAmount} and share the receipt._*',
+      '',
+      '🙏 *Jai Sri Ram* 🙏'
+    ];
+  }
+
+  if (normalizedMode === 'confirmed') {
+    return [
+      'Namaste, *{devoteeName}*,',
+      '',
+      'We have received your payment.',
+      'Booking reference: {bookingRef}',
+      'Seva Date: {sevaDate}',
+      'Seva: {sevaName}',
+      'Amount Paid: {paymentAmount}',
+      '',
+      '*Your booking is now confirmed.*',
+      '',
+      '🙏 *Jai Sri Ram* 🙏'
+    ];
+  }
+
+  return [
+    'Namaste, *{devoteeName}*,',
+    '',
+    'Your seva booking has been cancelled.',
+    'Booking reference: {bookingRef}',
+    'Seva Date: {sevaDate}',
+    'Seva: {sevaName}',
+    '',
+    '{refundLine}',
+    '',
+    'Sorry for the inconvenience caused.',
+    '',
+    '🙏 *Jai Sri Ram* 🙏'
+  ];
+}
+
 function getModalTemplateLines_(mode, language) {
   const normalizedMode = normalizeReviewMode(mode);
   const langKey = resolveTemplateLanguage_(language);
@@ -1736,14 +1849,7 @@ function getModalTemplateLines_(mode, language) {
     return current;
   }
 
-  const fallback = DEFAULT_ADMIN_CONTENT
-    && DEFAULT_ADMIN_CONTENT.modalTemplates
-    && DEFAULT_ADMIN_CONTENT.modalTemplates[normalizedMode]
-    && Array.isArray(DEFAULT_ADMIN_CONTENT.modalTemplates[normalizedMode][langKey])
-      ? DEFAULT_ADMIN_CONTENT.modalTemplates[normalizedMode][langKey]
-      : [];
-
-  return fallback;
+  return getDefaultModalTemplateLines_(normalizedMode, langKey);
 }
 
 function getPreferredModalLanguage_() {
@@ -2065,7 +2171,7 @@ function signOut() {
   if (typeof google !== 'undefined' && google.accounts) {
     google.accounts.id.disableAutoSelect();
   }
-  closeReviewModal();
+  closeReviewModal(true);
   adminCredential = '';
   document.getElementById('dashboardView').style.display = 'none';
   document.getElementById('authView').style.display      = 'flex';
@@ -2286,9 +2392,10 @@ function renderRow(selectedDate, r, idx) {
 function renderRowAction(selectedDate, row, statusLower) {
   const bookingRef = esc(row && row.bookingRef ? row.bookingRef : '\u2014');
   const key = row && row.bookingRef ? buildBookingKey(selectedDate, row.bookingRef) : '';
+  const currentStatus = String(statusLower || '').trim().toLowerCase();
 
   const makeButton = function (mode, title, iconClass) {
-    return '<button type="button" class="btn-row-action btn-row-' + esc(mode) + '" data-booking-key="' + esc(key) + '" data-transition-mode="' + esc(mode) + '" aria-label="' + esc(title) + '" title="' + esc(title) + '">' +
+    return '<button type="button" class="btn-row-action btn-row-' + esc(mode) + '" data-booking-key="' + esc(key) + '" data-transition-mode="' + esc(mode) + '" data-current-status="' + esc(currentStatus) + '" aria-label="' + esc(title) + '" title="' + esc(title) + '">' +
       '<span class="' + iconClass + '" aria-hidden="true"></span>' +
       '</button>';
   };
@@ -2338,7 +2445,8 @@ function bindReviewActionButtons() {
       btn.addEventListener('click', function () {
         openReviewModalByKey(
           btn.getAttribute('data-booking-key') || '',
-          btn.getAttribute('data-transition-mode') || 'reviewed'
+          btn.getAttribute('data-transition-mode') || 'reviewed',
+          btn.getAttribute('data-current-status') || ''
         );
       });
     });
@@ -2353,6 +2461,14 @@ function wireReviewModalEvents() {
   document.getElementById('reviewCloseBtn').addEventListener('click', closeReviewModal);
   document.getElementById('reviewCancelBtn').addEventListener('click', closeReviewModal);
   document.getElementById('reviewQrInput').addEventListener('change', onReviewQrInputChange);
+  document.getElementById('reviewPaymentAck').addEventListener('change', function () {
+    const modeConfig = getReviewModeConfig(reviewMode);
+    updateReviewSubmitButtonState(modeConfig);
+
+    if (modeConfig.requiresPaymentAck && document.getElementById('reviewPaymentAck').checked) {
+      setReviewModalError('');
+    }
+  });
   document.getElementById('reviewSubmitBtn').addEventListener('click', submitReviewTransition);
 
   modal.addEventListener('click', function (event) {
@@ -2385,31 +2501,85 @@ function getReviewModeConfig(mode) {
     : (normalized === 'cancelled' ? 'Cancelled' : 'Reviewed');
   const requiresQr = normalized === 'reviewed';
   const requiresPaymentAck = normalized === 'confirmed';
+  const fallbackCopy = getDefaultReviewModeCopy_(normalized, currentAdminLanguage);
 
   return {
     mode: normalized,
-    title: getAdminText(basePath + '.title'),
-    submitText: getAdminText(basePath + '.submit'),
+    title: getAdminText(basePath + '.title') || fallbackCopy.title,
+    submitText: getAdminText(basePath + '.submit') || fallbackCopy.submit,
     sendingText: getAdminText('modal.sending'),
     completedText: getAdminText('modal.completed'),
-    successText: getAdminText(basePath + '.success'),
-    note: getAdminText(basePath + '.note'),
+    successText: getAdminText(basePath + '.success') || fallbackCopy.success,
+    note: getAdminText(basePath + '.note') || fallbackCopy.note,
     action: normalized === 'reviewed' ? 'admin-transition-reviewed' : 'admin-transition-status',
     targetStatus: targetStatus,
     requiresQr: requiresQr,
     requiresPaymentAck: requiresPaymentAck,
     qrMeta: getAdminText(requiresQr ? 'modal.qrMetaRequired' : 'modal.qrMetaNotRequired'),
-    missingQrError: requiresQr ? getAdminText('modal.mode.reviewed.missingQr') : '',
-    paymentRequiredError: requiresPaymentAck ? getAdminText('modal.mode.confirmed.paymentRequired') : '',
-    whatsappHelp: getAdminText(basePath + '.whatsappHelp')
+    missingQrError: requiresQr
+      ? (getAdminText('modal.mode.reviewed.missingQr') || fallbackCopy.missingQr)
+      : '',
+    paymentRequiredError: requiresPaymentAck
+      ? (getAdminText('modal.mode.confirmed.paymentRequired') || fallbackCopy.paymentRequired)
+      : '',
+    whatsappHelp: getAdminText(basePath + '.whatsappHelp') || fallbackCopy.whatsappHelp
   };
+}
+
+function updateReviewSubmitButtonState(modeConfig) {
+  const config = modeConfig || getReviewModeConfig(reviewMode);
+  const submitBtn = document.getElementById('reviewSubmitBtn');
+  if (!submitBtn) {
+    return;
+  }
+
+  if (submitBtn.textContent === config.sendingText || submitBtn.textContent === config.completedText) {
+    return;
+  }
+
+  if (!config.requiresPaymentAck) {
+    submitBtn.disabled = false;
+    submitBtn.textContent = config.submitText;
+    return;
+  }
+
+  const paymentAck = document.getElementById('reviewPaymentAck');
+  const isChecked = Boolean(paymentAck && paymentAck.checked);
+  submitBtn.disabled = !isChecked;
+  submitBtn.textContent = config.submitText;
+}
+
+function setReviewModalCloseState_(disabled) {
+  ['reviewCloseBtn', 'reviewCancelBtn'].forEach(function (id) {
+    const el = document.getElementById(id);
+    if (!el) {
+      return;
+    }
+
+    el.disabled = Boolean(disabled);
+    el.setAttribute('aria-disabled', String(Boolean(disabled)));
+  });
+}
+
+function animateReviewModalNote_() {
+  const noteEl = document.getElementById('reviewModalNote');
+  if (!noteEl) {
+    return;
+  }
+
+  noteEl.classList.remove('is-animating');
+  void noteEl.offsetWidth;
+  noteEl.classList.add('is-animating');
 }
 
 function applyReviewModeConfig(mode) {
   const config = getReviewModeConfig(mode);
 
   document.getElementById('reviewModalTitle').textContent = config.title;
-  document.getElementById('reviewModalNote').textContent = config.note;
+  const noteEl = document.getElementById('reviewModalNote');
+  noteEl.textContent = config.note;
+  noteEl.classList.toggle('is-warning', config.mode === 'cancelled');
+  animateReviewModalNote_();
 
   const qrSection = document.getElementById('reviewQrSection');
   const qrMeta = document.getElementById('reviewQrMeta');
@@ -2434,26 +2604,24 @@ function applyReviewModeConfig(mode) {
     paymentAck.checked = false;
   }
 
-  const submitBtn = document.getElementById('reviewSubmitBtn');
-  if (submitBtn && !submitBtn.disabled) {
-    submitBtn.textContent = config.submitText;
-  }
+  updateReviewSubmitButtonState(config);
 
   return config;
 }
 
-function openReviewModalByKey(key, mode) {
+function openReviewModalByKey(key, mode, currentStatusHint) {
   const item = bookingLookup[key];
   if (!item || !item.row) {
     return;
   }
 
   reviewMode = normalizeReviewMode(mode);
+  const resolvedStatus = String(currentStatusHint || item.row.status || '').trim();
 
   reviewContext = {
     selectedDate: String(item.selectedDate || ''),
     bookingRef: String(item.row.bookingRef || ''),
-    status: String(item.row.status || ''),
+    status: resolvedStatus,
     devoteeName: String(item.row.devoteeName || ''),
     phone: String(item.row.phone || ''),
     sevaName: String(item.row.sevaName || ''),
@@ -2464,6 +2632,7 @@ function openReviewModalByKey(key, mode) {
   reviewQrDataUrl = '';
   reviewQrFileName = '';
   reviewRefreshPending = false;
+  reviewSubmitInProgress = false;
 
   const modeConfig = applyReviewModeConfig(reviewMode);
 
@@ -2482,21 +2651,31 @@ function openReviewModalByKey(key, mode) {
   setReviewModalStatus('');
 
   const submit = document.getElementById('reviewSubmitBtn');
-  submit.disabled = false;
-  submit.textContent = modeConfig.submitText;
+  updateReviewSubmitButtonState(modeConfig);
+  setReviewModalCloseState_(false);
 
   const modal = document.getElementById('reviewModal');
   modal.style.display = 'flex';
   modal.setAttribute('aria-hidden', 'false');
 }
 
-function closeReviewModal() {
+function closeReviewModal(forceClose) {
+  if (reviewSubmitInProgress && forceClose !== true) {
+    return;
+  }
+
   const shouldRefresh = reviewRefreshPending;
   reviewRefreshPending = false;
+  reviewSubmitInProgress = false;
 
   const modal = document.getElementById('reviewModal');
   modal.style.display = 'none';
   modal.setAttribute('aria-hidden', 'true');
+
+  const noteEl = document.getElementById('reviewModalNote');
+  if (noteEl) {
+    noteEl.classList.remove('is-animating');
+  }
 
   reviewContext = null;
   reviewMode = 'reviewed';
@@ -2508,11 +2687,12 @@ function closeReviewModal() {
     input.value = '';
   }
 
+  setReviewModalCloseState_(false);
+
   const submit = document.getElementById('reviewSubmitBtn');
   const modeConfig = applyReviewModeConfig(reviewMode);
   if (submit) {
-    submit.disabled = false;
-    submit.textContent = modeConfig.submitText;
+    updateReviewSubmitButtonState(modeConfig);
   }
 
   const paymentAck = document.getElementById('reviewPaymentAck');
@@ -2535,8 +2715,19 @@ function buildDefaultReviewMessage(mode, language, context) {
   const rawAmount = formatAmountInr(context && context.totalAmount);
   const paymentAmount = rawAmount === '-' ? '-' : ('\u20B9 ' + rawAmount);
   const bookingStatus = String(context && context.status || '').trim().toLowerCase();
-  const refundLine = activeMode === 'cancelled' && bookingStatus === 'confirmed'
-    ? getAdminTextForLanguage_(langKey, 'modal.refundLineConfirmedCancellation')
+  const englishConfirmed = String(getAdminTextForLanguage_('english', 'status.confirmed') || '').trim().toLowerCase();
+  const teluguConfirmed = String(getAdminTextForLanguage_('telugu', 'status.confirmed') || '').trim().toLowerCase();
+  const isConfirmedStatus = bookingStatus === 'confirmed'
+    || (englishConfirmed && bookingStatus === englishConfirmed)
+    || (teluguConfirmed && bookingStatus === teluguConfirmed)
+    || bookingStatus.indexOf('confirm') >= 0
+    || (englishConfirmed && bookingStatus.indexOf(englishConfirmed) >= 0)
+    || (teluguConfirmed && bookingStatus.indexOf(teluguConfirmed) >= 0);
+  const refundPaymentAmount = paymentAmount === '-' ? '' : paymentAmount;
+  const refundLine = activeMode === 'cancelled' && isConfirmedStatus
+    ? getAdminTextForLanguage_(langKey, 'modal.refundLineConfirmedCancellation', {
+        paymentAmount: refundPaymentAmount
+      }).replace(/\s{2,}/g, ' ').trim()
     : '';
 
   const replacements = {
@@ -2548,13 +2739,61 @@ function buildDefaultReviewMessage(mode, language, context) {
     refundLine: refundLine
   };
 
-  const lines = getModalTemplateLines_(activeMode, langKey)
+  let lines = getModalTemplateLines_(activeMode, langKey)
     .map(function (line) {
       return applyTemplate_(line, replacements);
-    })
-    .filter(function (_, index, arr) {
-      return !(arr[index] === '' && index > 0 && arr[index - 1] === '');
     });
+
+  if (activeMode === 'confirmed') {
+    const expectedPaymentLine = langKey === 'telugu'
+      ? 'చెల్లించిన రుసుము: ' + paymentAmount
+      : 'Amount Paid: ' + paymentAmount;
+    const confirmationLine = langKey === 'telugu'
+      ? '*మీ బుకింగ్ ఇప్పుడు ధృవీకరించబడింది.*'
+      : '*Your booking is now confirmed.*';
+    const hasPaymentLine = lines.some(function (line) {
+      return String(line || '').trim() === expectedPaymentLine;
+    });
+
+    if (!hasPaymentLine) {
+      const sevaPrefix = langKey === 'telugu' ? 'సేవ:' : 'Seva:';
+      const sevaIndex = lines.findIndex(function (line) {
+        return String(line || '').trim().indexOf(sevaPrefix) === 0;
+      });
+      const confirmationIndex = lines.indexOf(confirmationLine);
+      const insertAt = sevaIndex >= 0
+        ? sevaIndex + 1
+        : (confirmationIndex >= 0 ? confirmationIndex : lines.length);
+      lines.splice(insertAt, 0, expectedPaymentLine);
+    }
+  }
+
+  // Keep refund line visible for confirmed cancellations even if external template omits {refundLine}.
+  if (activeMode === 'cancelled' && refundLine) {
+    const hasRefundLine = lines.some(function (line) {
+      return String(line || '').trim() === refundLine;
+    });
+
+    if (!hasRefundLine) {
+      const apologyLine = langKey === 'telugu'
+        ? 'అనుకోని పరిస్థితుల కారణంగా, మేము మీ బుకింగ్‌ను రద్దు చేయాల్సి వచ్చింది. అసౌకర్యానికి క్షమించండి.'
+        : 'Due to unforeseen circumstances, we had to cancel your booking. Sorry for the inconvenience caused.';
+      const anchorIndex = lines.indexOf(apologyLine);
+      const insertAt = anchorIndex >= 0 ? anchorIndex : lines.length;
+      const insertion = [];
+
+      if (insertAt > 0 && lines[insertAt - 1] !== '') {
+        insertion.push('');
+      }
+
+      insertion.push(refundLine, '');
+      lines.splice.apply(lines, [insertAt, 0].concat(insertion));
+    }
+  }
+
+  lines = lines.filter(function (_, index, arr) {
+    return !(arr[index] === '' && index > 0 && arr[index - 1] === '');
+  });
 
   return lines.join('\n');
 }
@@ -2658,8 +2897,10 @@ async function submitReviewTransition() {
   const language = getPreferredModalLanguage_();
   const customMessage = String(document.getElementById('reviewMessage').value || '').trim();
   const submitBtn = document.getElementById('reviewSubmitBtn');
+  reviewSubmitInProgress = true;
   submitBtn.disabled = true;
   submitBtn.textContent = modeConfig.sendingText;
+  setReviewModalCloseState_(true);
   setReviewModalError('');
   setReviewModalStatus('');
 
@@ -2697,6 +2938,8 @@ async function submitReviewTransition() {
     const data = await response.json();
     if (!data.ok) {
       setReviewModalError(formatTransitionError(data));
+      reviewSubmitInProgress = false;
+      setReviewModalCloseState_(false);
       submitBtn.disabled = false;
       submitBtn.textContent = modeConfig.submitText;
       return;
@@ -2708,8 +2951,12 @@ async function submitReviewTransition() {
     submitBtn.textContent = modeConfig.completedText;
 
     reviewRefreshPending = true;
+    reviewSubmitInProgress = false;
+    setReviewModalCloseState_(false);
   } catch (error) {
     setReviewModalError(getAdminText('errors.transitionFailedPrefix') + ' ' + String(error.message || getAdminText('errors.unknownError')));
+    reviewSubmitInProgress = false;
+    setReviewModalCloseState_(false);
     submitBtn.disabled = false;
     submitBtn.textContent = modeConfig.submitText;
   }

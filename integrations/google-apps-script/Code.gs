@@ -442,8 +442,10 @@ function transitionBookingToReviewed_(spreadsheet, request) {
       );
     }
 
+    const bookingSevaDate = normalizeSevaDateValue_(row[BOOKING_COL_SEVA_DATE - 1], request.selectedDate);
+
     const bookingData = {
-      sevaDate: String(row[BOOKING_COL_SEVA_DATE - 1] || request.selectedDate).trim(),
+      sevaDate: bookingSevaDate,
       sevaName: String(row[BOOKING_COL_SEVA_NAME - 1] || '').trim(),
       devoteeName: String(row[BOOKING_COL_DEVOTEE_NAME - 1] || '').trim(),
       bookingRef: String(row[BOOKING_COL_BOOKING_REF - 1] || request.bookingRef).trim()
@@ -508,8 +510,8 @@ function transitionBookingToStatus_(spreadsheet, request) {
     const row = sheet.getRange(rowIndex, 1, 1, BOOKING_HEADERS.length).getValues()[0];
     const rawCurrentStatus = String(row[BOOKING_COL_STATUS - 1] || BOOKING_STATUS_SUBMITTED).trim() || BOOKING_STATUS_SUBMITTED;
     const currentStatus = normalizeBookingStatus_(rawCurrentStatus) || BOOKING_STATUS_SUBMITTED;
-    const sevaDate = String(row[BOOKING_COL_SEVA_DATE - 1] || request.selectedDate).trim();
-    const sevaTiming = String(row[BOOKING_COL_SEVA_TIMING - 1] || '').trim();
+    const sevaDate = normalizeSevaDateValue_(row[BOOKING_COL_SEVA_DATE - 1], request.selectedDate);
+    const sevaTiming = normalizeSevaTimingValue_(row[BOOKING_COL_SEVA_TIMING - 1]);
 
     validateAdminStatusTransition_(
       currentStatus,
@@ -522,7 +524,8 @@ function transitionBookingToStatus_(spreadsheet, request) {
       sevaDate: sevaDate,
       sevaName: String(row[BOOKING_COL_SEVA_NAME - 1] || '').trim(),
       devoteeName: String(row[BOOKING_COL_DEVOTEE_NAME - 1] || '').trim(),
-      bookingRef: String(row[BOOKING_COL_BOOKING_REF - 1] || request.bookingRef).trim()
+      bookingRef: String(row[BOOKING_COL_BOOKING_REF - 1] || request.bookingRef).trim(),
+      totalAmount: Number(row[10]) || 0
     };
 
     const toPhone = toWhatsappRecipient_(request.phone || String(row[BOOKING_COL_PHONE - 1] || ''));
@@ -615,8 +618,11 @@ function validateAdminStatusTransition_(currentStatus, targetStatus, paymentRece
 }
 
 function ensureConfirmedCancellationWithinWindow_(bookingMeta) {
-  const sevaDate = bookingMeta && bookingMeta.sevaDate ? String(bookingMeta.sevaDate).trim() : '';
-  const sevaTiming = bookingMeta && bookingMeta.sevaTiming ? String(bookingMeta.sevaTiming).trim() : '';
+  const sevaDate = normalizeSevaDateValue_(
+    bookingMeta && bookingMeta.sevaDate,
+    bookingMeta && bookingMeta.selectedDate
+  );
+  const sevaTiming = normalizeSevaTimingValue_(bookingMeta && bookingMeta.sevaTiming);
   const sevaDateTime = parseSevaDateTime_(sevaDate, sevaTiming);
 
   if (!sevaDateTime) {
@@ -643,8 +649,56 @@ function ensureConfirmedCancellationWithinWindow_(bookingMeta) {
   }
 }
 
+function formatDateForScriptTimeZone_(date, pattern) {
+  const timeZone = Session.getScriptTimeZone() || 'Asia/Kolkata';
+  return Utilities.formatDate(date, timeZone, pattern);
+}
+
+function coerceSevaDateValue_(value) {
+  if (!value) {
+    return '';
+  }
+
+  if (value instanceof Date && !Number.isNaN(value.getTime())) {
+    return formatDateForScriptTimeZone_(value, 'yyyy-MM-dd');
+  }
+
+  const raw = String(value || '').trim();
+  if (!raw) {
+    return '';
+  }
+
+  if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) {
+    return raw;
+  }
+
+  const parsed = new Date(raw);
+  if (Number.isNaN(parsed.getTime())) {
+    return '';
+  }
+
+  return formatDateForScriptTimeZone_(parsed, 'yyyy-MM-dd');
+}
+
+function normalizeSevaDateValue_(value, fallbackValue) {
+  const normalizedPrimary = coerceSevaDateValue_(value);
+  if (normalizedPrimary) {
+    return normalizedPrimary;
+  }
+
+  return coerceSevaDateValue_(fallbackValue);
+}
+
+function normalizeSevaTimingValue_(value) {
+  if (value instanceof Date && !Number.isNaN(value.getTime())) {
+    return formatDateForScriptTimeZone_(value, 'HH:mm');
+  }
+
+  return String(value || '').trim();
+}
+
 function parseSevaDateTime_(sevaDate, sevaTiming) {
-  const dateText = String(sevaDate || '').trim();
+  const dateText = normalizeSevaDateValue_(sevaDate);
   if (!/^\d{4}-\d{2}-\d{2}$/.test(dateText)) {
     return null;
   }
@@ -1192,6 +1246,15 @@ function buildReviewedTransitionMessage_(booking, language, customMessage) {
   return caption.length > 1000 ? caption.slice(0, 1000) : caption;
 }
 
+function formatAmountInr_(value) {
+  const amount = Number(value);
+  if (!Number.isFinite(amount) || amount <= 0) {
+    return '';
+  }
+
+  return '₹ ' + amount.toLocaleString('en-IN');
+}
+
 function buildAdminStatusTransitionMessage_(booking, targetStatus, language, customMessage, currentStatus) {
   const extra = String(customMessage || '').trim();
   if (extra) {
@@ -1202,6 +1265,7 @@ function buildAdminStatusTransitionMessage_(booking, targetStatus, language, cus
   const sevaDate = booking && booking.sevaDate ? booking.sevaDate : '-';
   const seva = booking && booking.sevaName ? booking.sevaName : '-';
   const devotee = booking && booking.devoteeName ? booking.devoteeName : '-';
+  const paymentAmount = formatAmountInr_(booking && booking.totalAmount);
   const includeRefundNote = targetStatus === BOOKING_STATUS_CANCELLED && normalizeBookingStatus_(currentStatus) === BOOKING_STATUS_CONFIRMED;
 
   let lines;
@@ -1263,8 +1327,12 @@ function buildAdminStatusTransitionMessage_(booking, targetStatus, language, cus
     if (includeRefundNote) {
       lines.splice(7, 0,
         language === 'te'
-          ? 'చెల్లించిన మొత్తం తదుపరి 5 రోజుల్లో తిరిగి చెల్లించబడుతుంది.'
-          : 'Amount paid will be refunded in next 5 days.',
+          ? (paymentAmount
+              ? 'చెల్లించిన మొత్తం ₹ ' + paymentAmount + ' తదుపరి 5 రోజుల్లో తిరిగి చెల్లించబడుతుంది.'
+              : 'చెల్లించిన మొత్తం తదుపరి 5 రోజుల్లో తిరిగి చెల్లించబడుతుంది.')
+          : (paymentAmount
+              ? 'Amount paid ₹ ' + paymentAmount + ' will be refunded in next 5 days.'
+              : 'Amount paid will be refunded in next 5 days.'),
         ''
       );
     }
@@ -1777,7 +1845,7 @@ function onBookingStatusEdit_(e) {
 
     const devoteeName = String(sheet.getRange(row, BOOKING_COL_DEVOTEE_NAME).getValue() || '').trim();
     const sevaName = String(sheet.getRange(row, BOOKING_COL_SEVA_NAME).getValue() || '').trim();
-    const sevaDate = String(sheet.getRange(row, BOOKING_COL_SEVA_DATE).getValue() || '').trim();
+    const sevaDate = normalizeSevaDateValue_(sheet.getRange(row, BOOKING_COL_SEVA_DATE).getValue(), sheet.getName());
     const bookingRef = String(sheet.getRange(row, BOOKING_COL_BOOKING_REF).getValue() || '').trim();
 
     sendBookingStatusWhatsapp_(phone, devoteeName, sevaName, sevaDate, bookingRef, newStatus);
@@ -1923,10 +1991,10 @@ function getAdminBookings_(spreadsheet) {
         rows.push({
           createdAt: createdAt,
           bookingRequest: bookingRequest,
-          sevaDate: String(row[2] || ''),
+          sevaDate: normalizeSevaDateValue_(row[2], name),
           sevaId: String(row[3] || ''),
           sevaName: String(row[4] || ''),
-          sevaTiming: String(row[5] || ''),
+          sevaTiming: normalizeSevaTimingValue_(row[5]),
           devoteeName: String(row[6] || ''),
           gotram: String(row[7] || ''),
           phone: String(row[8] || ''),

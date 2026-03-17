@@ -34,11 +34,11 @@
         "english": "Every Saturday at 6:00 PM, Hanuman Chalisa recital"
       },
       {
-        "telugu": "ప్రతి మంగళవారం భక్తులకు అన్నదానం మధ్యాహ్నం 12:30 కు",
-        "english": "Annadanam for devotees every Tuesday at 12:30 PM"
+        "telugu": "ప్రతి మంగళవారం అన్నదానం మధ్యాహ్నం 12:30 కు",
+        "english": "Annadanam every Tuesday at 12:30 PM"
       },
       {
-        "telugu": "ఉగాది పండుగ - 2026 మార్చి 19",
+        "telugu": "ఉగాది పండుగ - మార్చి 19, 2026",
         "english": "Ugadi Festival - March 19, 2026",
         "showUntil": "2026-03-19"
       }
@@ -181,7 +181,7 @@
           "close": "మూసివేయి",
           "sending": "పంపిస్తోంది...",
           "completed": "ట్రాన్సిషన్ పూర్తయింది ✓",
-          "refundLineConfirmedCancellation": "చెల్లించిన మొత్తం తదుపరి 5 రోజుల్లో తిరిగి చెల్లించబడుతుంది.",
+          "refundLineConfirmedCancellation": "చెల్లించిన మొత్తం {paymentAmount} తదుపరి 5 రోజుల్లో తిరిగి చెల్లించబడుతుంది.",
           "selectedFilePrefix": "ఎంచుకున్నది:",
           "mode": {
             "reviewed": {
@@ -204,7 +204,7 @@
               "title": "బుకింగ్‌ను Cancelled గా మార్చు",
               "submit": "వాట్సాప్ పంపి Cancelled గా మార్చు",
               "success": "✓ బుకింగ్ Cancelled కి మార్చబడింది, వాట్సాప్ సందేశం విజయవంతంగా పంపబడింది.",
-              "note": "ఇది రద్దు సమాచారం వాట్సాప్‌లో పంపి స్టేటస్‌ను Cancelled కి మార్చుతుంది. Confirmed బుకింగ్‌లు సేవ సమయానికి 14 గంటల ముందు మాత్రమే రద్దు చేయవచ్చు.",
+              "note": "ఇది రద్దు సమాచారం వాట్సాప్‌లో పంపి స్టేటస్‌ను Cancelled కి మార్చుతుంది. Confirmed సేవ బుకింగ్‌లు 14 గంటల సమయానికి ముందు మాత్రమే రద్దు చేయవచ్చు.",
               "whatsappHelp": "వాట్సాప్ టోకెన్ మరియు ఫోన్ నంబర్ ID సరిచూడండి."
             }
           }
@@ -308,7 +308,7 @@
           "close": "Close",
           "sending": "Sending...",
           "completed": "Transition Complete ✓",
-          "refundLineConfirmedCancellation": "Amount paid will be refunded in next 5 days.",
+          "refundLineConfirmedCancellation": "Amount paid {paymentAmount} will be refunded in next 5 days.",
           "selectedFilePrefix": "Selected:",
           "mode": {
             "reviewed": {
@@ -364,7 +364,7 @@
         "telugu": [
           "నమస్తే, *{devoteeName}*,",
           "",
-          "మేము మీ సేవ * {sevaName}* బుకింగ్ అభ్యర్థనను పరిశీలించాము.",
+          "మేము మీ సేవ *{sevaName}* బుకింగ్ అభ్యర్థనను పరిశీలించాము.",
           "",
           "బుకింగ్ రిఫరెన్స్: {bookingRef}",
           "సేవ తేదీ: {sevaDate}",
@@ -401,6 +401,7 @@
           "బుకింగ్ రిఫరెన్స్: {bookingRef}",
           "సేవ తేదీ: {sevaDate}",
           "సేవ: {sevaName}",
+          "చెల్లించిన రుసుము: {paymentAmount}",
           "",
           "*మీ బుకింగ్ ఇప్పుడు ధృవీకరించబడింది.*",
           "ఆలయానికి వచ్చినప్పుడు బుకింగ్ రిఫరెన్స్ చూపించండి.",
@@ -416,6 +417,7 @@
           "Booking reference: {bookingRef}",
           "Seva Date: {sevaDate}",
           "Seva: {sevaName}",
+          "Amount Paid: {paymentAmount}",
           "",
           "*Your booking is now confirmed.*",
           "Please carry this booking reference when you visit the temple.",

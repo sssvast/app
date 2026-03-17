@@ -80,11 +80,6 @@
     <div class="hero-content">
       <p class="hero-kicker" data-telugu="శ్రీ ఆంజనేయ స్వామి ఆశీస్సులతో" data-english="With the blessings of Sri Anjaneya Swamy">శ్రీ ఆంజనేయ స్వామి ఆశీస్సులతో</p>
       <h2 class="hero-title" data-telugu="జై శ్రీ రామ్" data-english="Jai Sri Ram">జై శ్రీ రామ్</h2>
-      <p class="hero-subtitle" data-telugu="భక్తి, శాంతి, సేవలతో ఆలయ దర్శనాన్ని మరింత ఆహ్లాదకరంగా అనుభవించండి." data-english="Experience temple darshan in a calmer, more welcoming space for devotion and seva.">భక్తి, శాంతి, సేవలతో ఆలయ దర్శనాన్ని మరింత ఆహ్లాదకరంగా అనుభవించండి.</p>
-      <div class="hero-actions">
-        <a class="hero-button primary" href="#about" data-telugu="ఆలయం గురించి" data-english="Explore Temple">ఆలయం గురించి</a>
-        <a class="hero-button secondary" href="#location" data-telugu="లోకేషన్" data-english="Find Location">లోకేషన్</a>
-      </div>
     </div>
   </div>
 
@@ -166,11 +161,16 @@
       <div>
         <h3 class="seva-subtitle" data-telugu="సేవా బుక్ చేయండి" data-english="Book a Seva">సేవా బుక్ చేయండి</h3>
         <form id="sevaBookingForm" class="seva-booking-form" novalidate>
+          <input id="sevaType" name="sevaType" type="hidden" required />
+
+          <label class="seva-field full-width seva-date-field" for="sevaDate">
+            <span data-telugu="తేదీ (దశ 1)" data-english="Date (Step 1)">తేదీ (దశ 1)</span>
+            <input id="sevaDate" name="sevaDate" type="date" required />
+          </label>
+
           <p id="sevaSelected" class="seva-meta seva-selected" data-telugu="ఎంచుకున్న సేవ: లేదు" data-english="Selected seva: None" hidden>ఎంచుకున్న సేవ: లేదు</p>
 
           <div class="seva-form-grid">
-            <input id="sevaType" name="sevaType" type="hidden" required />
-
             <label class="seva-field full-width" for="devoteeName">
               <span data-telugu="భక్తుని పేరు" data-english="Devotee Name">భక్తుని పేరు</span>
               <input id="devoteeName" name="devoteeName" type="text" autocomplete="name" required disabled />
@@ -183,22 +183,17 @@
 
             <label class="seva-field full-width" for="devoteePhone">
               <span data-telugu="ఫోన్ నంబర్" data-english="Phone Number">ఫోన్ నంబర్</span>
-              <input id="devoteePhone" name="devoteePhone" type="tel" inputmode="numeric" autocomplete="tel" pattern="[0-9]{10}" required disabled />
+              <input id="devoteePhone" name="devoteePhone" type="tel" inputmode="numeric" autocomplete="tel" pattern="[0-9]{10}" maxlength="10" required disabled />
             </label>
 
-            <label class="seva-field" for="sevaDate">
-              <span data-telugu="తేదీ" data-english="Date">తేదీ</span>
-              <input id="sevaDate" name="sevaDate" type="date" required disabled />
-            </label>
-
-            <label class="seva-field" for="sevaSlots">
+            <label class="seva-field full-width" for="sevaSlots">
               <span data-telugu="స్లాట్లు" data-english="Slots">స్లాట్లు</span>
               <input id="sevaSlots" name="sevaSlots" type="number" min="1" step="1" value="1" required disabled />
             </label>
           </div>
 
-          <p id="sevaAvailability" class="seva-meta" data-telugu="సేవా కార్డు మరియు తేదీ ఎంచుకుంటే అందుబాటు స్లాట్లు కనిపిస్తాయి." data-english="Choose a seva card and date to view available slots.">
-            సేవా కార్డు మరియు తేదీ ఎంచుకుంటే అందుబాటు స్లాట్లు కనిపిస్తాయి.
+          <p id="sevaAvailability" class="seva-meta" data-telugu="తేదీ మరియు సేవా కార్డు ఎంచుకుంటే అందుబాటు స్లాట్లు కనిపిస్తాయి." data-english="Choose a date and seva card to view available slots.">
+            తేదీ మరియు సేవా కార్డు ఎంచుకుంటే అందుబాటు స్లాట్లు కనిపిస్తాయి.
           </p>
           <p id="sevaTotal" class="seva-meta" data-telugu="మొత్తం: రూ. 0/-" data-english="Total: Rs. 0/-">మొత్తం: రూ. 0/-</p>
 

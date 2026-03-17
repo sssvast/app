@@ -21,6 +21,7 @@ const sevaTypeInput = document.getElementById('sevaType');
 const sevaDateInput = document.getElementById('sevaDate');
 const sevaSlotsInput = document.getElementById('sevaSlots');
 const sevaSelected = document.getElementById('sevaSelected');
+const sevaSelectionHint = document.getElementById('sevaSelectionHint');
 const sevaAvailability = document.getElementById('sevaAvailability');
 const sevaTotal = document.getElementById('sevaTotal');
 const sevaBookingMessage = document.getElementById('sevaBookingMessage');
@@ -368,26 +369,74 @@ function getSelectedSeva() {
   return sevaCatalog.find(seva => seva.id === sevaTypeInput.value) || null;
 }
 
+function shouldAutoScrollToSevaForm() {
+  return window.matchMedia('(max-width: 600px)').matches;
+}
+
+function scrollToSevaForm() {
+  if (!sevaBookingForm || !shouldAutoScrollToSevaForm()) {
+    return;
+  }
+
+  const top = window.scrollY + sevaBookingForm.getBoundingClientRect().top - getHeaderOffset() - 12;
+  window.scrollTo({
+    top: Math.max(0, top),
+    behavior: shouldReduceMotion() ? 'auto' : 'smooth'
+  });
+}
+
+function updateSevaSelectionHint() {
+  if (!sevaSelectionHint) {
+    return;
+  }
+
+  const selectedSeva = getSelectedSeva();
+  if (!selectedSeva) {
+    sevaSelectionHint.textContent = currentLang === 'telugu'
+      ? 'దశ 2: మీకు కావలసిన సేవా కార్డు పై ట్యాప్ చేసి ఎంచుకోండి. మళ్ళీ ట్యాప్ చేస్తే ఎంపిక తీసివేయబడుతుంది.'
+      : 'Step 2: Tap a seva card to select it. Tap again to clear your selection.';
+    return;
+  }
+
+  const sevaName = currentLang === 'telugu' ? selectedSeva.telugu : selectedSeva.english;
+  sevaSelectionHint.textContent = currentLang === 'telugu'
+    ? `దశ 2 పూర్తైంది: ${sevaName} ఎంచుకున్నారు. మరో కార్డు ట్యాప్ చేస్తే ఎంపిక మారుతుంది.`
+    : `Step 2 complete: ${sevaName} selected. Tap another card to change your selection.`;
+}
+
+function sanitizePhoneNumberInput() {
+  if (!devoteePhoneInput) {
+    return;
+  }
+
+  const digitsOnlyValue = devoteePhoneInput.value.replace(/\D/g, '').slice(0, 10);
+  if (devoteePhoneInput.value !== digitsOnlyValue) {
+    devoteePhoneInput.value = digitsOnlyValue;
+  }
+}
+
 function updateFormLockState() {
   const hasSelectedSeva = Boolean(getSelectedSeva());
+  const hasSelectedDate = Boolean(sevaDateInput && sevaDateInput.value);
+  const canUnlockDevoteeFields = hasSelectedSeva && hasSelectedDate;
 
   if (devoteeNameInput) {
-    devoteeNameInput.disabled = !hasSelectedSeva;
+    devoteeNameInput.disabled = !canUnlockDevoteeFields;
   }
 
   if (devoteeGotramInput) {
-    devoteeGotramInput.disabled = !hasSelectedSeva;
+    devoteeGotramInput.disabled = !canUnlockDevoteeFields;
   }
 
   if (devoteePhoneInput) {
-    devoteePhoneInput.disabled = !hasSelectedSeva;
+    devoteePhoneInput.disabled = !canUnlockDevoteeFields;
   }
 
   if (sevaDateInput) {
-    sevaDateInput.disabled = !hasSelectedSeva;
+    sevaDateInput.disabled = false;
   }
 
-  if (!hasSelectedSeva) {
+  if (!canUnlockDevoteeFields) {
     if (sevaSlotsInput) {
       sevaSlotsInput.disabled = true;
     }
@@ -553,29 +602,27 @@ function updateSevaSelectedLabel() {
 
 function setSelectedSeva(sevaId) {
   if (!sevaTypeInput) {
-    return;
+    return '';
   }
 
   const previousSevaId = sevaTypeInput.value;
-  const hasSelectionChanged = Boolean(sevaId) && previousSevaId !== sevaId;
+  const nextSevaId = previousSevaId === sevaId ? '' : (sevaId || '');
 
-  sevaTypeInput.value = sevaId || '';
-
-  if (hasSelectionChanged && sevaDateInput) {
-    sevaDateInput.value = '';
-  }
+  sevaTypeInput.value = nextSevaId;
 
   sevaOptionCards.forEach(card => {
-    const isSelected = card.dataset.sevaId === sevaId;
+    const isSelected = card.dataset.sevaId === nextSevaId;
     card.classList.toggle('is-selected', isSelected);
     card.setAttribute('aria-pressed', String(isSelected));
   });
 
-  updateFormLockState();
   updateDateConstraintsForSelectedSeva();
+  updateFormLockState();
   updateSevaSelectedLabel();
+  updateSevaSelectionHint();
   clearBookingMessage();
   updateSevaBookingSummary();
+  return nextSevaId;
 }
 
 function resetSevaBookingState() {
@@ -629,8 +676,8 @@ function updateSevaBookingSummary() {
 
   if (!selectedSeva || !selectedDate) {
     sevaAvailability.textContent = currentLang === 'telugu'
-      ? 'సేవా కార్డు మరియు తేదీ ఎంచుకుంటే అందుబాటు స్లాట్లు కనిపిస్తాయి.'
-      : 'Choose a seva card and date to view available slots.';
+      ? 'తేదీ మరియు సేవా కార్డు ఎంచుకుంటే అందుబాటు స్లాట్లు కనిపిస్తాయి.'
+      : 'Choose a date and seva card to view available slots.';
     sevaTotal.textContent = currentLang === 'telugu' ? 'మొత్తం: రూ. 0/-' : 'Total: Rs. 0/-';
     sevaSlotsInput.value = '1';
     sevaSlotsInput.disabled = true;
@@ -734,8 +781,8 @@ function getBookingSuccessMessage(selectedSeva) {
   const nextRequestDate = formatBookingDate(formatDateInputValue(addDays(new Date(), 1)));
 
   return currentLang === 'telugu'
-    ? `${sevaName} కోసం మీ సేవా అభ్యర్థన విజయవంతంగా స్వీకరించబడింది. ఆలయ ప్రతినిధి మీకు తుది నిర్ధారణను ${requestDate} లేదా ${nextRequestDate} సాయంత్రం 6:00 లోపు పంపిస్తారు. మీ భక్తికి ధన్యవాదాలు.`
-    : `Your seva request for ${sevaName} has been received successfully. A temple representative will share the final confirmation with you by 6:00 PM on ${requestDate} or ${nextRequestDate}. Thank you for your devotion.`;
+    ? `${sevaName} కోసం మీ సేవా అభ్యర్థన విజయవంతంగా స్వీకరించబడింది. ఆలయ ప్రతినిధి మీకు తుది నిర్ధారణను ${nextRequestDate} సాయంత్రం 6:00 లోపు పంపిస్తారు. మీ భక్తికి ధన్యవాదాలు.`
+    : `Your seva request for ${sevaName} has been received successfully. A temple representative will share the final confirmation with you before 6:00 PM on ${nextRequestDate}. Thank you for your devotion.`;
 }
 
 function loadSmtpLibrary() {
@@ -816,6 +863,7 @@ async function handleSevaBookingSubmit(event) {
   }
 
   clearBookingMessage();
+  sanitizePhoneNumberInput();
 
   const devoteeName = devoteeNameInput.value.trim();
   const devoteeGotram = devoteeGotramInput.value.trim();
@@ -925,6 +973,7 @@ function switchLanguage(lang) {
 
   updateFormLockState();
   updateSevaSelectedLabel();
+  updateSevaSelectionHint();
   updateSevaBookingSummary();
   clearBookingMessage();
   updatePageLoaderText();
@@ -994,7 +1043,10 @@ document.addEventListener('click', event => {
   }
 
   const sevaId = card.getAttribute('data-seva-id') || '';
-  setSelectedSeva(sevaId);
+  const selectedSevaId = setSelectedSeva(sevaId);
+  if (selectedSevaId) {
+    scrollToSevaForm();
+  }
 });
 
 document.addEventListener('keydown', event => {
@@ -1011,12 +1063,16 @@ document.addEventListener('keydown', event => {
   if (event.key === 'Enter' || event.key === ' ') {
     event.preventDefault();
     const sevaId = card.getAttribute('data-seva-id') || '';
-    setSelectedSeva(sevaId);
+    const selectedSevaId = setSelectedSeva(sevaId);
+    if (selectedSevaId) {
+      scrollToSevaForm();
+    }
   }
 });
 
 if (sevaDateInput) {
   sevaDateInput.addEventListener('change', () => {
+    updateFormLockState();
     clearBookingMessage();
     updateSevaBookingSummary();
   });
@@ -1027,6 +1083,10 @@ if (sevaSlotsInput) {
     clearBookingMessage();
     updateSevaBookingSummary();
   });
+}
+
+if (devoteePhoneInput) {
+  devoteePhoneInput.addEventListener('input', sanitizePhoneNumberInput);
 }
 
 if (sevaBookingForm) {
@@ -1081,6 +1141,7 @@ if (pageLoaderIsReady) {
 updateFormLockState();
 setMinimumBookingDate();
 updateSevaSelectedLabel();
+updateSevaSelectionHint();
 updateSevaBookingSummary();
 updateMenuState(false);
 syncActiveLinkToViewport();

@@ -1,0 +1,131 @@
+{
+  "bookingRules": {
+    "regularAdvanceDays": 2,
+    "regularWindowDays": 7,
+    "tuesdayWindowDays": 28,
+    "nextAvailableDateCutoffHour": 17,
+    "tuesdaySevaId": "tuesday-annadanam"
+  },
+  "bookingMessages": {
+    "telugu": {
+      "selectionHint": {
+        "default": "దశ 2: మీకు కావలసిన సేవా కార్డు పై ట్యాప్ చేసి ఎంచుకోండి. మళ్ళీ ట్యాప్ చేస్తే ఎంపిక తీసివేయబడుతుంది.",
+        "selected": "దశ 2 పూర్తైంది: {sevaName} ఎంచుకున్నారు. మరో కార్డు ట్యాప్ చేస్తే ఎంపిక మారుతుంది."
+      },
+      "selectedSeva": {
+        "none": "ఎంచుకున్న సేవ: లేదు",
+        "selected": "ఎంచుకున్న సేవ: {sevaName} ({sevaTiming})"
+      },
+      "availability": {
+        "selectDateAndSeva": "తేదీ మరియు సేవా కార్డు ఎంచుకుంటే అందుబాటు స్లాట్లు కనిపిస్తాయి.",
+        "tuesdayOnly": "మంగళవారం అన్నదానం కోసం మంగళవారం తేదీలే ఎంచుకోవాలి.",
+        "loading": "ప్రత్యక్ష అందుబాటు స్లాట్లు చూస్తున్నాం...",
+        "zeroSlots": "ఎంచుకున్న తేదీకి అందుబాటులో ఉన్న స్లాట్లు: 0 / {dailySlots}",
+        "availableSlots": "ఎంచుకున్న తేదీకి అందుబాటులో ఉన్న స్లాట్లు: {availableSlots} / {dailySlots}"
+      },
+      "total": {
+        "zero": "మొత్తం: రూ. 0/-",
+        "amount": "మొత్తం: రూ. {totalAmount}/-"
+      },
+      "errors": {
+        "invalidDetails": "దయచేసి సరైన వివరాలు నమోదు చేయండి. గోత్రం ఇవ్వాలి, ఫోన్ నంబర్ 10 అంకెలుగా ఉండాలి మరియు సేవా కార్డు ఎంచుకోవాలి.",
+        "tuesdayOnly": "మంగళవారం అన్నదానం కోసం మంగళవారం తేదీలే ఎంచుకోవాలి.",
+        "bookingWindowTuesday": "మంగళవారం అన్నదానం కోసం రాబోయే {tuesdayWindowDays} రోజులలోని మంగళవారం తేదీల్లో మాత్రమే బుకింగ్ చేయవచ్చు. అన్ని సేవలకు కనీసం {regularAdvanceDays} రోజు గ్యాప్ అవసరం.",
+        "bookingWindowRegular": "అన్ని సేవలకు కనీసం {regularAdvanceDays} రోజు ముందుగా మాత్రమే బుకింగ్ చేయవచ్చు. రాబోయే {regularWindowDays} రోజుల తేదీల్లో మాత్రమే బుకింగ్ చేయవచ్చు.",
+        "onlySlotsLeft": "ఈ తేదీకి {availableSlots} స్లాట్(లు) మాత్రమే మిగిలి ఉన్నాయి.",
+        "blockedDate": "ఎంచుకున్న తేదీ ఈ సేవకు అందుబాటులో లేదు. దయచేసి మరొక తేదీ ఎంచుకోండి.",
+        "bookingUnavailable": "ప్రస్తుతం ప్రత్యక్ష అందుబాటును నిర్ధారించలేకపోయాము. దయచేసి మళ్లీ ప్రయత్నించండి."
+      },
+      "success": {
+        "bookingReceived": "{sevaName} కోసం మీ సేవా అభ్యర్థన విజయవంతంగా స్వీకరించబడింది. ఆలయ ప్రతినిధి మీకు తుది నిర్ధారణను {nextRequestDate} సాయంత్రం 6:00 లోపు పంపిస్తారు. ధన్యవాదాలు.",
+        "bookingReceivedWithRef": "{sevaName} కోసం మీ సేవా అభ్యర్థన విజయవంతంగా స్వీకరించబడింది. బుకింగ్ నంబర్: {bookingRef}. ఆలయ ప్రతినిధి మీకు తుది నిర్ధారణను {nextRequestDate} సాయంత్రం 6:00 లోపు పంపిస్తారు. ధన్యవాదాలు."
+      }
+    },
+    "english": {
+      "selectionHint": {
+        "default": "Step 2: Tap a seva card to select it. Tap again to clear your selection.",
+        "selected": "Step 2 complete: {sevaName} selected. Tap another card to change your selection."
+      },
+      "selectedSeva": {
+        "none": "Selected seva: None",
+        "selected": "Selected seva: {sevaName} ({sevaTiming})"
+      },
+      "availability": {
+        "selectDateAndSeva": "Choose a date and seva card to view available slots.",
+        "tuesdayOnly": "For Tuesday Annadanam, only Tuesdays can be selected.",
+        "loading": "Checking live availability...",
+        "zeroSlots": "Available slots for selected date: 0 / {dailySlots}",
+        "availableSlots": "Available slots for selected date: {availableSlots} / {dailySlots}"
+      },
+      "total": {
+        "zero": "Total: Rs. 0/-",
+        "amount": "Total: Rs. {totalAmount}/-"
+      },
+      "errors": {
+        "invalidDetails": "Please enter valid details. Gotram is required, phone number must contain 10 digits, and a seva card must be selected.",
+        "tuesdayOnly": "For Tuesday Annadanam, only Tuesdays can be selected.",
+        "bookingWindowTuesday": "Tuesday Annadanam can be booked only for Tuesdays within the upcoming {tuesdayWindowDays} days. A minimum {regularAdvanceDays}-day gap is required for all sevas.",
+        "bookingWindowRegular": "For all sevas, booking starts only from {regularAdvanceDays} day(s) ahead. Booking remains limited to the upcoming {regularWindowDays} days.",
+        "onlySlotsLeft": "Only {availableSlots} slot(s) are available for this date.",
+        "blockedDate": "The selected date is not available for this seva. Please choose another date.",
+        "bookingUnavailable": "We could not verify live availability right now. Please try again."
+      },
+      "success": {
+        "bookingReceived": "Your seva request for {sevaName} has been received successfully. A temple representative will share the final confirmation with you before 6:00 PM on {nextRequestDate}. Thank you.",
+        "bookingReceivedWithRef": "Your seva request for {sevaName} has been received. Booking Reference: {bookingRef}. A temple representative will share the final confirmation with you before 6:00 PM on {nextRequestDate}. Thank you."
+      }
+    }
+  },
+  "sevas": [
+    {
+      "id": "rahu-kethu-pooja",
+      "telugu": "శ్రీ రాహు & కేతు పూజ",
+      "english": "Sri Rahu & Kethu Pooja",
+      "timingTelugu": "ఉదయం 8:00",
+      "timingEnglish": "8:00 AM",
+      "price": 750,
+      "dailySlots": 20,
+      "blockedDates": ["2026-03-19"]
+    },
+    {
+      "id": "varadhanjaneya-abhishekam",
+      "telugu": "శ్రీ వరధాంజనేయ స్వామి అభిషేకం",
+      "english": "Sri Varadhanjaneya Swamy Abhishekam",
+      "timingTelugu": "ఉదయం 8:00",
+      "timingEnglish": "8:00 AM",
+      "price": 500,
+      "dailySlots": 5,
+      "blockedDates": ["2026-03-19"]
+    },
+    {
+      "id": "ramalingeswara-abhishekam",
+      "telugu": "శ్రీ రామలింగేశ్వర స్వామి అభిషేకం",
+      "english": "Sri Ramalingeswara Swamy Abhishekam",
+      "timingTelugu": "ఉదయం 8:00",
+      "timingEnglish": "8:00 AM",
+      "price": 500,
+      "dailySlots": 5,
+      "blockedDates": ["2026-03-19"]
+    },
+    {
+      "id": "rajarajeshwari-abhishekam",
+      "telugu": "శ్రీ రాజరాజేశ్వరి మాత అభిషేకం",
+      "english": "Sri Rajarajeshwari Matha Abhishekam",
+      "timingTelugu": "ఉదయం 8:00",
+      "timingEnglish": "8:00 AM",
+      "price": 500,
+      "dailySlots": 5,
+      "blockedDates": ["2026-03-19"]
+    },
+    {
+      "id": "tuesday-annadanam",
+      "telugu": "మంగళవారం అన్నదానం",
+      "english": "Tuesday Annadanam",
+      "timingTelugu": "మధ్యాహ్నం 12:30",
+      "timingEnglish": "Afternoon 12:30 PM",
+      "price": 6500,
+      "dailySlots": 1,
+      "blockedDates": ["2026-03-19"]
+    }
+  ]
+}

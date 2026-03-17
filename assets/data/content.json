@@ -1,0 +1,92 @@
+{
+  "page": {
+    "titleTelugu": "శ్రీ శ్రీ శ్రీ వరధాంజనేయ స్వామి వారి దేవాలయం",
+    "titleEnglish": "Sri Sri Sri Varadhan Janeya Swamy Temple"
+  },
+  "nav": {
+    "telugu": {
+      "about": "ఆలయం గురించి",
+      "pooja": "పూజలు",
+      "seva-booking": "సేవా బుకింగ్",
+      "gallery": "గ్యాలరీ",
+      "location": "లోకేషన్"
+    },
+    "english": {
+      "about": "About",
+      "pooja": "Services",
+      "seva-booking": "Seva Booking",
+      "gallery": "Gallery",
+      "location": "Location"
+    }
+  },
+  "hero": {
+    "kickerTelugu": "శ్రీ ఆంజనేయ స్వామి ఆశీస్సులతో",
+    "kickerEnglish": "With the blessings of Sri Anjaneya Swamy",
+    "titleTelugu": "జై శ్రీ రామ్",
+    "titleEnglish": "Jai Sri Ram"
+  },
+  "banner": {
+    "labelTelugu": "రాబోయే కార్యక్రమాలు",
+    "labelEnglish": "Upcoming Events",
+    "items": [
+      {
+        "telugu": "ప్రతి శనివారం సాయంత్రం 6:00 కు హనుమాన్ చాలీసా పారాయణం",
+        "english": "Every Saturday at 6:00 PM, Hanuman Chalisa recital"
+      },
+      {
+        "telugu": "ప్రతి మంగళవారం భక్తులకు అన్నదానం మధ్యాహ్నం 12:30 కు",
+        "english": "Annadanam for devotees every Tuesday at 12:30 PM"
+      },
+      {
+        "telugu": "ఉగాది పండుగ - 2026 మార్చి 19",
+        "english": "Ugadi Festival - March 19, 2026",
+        "showUntil": "2026-03-19"
+      }
+    ]
+  },
+  "sections": {
+    "about": {
+      "paragraphs": [
+        {
+          "telugu": "శ్రీ శ్రీ శ్రీ వరధాంజనేయ స్వామి వారి దేవాలయం హైదరాబాద్, ఎల్. బి. నగర్ లోని పవిత్రమైన ఆంజనేయ స్వామి ఆలయం. ఈ ఆలయానికి భక్తులు దూర ప్రాంతాల నుండి దర్శనం కోసం వస్తారు.",
+          "english": "Sri Sri Sri Varadhan Janeya Swamy Temple is a sacred Hanuman temple located in Hyderabad. Devotees come from distant places to seek blessings and darshan."
+        }
+      ]
+    },
+    "pooja": {
+      "items": [
+        { "telugu": "అర్చన", "english": "Archana" },
+        { "telugu": "అభిషేకం", "english": "Abhishekam" },
+        { "telugu": "హనుమాన్ చాలీసా పారాయణం", "english": "Hanuman Chalisa Recitation" },
+        { "telugu": "ప్రత్యేక పూజలు", "english": "Special Poojas" }
+      ]
+    },
+    "location": {
+      "mapIntroTelugu": "Google Maps లో ఆలయ లోకేషన్:",
+      "mapIntroEnglish": "Temple location on Google Maps:",
+      "mapLinkTelugu": "Google Maps లో తెరవండి",
+      "mapLinkEnglish": "Open in Google Maps",
+      "mapLinkUrl": "https://maps.app.goo.gl/aPE5P6qyGQTjuyRh7",
+      "mapCoordinates": "17.347357,78.545501",
+      "mapZoom": 17
+    }
+  },
+  "audio": {
+    "musicSrc": "assets/audio/background.mp3",
+    "autoplay": true,
+    "loop": true,
+    "volume": 0.2
+  },
+  "integrations": {
+    "bookingWebhookUrl": "https://script.google.com/macros/s/AKfycbyyPxEKFQNg_sYxmlgOGuHhls2bvBupiS8K8K5QNzDbXq0aH4PKNjZdsrtOsaMJ0nes/exec",
+    "bookingWebhookTimeoutMs": 12000,
+    "enableSheetUpdate": true,
+    "enableWhatsappMessage": false
+  },
+  "footer": {
+    "telugu": "© 2026 శ్రీ శ్రీ శ్రీ వరధాంజనేయ స్వామి వారి దేవాలయం | దానాపురం, ఎల్. బి. నగర్, హైదరాబాదు-74, తెలంగాణ.",
+    "english": "© 2026 Sri Sri Sri Varadhanjaneya Swamy Temple | Danapuram, L. B. Nagar, Hyderabad-74, Telangana.",
+    "phone": "040-12345678",
+    "email": "svanjaneya.temple@gmail.com"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "images": [
+    {
+      "src": "assets/images/t1.jpg",
+      "teluguAlt": "శ్రీ వరధాంజనేయ స్వామి వారు",
+      "englishAlt": "Sri Varadhanjeneya Swamy"
+    },
+    {
+      "src": "assets/images/t3.jpg",
+      "teluguAlt": "శ్రీ రామలింగేశ్వర స్వామి వారు",
+      "englishAlt": "Sri Ramalingeswara Swamy"
+    },
+    {
+      "src": "assets/images/t2.jpg",
+      "teluguAlt": "శ్రీ రాజరాజేశ్వరి అమ్మ వారు",
+      "englishAlt": "Sri Rajarajeshwari Amman"
+    }
+  ]
+}

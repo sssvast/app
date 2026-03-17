@@ -3,16 +3,16 @@ const teluguBtn = document.getElementById('teluguBtn');
 const englishBtn = document.getElementById('englishBtn');
 const menuToggle = document.getElementById('menuToggle');
 const menuToggleLabel = document.getElementById('menuToggleLabel');
+const musicToggleBtn = document.getElementById('musicToggleBtn');
 const navLinks = document.querySelectorAll('header nav a.nav-link');
 const sections = document.querySelectorAll('main section[id]');
-const allTextElements = document.querySelectorAll('[data-telugu]');
-const galleryImages = document.querySelectorAll('.gallery img');
-const galleryButtons = document.querySelectorAll('.gallery-item');
 const lightbox = document.getElementById('lightbox');
+const backgroundMusic = document.getElementById('backgroundMusic');
+const sevaDateBlockedHint = document.getElementById('sevaDateBlockedHint');
 const lightboxImage = document.getElementById('lightboxImage');
 const lightboxCaption = document.getElementById('lightboxCaption');
 const lightboxClose = document.getElementById('lightboxClose');
-const sevaOptionCards = document.querySelectorAll('.seva-option');
+const sevaList = document.getElementById('sevaList');
 const sevaBookingForm = document.getElementById('sevaBookingForm');
 const devoteeNameInput = document.getElementById('devoteeName');
 const devoteeGotramInput = document.getElementById('devoteeGotram');
@@ -26,6 +26,7 @@ const sevaAvailability = document.getElementById('sevaAvailability');
 const sevaTotal = document.getElementById('sevaTotal');
 const sevaBookingMessage = document.getElementById('sevaBookingMessage');
 const bookSevaBtn = document.getElementById('bookSevaBtn');
+const honeypotInput = document.getElementById('bookingHoneypot');
 const pageLoader = document.getElementById('pageLoader');
 const pageLoaderStatus = document.getElementById('pageLoaderStatus');
 const pageLoaderCountdown = document.getElementById('pageLoaderCountdown');
@@ -40,22 +41,125 @@ let pageLoaderTimer = 0;
 let pageLoaderCountdownDone = false;
 let pageLoaderIsReady = document.readyState === 'complete';
 let pageLoaderHideTimer = 0;
-const bookingRules = {
+let musicResumeHandlersBound = false;
+const defaultBookingRules = {
   regularAdvanceDays: 1,
   regularWindowDays: 15,
   tuesdayWindowDays: 28,
   nextAvailableDateCutoffHour: 17,
-  sameDayServiceCutoffHour: 8
+  tuesdaySevaId: 'tuesday-annadanam'
 };
+let bookingRules = { ...defaultBookingRules };
+const defaultBookingMessages = {
+  telugu: {
+    selectionHint: {
+      default: 'దశ 2: మీకు కావలసిన సేవా కార్డు పై ట్యాప్ చేసి ఎంచుకోండి. మళ్ళీ ట్యాప్ చేస్తే ఎంపిక తీసివేయబడుతుంది.',
+      selected: 'దశ 2 పూర్తైంది: {sevaName} ఎంచుకున్నారు. మరో కార్డు ట్యాప్ చేస్తే ఎంపిక మారుతుంది.'
+    },
+    selectedSeva: {
+      none: 'ఎంచుకున్న సేవ: లేదు',
+      selected: 'ఎంచుకున్న సేవ: {sevaName} ({sevaTiming})'
+    },
+    availability: {
+      selectDateAndSeva: 'తేదీ మరియు సేవా కార్డు ఎంచుకుంటే అందుబాటు స్లాట్లు కనిపిస్తాయి.',
+      tuesdayOnly: 'మంగళవారం అన్నదానం కోసం మంగళవారం తేదీలే ఎంచుకోవాలి.',
+      loading: 'ప్రత్యక్ష అందుబాటు స్లాట్లు చూస్తున్నాం...',
+      zeroSlots: 'ఎంచుకున్న తేదీకి అందుబాటులో ఉన్న స్లాట్లు: 0 / {dailySlots}',
+      availableSlots: 'ఎంచుకున్న తేదీకి అందుబాటులో ఉన్న స్లాట్లు: {availableSlots} / {dailySlots}'
+    },
+    total: {
+      zero: 'మొత్తం: రూ. 0/-',
+      amount: 'మొత్తం: రూ. {totalAmount}/-'
+    },
+    errors: {
+      invalidDetails: 'దయచేసి సరైన వివరాలు నమోదు చేయండి. గోత్రం ఇవ్వాలి, వాట్సాప్ నంబర్ 10 అంకెలుగా ఉండాలి మరియు సేవా కార్డు ఎంచుకోవాలి.',
+      tuesdayOnly: 'మంగళవారం అన్నదానం కోసం మంగళవారం తేదీలే ఎంచుకోవాలి.',
+      bookingWindowTuesday: 'మంగళవారం అన్నదానం కోసం రాబోయే {tuesdayWindowDays} రోజులలోని మంగళవారం తేదీల్లో మాత్రమే బుకింగ్ చేయవచ్చు. అన్ని సేవలకు కనీసం {regularAdvanceDays} రోజు గ్యాప్ అవసరం.',
+      bookingWindowRegular: 'అన్ని సేవలకు కనీసం {regularAdvanceDays} రోజు ముందుగా మాత్రమే బుకింగ్ చేయవచ్చు. రాబోయే {regularWindowDays} రోజుల తేదీల్లో మాత్రమే బుకింగ్ చేయవచ్చు.',
+      onlySlotsLeft: 'ఈ తేదీకి {availableSlots} స్లాట్(లు) మాత్రమే మిగిలి ఉన్నాయి.',
+      blockedDate: 'ఎంచుకున్న తేదీ ఈ సేవకు అందుబాటులో లేదు. దయచేసి మరొక తేదీ ఎంచుకోండి.',
+      tooFast: 'దయచేసి వివరాలు సమీక్షించి తిరిగి సమర్పించండి.',
+      rateLimited: 'చాలా ప్రయత్నాలు చేశారు. దయచేసి కొంత సమయం తర్వాత ప్రయత్నించండి.',
+      bookingUnavailable: 'ప్రస్తుతం ప్రత్యక్ష అందుబాటును నిర్ధారించలేకపోయాము. దయచేసి మళ్లీ ప్రయత్నించండి.'
+    },
+    success: {
+      bookingReceived: '{sevaName} కోసం మీ సేవా అభ్యర్థన విజయవంతంగా స్వీకరించబడింది. ఆలయ ప్రతినిధి మీకు తుది నిర్ధారణను {nextRequestDate} సాయంత్రం 6:00 లోపు పంపిస్తారు. మీ భక్తికి ధన్యవాదాలు.',
+      bookingReceivedWithRef: '{sevaName} కోసం మీ సేవా అభ్యర్థన విజయవంతంగా స్వీకరించబడింది. బుకింగ్ నంబర్: {bookingRef}. ఆలయ ప్రతినిధి మీకు తుది నిర్ధారణను {nextRequestDate} సాయంత్రం 6:00 లోపు పంపిస్తారు. మీ భక్తికి ధన్యవాదాలు.'
+    }
+  },
+  english: {
+    selectionHint: {
+      default: 'Step 2: Tap a seva card to select it. Tap again to clear your selection.',
+      selected: 'Step 2 complete: {sevaName} selected. Tap another card to change your selection.'
+    },
+    selectedSeva: {
+      none: 'Selected seva: None',
+      selected: 'Selected seva: {sevaName} ({sevaTiming})'
+    },
+    availability: {
+      selectDateAndSeva: 'Choose a date and seva card to view available slots.',
+      tuesdayOnly: 'For Tuesday Annadanam, only Tuesdays can be selected.',
+      loading: 'Checking live availability...',
+      zeroSlots: 'Available slots for selected date: 0 / {dailySlots}',
+      availableSlots: 'Available slots for selected date: {availableSlots} / {dailySlots}'
+    },
+    total: {
+      zero: 'Total: Rs. 0/-',
+      amount: 'Total: Rs. {totalAmount}/-'
+    },
+    errors: {
+      invalidDetails: 'Please enter valid details. Gotram is required, WhatsApp number must contain 10 digits, and a seva card must be selected.',
+      tuesdayOnly: 'For Tuesday Annadanam, only Tuesdays can be selected.',
+      bookingWindowTuesday: 'Tuesday Annadanam can be booked only for Tuesdays within the upcoming {tuesdayWindowDays} days. A minimum {regularAdvanceDays}-day gap is required for all sevas.',
+      bookingWindowRegular: 'For all sevas, booking starts only from {regularAdvanceDays} day(s) ahead. Booking remains limited to the upcoming {regularWindowDays} days.',
+      onlySlotsLeft: 'Only {availableSlots} slot(s) are available for this date.',
+      blockedDate: 'The selected date is not available for this seva. Please choose another date.',
+      tooFast: 'Please review your details and try again.',
+      rateLimited: 'Too many attempts. Please wait a few minutes before trying again.',
+      bookingUnavailable: 'We could not verify live availability right now. Please try again.'
+    },
+    success: {
+      bookingReceived: 'Your seva request for {sevaName} has been received successfully. A temple representative will share the final confirmation with you before 6:00 PM on {nextRequestDate}. Thank you for your devotion.',
+      bookingReceivedWithRef: 'Your seva request for {sevaName} has been received. Booking Reference: {bookingRef}. A temple representative will share the final confirmation with you before 6:00 PM on {nextRequestDate}. Thank you for your devotion.'
+    }
+  }
+};
+let bookingMessages = JSON.parse(JSON.stringify(defaultBookingMessages));
 const bookingStorageKey = 'svsTempleSevaBookings';
+const musicPreferenceKey = 'svsTempleMusicMuted';
+const bookingRateLimitKey = 'svsTempleBookingAttemptsByPhone';
+const BOOKING_RATE_LIMIT_MAX = 5;
+const BOOKING_RATE_WINDOW_MS = 10 * 60 * 1000;
+const BOOKING_MIN_TIME_MS = 5000;
+const BOOKING_AVAILABILITY_CACHE_TTL_MS = 30 * 1000;
+const pageLoadTime = Date.now();
+const bookingAvailabilityCache = new Map();
+let bookingAvailabilityRequestId = 0;
 const templeBookingEmail = 'svanjaneya.temple@gmail.com';
 const smtpConfig = window.TEMPLE_SMTP_CONFIG || {};
 const smtpSecureToken = typeof smtpConfig.secureToken === 'string' ? smtpConfig.secureToken.trim() : '';
 const smtpFromEmail = smtpConfig.fromEmail || templeBookingEmail;
 const smtpToEmail = smtpConfig.toEmail || templeBookingEmail;
 const smtpScriptUrl = 'https://smtpjs.com/v3/smtp.js';
+const sevaCatalogUrl = 'assets/data/sevas.json';
+const galleryUrl = 'assets/data/gallery.json';
+const contentUrl = 'assets/data/content.json';
+
+function logJsonLoadFallback(dataPath, error) {
+  const reason = error && typeof error.message === 'string' ? error.message : String(error);
+
+  if (window.location.protocol === 'file:') {
+    console.warn(
+      `[Temple] Failed to load ${dataPath} (${reason}). The app is running via file:// and browser JSON fetch may be blocked. Run from a local server: python -m http.server 8080 or npx serve .`
+    );
+    return;
+  }
+
+  console.warn(`[Temple] Failed to load ${dataPath} (${reason}). Using fallback data.`);
+}
+
 let smtpLibraryPromise = null;
-const sevaCatalog = [
+const fallbackSevaCatalog = [
   {
     id: 'rahu-kethu-pooja',
     telugu: 'శ్రీ రాహు & కేతు పూజ',
@@ -63,7 +167,8 @@ const sevaCatalog = [
     timingTelugu: 'ఉదయం 8:00',
     timingEnglish: '8:00 AM',
     price: 750,
-    dailySlots: 20
+    dailySlots: 20,
+    blockedDates: []
   },
   {
     id: 'varadhanjaneya-abhishekam',
@@ -72,7 +177,8 @@ const sevaCatalog = [
     timingTelugu: 'ఉదయం 8:00',
     timingEnglish: '8:00 AM',
     price: 500,
-    dailySlots: 20
+    dailySlots: 20,
+    blockedDates: []
   },
   {
     id: 'ramalingeswara-abhishekam',
@@ -81,7 +187,8 @@ const sevaCatalog = [
     timingTelugu: 'ఉదయం 8:00',
     timingEnglish: '8:00 AM',
     price: 500,
-    dailySlots: 20
+    dailySlots: 20,
+    blockedDates: []
   },
   {
     id: 'rajarajeshwari-abhishekam',
@@ -90,7 +197,8 @@ const sevaCatalog = [
     timingTelugu: 'ఉదయం 8:00',
     timingEnglish: '8:00 AM',
     price: 500,
-    dailySlots: 20
+    dailySlots: 20,
+    blockedDates: []
   },
   {
     id: 'tuesday-annadanam',
@@ -99,19 +207,88 @@ const sevaCatalog = [
     timingTelugu: 'ఉదయం 8:00',
     timingEnglish: '8:00 AM',
     price: 6500,
-    dailySlots: 1
+    dailySlots: 1,
+    blockedDates: []
   }
 ];
-const pageTitles = {
+let sevaCatalog = [...fallbackSevaCatalog];
+const defaultGalleryCatalog = [
+  { src: 'assets/images/t1.jpg', teluguAlt: 'శ్రీ వరధాంజనేయ స్వామి వారు', englishAlt: 'Sri Varadhanjeneya Swamy' },
+  { src: 'assets/images/t2.jpg', teluguAlt: 'శ్రీ రాజరాజేశ్వరి అమ్మ వారు', englishAlt: 'Sri Rajarajeshwari Amman' },
+  { src: 'assets/images/t3.jpg', teluguAlt: 'శ్రీ రామలింగేశ్వర స్వామి వారు', englishAlt: 'Sri Ramalingeswara Swamy' },
+  { src: 'assets/images/t4.jpg', teluguAlt: 'గుడి ముఖద్వారం', englishAlt: 'Temple Arch' }
+];
+let galleryCatalog = [...defaultGalleryCatalog];
+const defaultContent = {
+  page: {
+    titleTelugu: 'శ్రీ శ్రీ శ్రీ వరధాంజనేయ స్వామి వారి దేవాలయం',
+    titleEnglish: 'Sri Sri Sri Varadhan Janeya Swamy Temple'
+  },
+  nav: {
+    telugu: { about: 'ఆలయం గురించి', pooja: 'పూజలు', 'seva-booking': 'సేవా బుకింగ్', gallery: 'గ్యాలరీ', location: 'లోకేషన్' },
+    english: { about: 'About', pooja: 'Services', 'seva-booking': 'Seva Booking', gallery: 'Gallery', location: 'Location' }
+  },
+  hero: {
+    kickerTelugu: 'శ్రీ ఆంజనేయ స్వామి ఆశీస్సులతో',
+    kickerEnglish: 'With the blessings of Sri Anjaneya Swamy',
+    titleTelugu: 'జై శ్రీ రామ్',
+    titleEnglish: 'Jai Sri Ram'
+  },
+  banner: {
+    labelTelugu: 'రాబోయే కార్యక్రమాలు',
+    labelEnglish: 'Upcoming Events',
+    items: [
+      { telugu: 'ప్రతి శనివారం సాయంత్రం 6:00 కు హనుమాన్ చాలీసా పారాయణం', english: 'Every Saturday at 6:00 PM, Hanuman Chalisa recital' },
+      { telugu: 'ప్రతి మంగళవారం భక్తులకు అన్నదానం మధ్యాహ్నం 12:30 కు', english: 'Annadanam for devotees every Tuesday at 12:30 PM' },
+      { telugu: 'ఉగాది పండుగ - 2026 మార్చి 19', english: 'Ugadi Festival - March 19, 2026', showUntil: '2026-03-19' }
+    ]
+  },
+  sections: {
+    about: {
+      paragraphs: [
+        { telugu: 'శ్రీ శ్రీ శ్రీ వరధాంజనేయ స్వామి వారి దేవాలయం హైదరాబాద్, ఎల్. బి. నగర్ లోని పవిత్రమైన ఆంజనేయ స్వామి ఆలయం. ఈ ఆలయానికి భక్తులు దూర ప్రాంతాల నుండి దర్శనం కోసం వస్తారు.', english: 'Sri Sri Sri Varadhan Janeya Swamy Temple is a sacred Hanuman temple located in Hyderabad. Devotees come from distant places to seek blessings and darshan.' }
+      ]
+    },
+    pooja: { items: [ { telugu: 'అర్చన', english: 'Archana' }, { telugu: 'అభిషేకం', english: 'Abhishekam' }, { telugu: 'హనుమాన్ చాలీసా పారాయణం', english: 'Hanuman Chalisa Recitation' }, { telugu: 'ప్రత్యేక పూజలు', english: 'Special Poojas' } ] },
+    location: {
+      mapIntroTelugu: 'Google Maps లో ఆలయ లోకేషన్:',
+      mapIntroEnglish: 'Temple location on Google Maps:',
+      mapLinkTelugu: 'Google Maps లో తెరవండి',
+      mapLinkEnglish: 'Open in Google Maps',
+      mapLinkUrl: 'https://maps.app.goo.gl/aPE5P6qyGQTjuyRh7',
+      mapCoordinates: '17.347357,78.545501',
+      mapZoom: 17
+    }
+  },
+  audio: {
+    musicSrc: 'assets/audio/temple-background.mp3',
+    autoplay: true,
+    loop: true,
+    volume: 0.2
+  },
+  integrations: {
+    bookingWebhookUrl: '',
+    bookingWebhookTimeoutMs: 12000,
+    enableSheetUpdate: true,
+    enableWhatsappMessage: true
+  },
+  footer: {
+    telugu: '© 2026 శ్రీ శ్రీ శ్రీ వరధాంజనేయ స్వామి వారి దేవాలయం | దానాపురం, ఎల్. బి. నగర్, హైదరాబాదు-74, తెలంగాణ | ఫోన్: 040-12345678 | ఇమెయిల్: svanjaneya.temple@gmail.com',
+    english: '© 2026 Sri Sri Sri Varadhan Janeya Swamy Temple | Danapuram, L. B. Nagar, Hyderabad-74, Telangana | Phone: 040-12345678 | Email: svanjaneya.temple@gmail.com',
+    phone: '040-12345678',
+    email: 'svanjaneya.temple@gmail.com'
+  }
+};
+let siteContent = JSON.parse(JSON.stringify(defaultContent));
+let pageTitles = {
   telugu: 'శ్రీ శ్రీ శ్రీ వరధాంజనేయ స్వామి వారి దేవాలయం',
   english: 'Sri Sri Sri Varadhan Janeya Swamy Temple'
 };
-const navLabels = {
+let navLabels = {
   telugu: {
     about: 'ఆలయం గురించి',
     pooja: 'పూజలు',
     'seva-booking': 'సేవా బుకింగ్',
-    festivals: 'పండుగలు',
     gallery: 'గ్యాలరీ',
     location: 'లోకేషన్'
   },
@@ -119,11 +296,783 @@ const navLabels = {
     about: 'About',
     pooja: 'Services',
     'seva-booking': 'Seva Booking',
-    festivals: 'Festivals',
     gallery: 'Gallery',
     location: 'Location'
   }
 };
+
+function getSevaOptionCards() {
+  return document.querySelectorAll('.seva-option');
+}
+
+function getSevaCardTextValues(seva) {
+  return {
+    title: currentLang === 'telugu' ? seva.telugu : seva.english,
+    price: currentLang === 'telugu' ? `రుసుము: రూ. ${seva.price}/-` : `Price: Rs. ${seva.price}/-`,
+    slots: currentLang === 'telugu' ? `రోజుకు స్లాట్లు: ${seva.dailySlots}` : `Slots per day: ${seva.dailySlots}`,
+    timing: currentLang === 'telugu' ? `సమయం: ${seva.timingTelugu}` : `Timing: ${seva.timingEnglish}`
+  };
+}
+
+function renderSevaCards() {
+  if (!sevaList) {
+    return;
+  }
+
+  const selectedSevaId = sevaTypeInput ? sevaTypeInput.value : '';
+  const cardsFragment = document.createDocumentFragment();
+
+  sevaCatalog.forEach(seva => {
+    const card = document.createElement('li');
+    const isSelected = selectedSevaId === seva.id;
+    const textValues = getSevaCardTextValues(seva);
+
+    card.className = 'seva-card seva-option';
+    card.dataset.sevaId = seva.id;
+    card.setAttribute('role', 'button');
+    card.setAttribute('tabindex', '0');
+    card.classList.toggle('is-selected', isSelected);
+    card.setAttribute('aria-pressed', String(isSelected));
+
+    const title = document.createElement('h4');
+    title.dataset.telugu = seva.telugu;
+    title.dataset.english = seva.english;
+    title.textContent = textValues.title;
+
+    const price = document.createElement('p');
+    price.dataset.telugu = `రుసుము: రూ. ${seva.price}/-`;
+    price.dataset.english = `Price: Rs. ${seva.price}/-`;
+    price.textContent = textValues.price;
+
+    const slots = document.createElement('p');
+    slots.dataset.telugu = `రోజుకు స్లాట్లు: ${seva.dailySlots}`;
+    slots.dataset.english = `Slots per day: ${seva.dailySlots}`;
+    slots.textContent = textValues.slots;
+
+    const timing = document.createElement('p');
+    timing.dataset.telugu = `సమయం: ${seva.timingTelugu}`;
+    timing.dataset.english = `Timing: ${seva.timingEnglish}`;
+    timing.textContent = textValues.timing;
+
+    card.append(title, price, slots, timing);
+    cardsFragment.appendChild(card);
+  });
+
+  sevaList.replaceChildren(cardsFragment);
+}
+
+function normalizeSevaCatalogItem(item) {
+  if (!item || typeof item !== 'object') {
+    return null;
+  }
+
+  const id = typeof item.id === 'string' ? item.id.trim() : '';
+  const telugu = typeof item.telugu === 'string' ? item.telugu.trim() : '';
+  const english = typeof item.english === 'string' ? item.english.trim() : '';
+  const timingTelugu = typeof item.timingTelugu === 'string' ? item.timingTelugu.trim() : '';
+  const timingEnglish = typeof item.timingEnglish === 'string' ? item.timingEnglish.trim() : '';
+  const price = Number(item.price);
+  const dailySlots = Number(item.dailySlots);
+
+  if (!id || !telugu || !english || !timingTelugu || !timingEnglish) {
+    return null;
+  }
+
+  if (!Number.isFinite(price) || price <= 0 || !Number.isFinite(dailySlots) || dailySlots < 1) {
+    return null;
+  }
+
+  const blockedDates = Array.isArray(item.blockedDates)
+    ? item.blockedDates.filter(d => typeof d === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(d))
+    : [];
+
+  return {
+    id,
+    telugu,
+    english,
+    timingTelugu,
+    timingEnglish,
+    price: Math.round(price),
+    dailySlots: Math.max(1, Math.trunc(dailySlots)),
+    blockedDates
+  };
+}
+
+function normalizeSevaCatalogPayload(payload) {
+  const list = Array.isArray(payload)
+    ? payload
+    : (payload && Array.isArray(payload.sevas) ? payload.sevas : []);
+
+  const normalized = list
+    .map(normalizeSevaCatalogItem)
+    .filter(Boolean);
+
+  const unique = [];
+  const seenIds = new Set();
+
+  normalized.forEach(seva => {
+    if (seenIds.has(seva.id)) {
+      return;
+    }
+
+    seenIds.add(seva.id);
+    unique.push(seva);
+  });
+
+  return unique;
+}
+
+async function loadSevaCatalog() {
+  let loadedCatalog = [...fallbackSevaCatalog];
+  let loadedRules = { ...defaultBookingRules };
+  let loadedMessages = JSON.parse(JSON.stringify(defaultBookingMessages));
+
+  try {
+    const response = await fetch(sevaCatalogUrl, { cache: 'no-store' });
+    if (!response.ok) {
+      throw new Error(`Unable to load seva catalog: ${response.status}`);
+    }
+
+    const payload = await response.json();
+
+    const normalizedRules = normalizeBookingRulesPayload(payload);
+    if (normalizedRules) {
+      loadedRules = normalizedRules;
+    }
+
+    const normalizedMessages = normalizeBookingMessagesPayload(payload);
+    if (normalizedMessages) {
+      loadedMessages = normalizedMessages;
+    }
+
+    const normalizedCatalog = normalizeSevaCatalogPayload(payload);
+    if (normalizedCatalog.length > 0) {
+      loadedCatalog = normalizedCatalog;
+    }
+  } catch (error) {
+    logJsonLoadFallback(sevaCatalogUrl, error);
+  }
+
+  bookingRules = loadedRules;
+  bookingMessages = loadedMessages;
+  sevaCatalog = loadedCatalog;
+
+  if (sevaTypeInput && sevaTypeInput.value && !sevaCatalog.some(seva => seva.id === sevaTypeInput.value)) {
+    sevaTypeInput.value = '';
+  }
+
+  renderSevaCards();
+  updateDateConstraintsForSelectedSeva();
+  updateFormLockState();
+  updateSevaSelectedLabel();
+  updateSevaSelectionHint();
+  updateSevaBookingSummary();
+
+  console.info('[Temple] Booking rules in use:', bookingRules);
+}
+
+function normalizeBookingRulesPayload(payload) {
+  const source = payload && typeof payload === 'object' && payload.bookingRules && typeof payload.bookingRules === 'object'
+    ? payload.bookingRules
+    : payload;
+
+  if (!source || typeof source !== 'object') {
+    return null;
+  }
+
+  const normalized = { ...defaultBookingRules };
+  const regularAdvanceDays = Number(source.regularAdvanceDays);
+  const regularWindowDays = Number(source.regularWindowDays);
+  const tuesdayWindowDays = Number(source.tuesdayWindowDays);
+  const nextAvailableDateCutoffHour = Number(source.nextAvailableDateCutoffHour);
+
+  if (Number.isFinite(regularAdvanceDays) && regularAdvanceDays >= 1) {
+    normalized.regularAdvanceDays = Math.max(1, Math.trunc(regularAdvanceDays));
+  }
+
+  if (Number.isFinite(regularWindowDays) && regularWindowDays >= normalized.regularAdvanceDays) {
+    normalized.regularWindowDays = Math.max(normalized.regularAdvanceDays, Math.trunc(regularWindowDays));
+  }
+
+  if (Number.isFinite(tuesdayWindowDays) && tuesdayWindowDays >= 7) {
+    normalized.tuesdayWindowDays = Math.max(7, Math.trunc(tuesdayWindowDays));
+  }
+
+  if (Number.isFinite(nextAvailableDateCutoffHour) && nextAvailableDateCutoffHour >= 0 && nextAvailableDateCutoffHour <= 23) {
+    normalized.nextAvailableDateCutoffHour = Math.trunc(nextAvailableDateCutoffHour);
+  }
+
+  if (typeof source.tuesdaySevaId === 'string' && source.tuesdaySevaId.trim()) {
+    normalized.tuesdaySevaId = source.tuesdaySevaId.trim();
+  }
+
+  normalized.regularWindowDays = Math.max(normalized.regularAdvanceDays, normalized.regularWindowDays);
+  normalized.tuesdayWindowDays = Math.max(7, normalized.tuesdayWindowDays);
+
+  return normalized;
+}
+
+function isPlainObject(value) {
+  return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
+}
+
+function deepMergeContent(base, override) {
+    if (!isPlainObject(base)) {
+      return override !== undefined ? override : base;
+    }
+
+    const result = {};
+    Object.keys(base).forEach(key => {
+      const overrideVal = isPlainObject(override) && override[key] !== undefined ? override[key] : undefined;
+      if (isPlainObject(base[key])) {
+        result[key] = deepMergeContent(base[key], overrideVal);
+      } else if (Array.isArray(base[key])) {
+        result[key] = Array.isArray(overrideVal) && overrideVal.length > 0 ? overrideVal : base[key];
+      } else {
+        result[key] = overrideVal !== undefined ? overrideVal : base[key];
+      }
+    });
+    return result;
+  }
+
+  function normalizeContentPayload(payload) {
+    if (!isPlainObject(payload)) {
+      return null;
+    }
+
+    return deepMergeContent(defaultContent, payload);
+  }
+
+  function renderHero() {
+    const kickerEl = document.getElementById('heroKicker');
+    const titleEl = document.getElementById('heroTitle');
+    const hero = siteContent.hero;
+
+    if (kickerEl) {
+      kickerEl.dataset.telugu = hero.kickerTelugu;
+      kickerEl.dataset.english = hero.kickerEnglish;
+      kickerEl.textContent = currentLang === 'telugu' ? hero.kickerTelugu : hero.kickerEnglish;
+    }
+
+    if (titleEl) {
+      titleEl.dataset.telugu = hero.titleTelugu;
+      titleEl.dataset.english = hero.titleEnglish;
+      titleEl.textContent = currentLang === 'telugu' ? hero.titleTelugu : hero.titleEnglish;
+    }
+  }
+
+  function renderBanner() {
+    const track1 = document.getElementById('eventBannerTrack1');
+    const track2 = document.getElementById('eventBannerTrack2');
+    if (!track1 || !track2) {
+      return;
+    }
+
+    const banner = siteContent.banner;
+    const todayValue = getTodayDateValue();
+
+    const visibleBannerItems = (banner.items || []).filter(item => {
+      if (!item || typeof item !== 'object') {
+        return false;
+      }
+
+      const showUntil = typeof item.showUntil === 'string' ? item.showUntil.trim() : '';
+      if (!showUntil) {
+        return true;
+      }
+
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(showUntil)) {
+        return true;
+      }
+
+      return todayValue <= showUntil;
+    });
+
+    function buildTrackFragment() {
+      const frag = document.createDocumentFragment();
+      const labelEl = document.createElement('span');
+      labelEl.className = 'event-banner-label';
+      labelEl.dataset.telugu = banner.labelTelugu;
+      labelEl.dataset.english = banner.labelEnglish;
+      labelEl.textContent = currentLang === 'telugu' ? banner.labelTelugu : banner.labelEnglish;
+      frag.appendChild(labelEl);
+
+      visibleBannerItems.forEach(item => {
+        const span = document.createElement('span');
+        span.className = 'event-banner-item';
+        span.dataset.telugu = item.telugu;
+        span.dataset.english = item.english;
+        span.textContent = currentLang === 'telugu' ? item.telugu : item.english;
+        frag.appendChild(span);
+      });
+      return frag;
+    }
+
+    track1.replaceChildren(buildTrackFragment());
+    track2.replaceChildren(buildTrackFragment());
+  }
+
+  function renderAboutSection() {
+    const container = document.getElementById('aboutContent');
+    if (!container) {
+      return;
+    }
+
+    const frag = document.createDocumentFragment();
+    (siteContent.sections.about.paragraphs || []).forEach(para => {
+      const p = document.createElement('p');
+      p.className = 'content-p';
+      p.dataset.telugu = para.telugu;
+      p.dataset.english = para.english;
+      p.textContent = currentLang === 'telugu' ? para.telugu : para.english;
+      frag.appendChild(p);
+    });
+    container.replaceChildren(frag);
+  }
+
+  function renderPoojaList() {
+    const list = document.getElementById('poojaList');
+    if (!list) {
+      return;
+    }
+
+    const frag = document.createDocumentFragment();
+    (siteContent.sections.pooja.items || []).forEach(item => {
+      const li = document.createElement('li');
+      li.dataset.telugu = item.telugu;
+      li.dataset.english = item.english;
+      li.textContent = currentLang === 'telugu' ? item.telugu : item.english;
+      frag.appendChild(li);
+    });
+    list.replaceChildren(frag);
+  }
+
+  function renderFestivalsList() {
+    const list = document.getElementById('festivalsList');
+    if (!list) {
+      return;
+    }
+
+    const festivals = siteContent.sections && siteContent.sections.festivals;
+    const festivalItems = festivals && Array.isArray(festivals.items) ? festivals.items : [];
+
+    const frag = document.createDocumentFragment();
+    festivalItems.forEach(item => {
+      const li = document.createElement('li');
+      li.dataset.telugu = item.telugu;
+      li.dataset.english = item.english;
+      li.textContent = currentLang === 'telugu' ? item.telugu : item.english;
+      frag.appendChild(li);
+    });
+    list.replaceChildren(frag);
+  }
+
+  function renderLocationSection() {
+    const introEl = document.getElementById('locationMapIntro');
+    const linkEl = document.getElementById('locationMapLink');
+    const mapEl = document.getElementById('locationMap');
+    const loc = siteContent.sections.location;
+
+    if (introEl) {
+      introEl.dataset.telugu = loc.mapIntroTelugu;
+      introEl.dataset.english = loc.mapIntroEnglish;
+      introEl.textContent = currentLang === 'telugu' ? loc.mapIntroTelugu : loc.mapIntroEnglish;
+    }
+
+    if (linkEl) {
+      linkEl.href = loc.mapLinkUrl;
+      linkEl.dataset.telugu = loc.mapLinkTelugu;
+      linkEl.dataset.english = loc.mapLinkEnglish;
+      linkEl.textContent = currentLang === 'telugu' ? loc.mapLinkTelugu : loc.mapLinkEnglish;
+    }
+
+    if (mapEl) {
+      const newSrc = `https://www.google.com/maps?q=${encodeURIComponent(loc.mapCoordinates)}&z=${loc.mapZoom}&output=embed`;
+      if (mapEl.src !== newSrc) {
+        mapEl.src = newSrc;
+      }
+    }
+  }
+
+  function renderFooter() {
+    const footerEl = document.getElementById('siteFooterText');
+    const footerContactsEl = document.getElementById('siteFooterContacts');
+    if (!footerEl) {
+      return;
+    }
+
+    const footer = isPlainObject(siteContent.footer) ? siteContent.footer : {};
+    const footerTelugu = typeof footer.telugu === 'string' ? footer.telugu : '';
+    const footerEnglish = typeof footer.english === 'string' ? footer.english : '';
+
+    const stripContactPart = text => text
+      .replace(/\|\s*ఫోన్\s*:\s*[^|]+/gi, '')
+      .replace(/\|\s*ఇమెయిల్\s*:\s*[^|]+/gi, '')
+      .replace(/\|\s*Phone\s*:\s*[^|]+/gi, '')
+      .replace(/\|\s*Email\s*:\s*[^|]+/gi, '')
+      .trim();
+
+    const normalizePhoneHref = rawPhone => {
+      const compact = rawPhone.replace(/[^0-9+]/g, '');
+      const normalized = compact.startsWith('+') ? compact : compact.replace(/\+/g, '');
+      return `tel:${normalized || rawPhone}`;
+    };
+
+    const appendContactLink = (container, href, iconType, text, label) => {
+      const link = document.createElement('a');
+      link.className = 'footer-contact-link';
+      link.href = href;
+      link.setAttribute('aria-label', label);
+
+      const iconSpan = document.createElement('span');
+      iconSpan.className = `footer-contact-icon footer-contact-icon--${iconType}`;
+      iconSpan.setAttribute('aria-hidden', 'true');
+
+      const textSpan = document.createElement('span');
+      textSpan.textContent = text;
+
+      link.append(iconSpan, textSpan);
+      container.appendChild(link);
+    };
+
+    footerEl.dataset.telugu = footerTelugu;
+    footerEl.dataset.english = footerEnglish;
+    const footerText = currentLang === 'telugu' ? footerTelugu : footerEnglish;
+    footerEl.textContent = stripContactPart(footerText) || footerText;
+
+    if (!footerContactsEl) {
+      return;
+    }
+
+    const phone = typeof footer.phone === 'string' ? footer.phone.trim() : '';
+    const email = typeof footer.email === 'string' ? footer.email.trim() : '';
+
+    footerContactsEl.replaceChildren();
+
+    if (!phone && !email) {
+      footerContactsEl.setAttribute('hidden', '');
+      return;
+    }
+
+    footerContactsEl.removeAttribute('hidden');
+
+    if (phone) {
+      appendContactLink(
+        footerContactsEl,
+        normalizePhoneHref(phone),
+        'phone',
+        phone,
+        currentLang === 'telugu' ? `ఫోన్ ${phone}` : `Phone ${phone}`
+      );
+    }
+
+    if (email) {
+      appendContactLink(
+        footerContactsEl,
+        `mailto:${email}`,
+        'email',
+        email,
+        currentLang === 'telugu' ? `ఇమెయిల్ ${email}` : `Email ${email}`
+      );
+    }
+  }
+
+  function getStoredMusicMutedPreference() {
+    try {
+      return localStorage.getItem(musicPreferenceKey) === 'true';
+    } catch (error) {
+      return false;
+    }
+  }
+
+  function setStoredMusicMutedPreference(isMuted) {
+    try {
+      localStorage.setItem(musicPreferenceKey, String(Boolean(isMuted)));
+    } catch (error) {
+      // Ignore localStorage restrictions.
+    }
+  }
+
+  function updateMusicToggleButtonLabel() {
+    if (!musicToggleBtn || !backgroundMusic) {
+      return;
+    }
+
+    const isTelugu = currentLang === 'telugu';
+    const hasSource = Boolean(backgroundMusic.getAttribute('src'));
+
+    if (!hasSource) {
+      musicToggleBtn.disabled = true;
+      musicToggleBtn.setAttribute('aria-pressed', 'false');
+      const unavailableLabel = isTelugu
+        ? (musicToggleBtn.dataset.teluguUnavailable || 'సంగీతం లేదు')
+        : (musicToggleBtn.dataset.englishUnavailable || 'Music unavailable');
+      musicToggleBtn.setAttribute('aria-label', unavailableLabel);
+      musicToggleBtn.title = unavailableLabel;
+      return;
+    }
+
+    musicToggleBtn.disabled = false;
+    const isMuted = backgroundMusic.muted;
+    musicToggleBtn.setAttribute('aria-pressed', String(isMuted));
+    const actionLabel = isMuted
+      ? (isTelugu ? (musicToggleBtn.dataset.teluguMuted || 'సంగీతం ఆన్') : (musicToggleBtn.dataset.englishMuted || 'Unmute Music'))
+      : (isTelugu ? (musicToggleBtn.dataset.teluguUnmuted || 'సంగీతం ఆఫ్') : (musicToggleBtn.dataset.englishUnmuted || 'Mute Music'));
+    musicToggleBtn.setAttribute('aria-label', actionLabel);
+    musicToggleBtn.title = actionLabel;
+  }
+
+  function registerMusicResumeHandlers() {
+    if (musicResumeHandlersBound) {
+      return;
+    }
+
+    musicResumeHandlersBound = true;
+
+    const resumeMusic = () => {
+      musicResumeHandlersBound = false;
+      void tryPlayBackgroundMusic();
+    };
+
+    document.addEventListener('click', resumeMusic, { once: true });
+    document.addEventListener('keydown', resumeMusic, { once: true });
+    document.addEventListener('touchstart', resumeMusic, { once: true });
+  }
+
+  async function tryPlayBackgroundMusic() {
+    if (!backgroundMusic || backgroundMusic.muted || !backgroundMusic.getAttribute('src')) {
+      return;
+    }
+
+    try {
+      await backgroundMusic.play();
+    } catch (error) {
+      // Most browsers require a user gesture before unmuted autoplay.
+      registerMusicResumeHandlers();
+    }
+  }
+
+  function applyBackgroundMusicConfig() {
+    if (!backgroundMusic || !musicToggleBtn) {
+      return;
+    }
+
+    const audioConfig = isPlainObject(siteContent.audio) ? siteContent.audio : {};
+    const musicSrc = typeof audioConfig.musicSrc === 'string' ? audioConfig.musicSrc.trim() : '';
+    const autoplayEnabled = audioConfig.autoplay !== false;
+    const shouldLoop = audioConfig.loop !== false;
+    const rawVolume = Number(audioConfig.volume);
+    const volume = Number.isFinite(rawVolume) ? Math.min(Math.max(rawVolume, 0), 1) : 0.2;
+
+    if (musicSrc) {
+      if (backgroundMusic.getAttribute('src') !== musicSrc) {
+        backgroundMusic.setAttribute('src', musicSrc);
+        backgroundMusic.load();
+      }
+    } else {
+      backgroundMusic.removeAttribute('src');
+      backgroundMusic.load();
+    }
+
+    backgroundMusic.loop = shouldLoop;
+    backgroundMusic.volume = volume;
+    backgroundMusic.muted = getStoredMusicMutedPreference();
+
+    if (backgroundMusic.muted || !musicSrc) {
+      backgroundMusic.pause();
+    }
+
+    updateMusicToggleButtonLabel();
+
+    if (autoplayEnabled && !backgroundMusic.muted) {
+      void tryPlayBackgroundMusic();
+    }
+  }
+
+  async function loadContent() {
+    let loaded = JSON.parse(JSON.stringify(defaultContent));
+
+    try {
+      const response = await fetch(contentUrl, { cache: 'no-store' });
+      if (!response.ok) {
+        throw new Error(`Unable to load content: ${response.status}`);
+      }
+
+      const payload = await response.json();
+      const normalized = normalizeContentPayload(payload);
+      if (normalized) {
+        loaded = normalized;
+      }
+    } catch (error) {
+      logJsonLoadFallback(contentUrl, error);
+    }
+
+    siteContent = loaded;
+    pageTitles.telugu = siteContent.page.titleTelugu;
+    pageTitles.english = siteContent.page.titleEnglish;
+    navLabels.telugu = siteContent.nav.telugu;
+    navLabels.english = siteContent.nav.english;
+    applyBackgroundMusicConfig();
+
+    renderHero();
+    renderBanner();
+    renderAboutSection();
+    renderPoojaList();
+    renderFestivalsList();
+    renderLocationSection();
+    renderFooter();
+
+    document.querySelectorAll('[data-telugu]').forEach(el => {
+      el.textContent = currentLang === 'telugu' ? el.dataset.telugu : el.dataset.english;
+    });
+    document.title = pageTitles[currentLang];
+    navLinks.forEach(link => {
+      const section = link.dataset.section;
+      if (section && navLabels[currentLang] && navLabels[currentLang][section]) {
+        link.textContent = navLabels[currentLang][section];
+      }
+    });
+  }
+
+  function normalizeGalleryPayload(payload) {
+    const list = Array.isArray(payload)
+      ? payload
+      : (payload && Array.isArray(payload.images) ? payload.images : []);
+
+    return list.filter(item =>
+      item && typeof item.src === 'string' && item.src.trim() &&
+      typeof item.teluguAlt === 'string' && typeof item.englishAlt === 'string'
+    ).map(item => ({
+      src: item.src.trim(),
+      teluguAlt: item.teluguAlt.trim(),
+      englishAlt: item.englishAlt.trim()
+    }));
+  }
+
+  function renderGallery() {
+    const container = document.getElementById('galleryContainer');
+    if (!container) {
+      return;
+    }
+
+    const frag = document.createDocumentFragment();
+    galleryCatalog.forEach(image => {
+      const button = document.createElement('button');
+      button.className = 'gallery-item';
+      button.type = 'button';
+      button.setAttribute('role', 'listitem');
+
+      const img = document.createElement('img');
+      img.src = image.src;
+      img.alt = currentLang === 'telugu' ? image.teluguAlt : image.englishAlt;
+      img.dataset.teluguAlt = image.teluguAlt;
+      img.dataset.englishAlt = image.englishAlt;
+      img.loading = 'lazy';
+      img.decoding = 'async';
+
+      button.appendChild(img);
+      frag.appendChild(button);
+    });
+    container.replaceChildren(frag);
+  }
+
+  async function loadGallery() {
+    let loaded = [...defaultGalleryCatalog];
+
+    try {
+      const response = await fetch(galleryUrl, { cache: 'no-store' });
+      if (!response.ok) {
+        throw new Error(`Unable to load gallery: ${response.status}`);
+      }
+
+      const payload = await response.json();
+      const normalized = normalizeGalleryPayload(payload);
+      if (normalized.length > 0) {
+        loaded = normalized;
+      }
+    } catch (error) {
+      logJsonLoadFallback(galleryUrl, error);
+    }
+
+    galleryCatalog = loaded;
+    renderGallery();
+  }
+
+  function showBlockedDateHint() {
+    if (!sevaDateBlockedHint) {
+      return;
+    }
+
+    sevaDateBlockedHint.textContent = currentLang === 'telugu'
+      ? (sevaDateBlockedHint.dataset.telugu || 'సేవ నిర్వహించబడదు')
+      : (sevaDateBlockedHint.dataset.english || 'Seva not performed');
+    sevaDateBlockedHint.removeAttribute('hidden');
+  }
+
+  function hideBlockedDateHint() {
+    if (sevaDateBlockedHint) {
+      sevaDateBlockedHint.setAttribute('hidden', '');
+    }
+  }
+
+function mergeMessageTree(baseNode, overrideNode) {
+  if (typeof baseNode === 'string') {
+    return typeof overrideNode === 'string' ? overrideNode : baseNode;
+  }
+
+  const merged = {};
+  Object.keys(baseNode).forEach(key => {
+    const baseValue = baseNode[key];
+    const overrideValue = isPlainObject(overrideNode) ? overrideNode[key] : undefined;
+    merged[key] = mergeMessageTree(baseValue, overrideValue);
+  });
+  return merged;
+}
+
+function normalizeBookingMessagesPayload(payload) {
+  const source = payload && typeof payload === 'object' && isPlainObject(payload.bookingMessages)
+    ? payload.bookingMessages
+    : payload;
+
+  if (!isPlainObject(source)) {
+    return null;
+  }
+
+  return {
+    telugu: mergeMessageTree(defaultBookingMessages.telugu, source.telugu),
+    english: mergeMessageTree(defaultBookingMessages.english, source.english)
+  };
+}
+
+function getMessageByPath(tree, messageKey) {
+  return messageKey.split('.').reduce((current, keyPart) => {
+    if (!current || typeof current !== 'object' || !(keyPart in current)) {
+      return undefined;
+    }
+
+    return current[keyPart];
+  }, tree);
+}
+
+function formatMessageTemplate(template, replacements) {
+  if (typeof template !== 'string') {
+    return '';
+  }
+
+  return template.replace(/\{([a-zA-Z0-9_]+)\}/g, (match, token) => {
+    if (Object.prototype.hasOwnProperty.call(replacements, token)) {
+      return String(replacements[token]);
+    }
+
+    return match;
+  });
+}
+
+function getBookingMessage(messageKey, replacements = {}) {
+  const languageKey = currentLang === 'telugu' ? 'telugu' : 'english';
+  const template = getMessageByPath(bookingMessages[languageKey], messageKey);
+  return formatMessageTemplate(template, replacements);
+}
 
 function updateMenuState(isOpen) {
   header.classList.toggle('nav-open', isOpen);
@@ -361,6 +1310,24 @@ function getBookedSlots(sevaId, dateValue) {
   return Number.isFinite(booked) ? booked : 0;
 }
 
+function setBookedSlots(sevaId, dateValue, bookedSlots) {
+  if (!sevaId || !dateValue) {
+    return;
+  }
+
+  const bookings = getStoredBookings();
+  const safeBookedSlots = Math.max(0, Math.trunc(Number(bookedSlots) || 0));
+  const bookingKey = getBookingKey(sevaId, dateValue);
+
+  if (safeBookedSlots > 0) {
+    bookings[bookingKey] = safeBookedSlots;
+  } else {
+    delete bookings[bookingKey];
+  }
+
+  setStoredBookings(bookings);
+}
+
 function getSelectedSeva() {
   if (!sevaTypeInput || !sevaTypeInput.value) {
     return null;
@@ -392,16 +1359,12 @@ function updateSevaSelectionHint() {
 
   const selectedSeva = getSelectedSeva();
   if (!selectedSeva) {
-    sevaSelectionHint.textContent = currentLang === 'telugu'
-      ? 'దశ 2: మీకు కావలసిన సేవా కార్డు పై ట్యాప్ చేసి ఎంచుకోండి. మళ్ళీ ట్యాప్ చేస్తే ఎంపిక తీసివేయబడుతుంది.'
-      : 'Step 2: Tap a seva card to select it. Tap again to clear your selection.';
+    sevaSelectionHint.textContent = getBookingMessage('selectionHint.default');
     return;
   }
 
   const sevaName = currentLang === 'telugu' ? selectedSeva.telugu : selectedSeva.english;
-  sevaSelectionHint.textContent = currentLang === 'telugu'
-    ? `దశ 2 పూర్తైంది: ${sevaName} ఎంచుకున్నారు. మరో కార్డు ట్యాప్ చేస్తే ఎంపిక మారుతుంది.`
-    : `Step 2 complete: ${sevaName} selected. Tap another card to change your selection.`;
+  sevaSelectionHint.textContent = getBookingMessage('selectionHint.selected', { sevaName });
 }
 
 function sanitizePhoneNumberInput() {
@@ -416,9 +1379,12 @@ function sanitizePhoneNumberInput() {
 }
 
 function updateFormLockState() {
-  const hasSelectedSeva = Boolean(getSelectedSeva());
-  const hasSelectedDate = Boolean(sevaDateInput && sevaDateInput.value);
-  const canUnlockDevoteeFields = hasSelectedSeva && hasSelectedDate;
+  const selectedSeva = getSelectedSeva();
+  const selectedDate = sevaDateInput ? sevaDateInput.value : '';
+  const hasSelectedSeva = Boolean(selectedSeva);
+  const hasSelectedDate = Boolean(selectedDate);
+  const hasBlockedDateSelection = Boolean(selectedSeva && selectedDate && isDateBlockedForSeva(selectedSeva, selectedDate));
+  const canUnlockDevoteeFields = hasSelectedSeva && hasSelectedDate && !hasBlockedDateSelection;
 
   if (devoteeNameInput) {
     devoteeNameInput.disabled = !canUnlockDevoteeFields;
@@ -436,14 +1402,12 @@ function updateFormLockState() {
     sevaDateInput.disabled = false;
   }
 
-  if (!canUnlockDevoteeFields) {
-    if (sevaSlotsInput) {
-      sevaSlotsInput.disabled = true;
-    }
+  if (sevaSlotsInput) {
+    sevaSlotsInput.disabled = !canUnlockDevoteeFields;
+  }
 
-    if (bookSevaBtn) {
-      bookSevaBtn.disabled = true;
-    }
+  if (bookSevaBtn) {
+    bookSevaBtn.disabled = !canUnlockDevoteeFields;
   }
 }
 
@@ -467,16 +1431,6 @@ function isTuesdayDate(dateValue) {
   return selectedDate.getDay() === 2;
 }
 
-function isAfterSameDayServiceCutoff(dateValue) {
-  if (!dateValue || dateValue !== getTodayDateValue()) {
-    return false;
-  }
-
-  const now = new Date();
-  const cutoff = new Date(now.getFullYear(), now.getMonth(), now.getDate(), bookingRules.sameDayServiceCutoffHour, 0, 0, 0);
-  return now >= cutoff;
-}
-
 function isAfterNextAvailableDateCutoff() {
   const now = new Date();
   const cutoff = new Date(now.getFullYear(), now.getMonth(), now.getDate(), bookingRules.nextAvailableDateCutoffHour, 0, 0, 0);
@@ -491,7 +1445,7 @@ function addDays(date, days) {
 
 function getRegularBookingWindow() {
   const today = new Date();
-  const minLeadDays = bookingRules.regularAdvanceDays + (isAfterNextAvailableDateCutoff() ? 1 : 0);
+  const minLeadDays = bookingRules.regularAdvanceDays;
   const minDate = addDays(today, minLeadDays);
   const maxDate = addDays(today, bookingRules.regularWindowDays);
 
@@ -503,18 +1457,10 @@ function getRegularBookingWindow() {
 
 function getTuesdayBookingWindow() {
   const today = new Date();
-  const todayValue = getTodayDateValue();
   const maxDate = addDays(today, bookingRules.tuesdayWindowDays);
-  let minDate = new Date(today);
-
-  if (!(minDate.getDay() === 2 && !isAfterSameDayServiceCutoff(todayValue))) {
-    const daysUntilTuesday = (2 - minDate.getDay() + 7) % 7;
-    minDate = addDays(minDate, daysUntilTuesday === 0 ? 7 : daysUntilTuesday);
-  }
-
-  if (isAfterNextAvailableDateCutoff()) {
-    minDate = addDays(minDate, 7);
-  }
+  const minLeadDate = addDays(today, bookingRules.regularAdvanceDays);
+  const daysUntilTuesday = (2 - minLeadDate.getDay() + 7) % 7;
+  const minDate = addDays(minLeadDate, daysUntilTuesday);
 
   return {
     minValue: formatDateInputValue(minDate),
@@ -522,8 +1468,12 @@ function getTuesdayBookingWindow() {
   };
 }
 
+function isTuesdayRuleSeva(selectedSeva) {
+  return Boolean(selectedSeva && selectedSeva.id === bookingRules.tuesdaySevaId);
+}
+
 function getBookingWindowForSeva(selectedSeva) {
-  if (selectedSeva && selectedSeva.id === 'tuesday-annadanam') {
+  if (isTuesdayRuleSeva(selectedSeva)) {
     return getTuesdayBookingWindow();
   }
 
@@ -538,16 +1488,41 @@ function isDateOutsideWindow(dateValue, bookingWindow) {
   return dateValue < bookingWindow.minValue || dateValue > bookingWindow.maxValue;
 }
 
-function getBookingWindowRestrictionMessage(selectedSeva) {
-  if (currentLang === 'telugu') {
-    return selectedSeva && selectedSeva.id === 'tuesday-annadanam'
-      ? 'మంగళవారం అన్నదానం కోసం రాబోయే 4 వారాల మంగళవారం తేదీల్లో మాత్రమే బుకింగ్ చేయవచ్చు. సాయంత్రం 5:00 తర్వాత తదుపరి అందుబాటు మంగళవారం తేదీ అందుబాటులో ఉండదు.'
-      : `మొదటి 5 సేవల కోసం కనీసం ${bookingRules.regularAdvanceDays} రోజుల ముందుగా మాత్రమే బుకింగ్ చేయవచ్చు. సాయంత్రం 5:00 తర్వాత తదుపరి అందుబాటు తేదీ అందుబాటులో ఉండదు. రాబోయే ${bookingRules.regularWindowDays} రోజుల తేదీల్లో మాత్రమే బుకింగ్ చేయవచ్చు.`;
+function isDateBlockedForSeva(seva, dateValue) {
+  if (!seva || !Array.isArray(seva.blockedDates) || !dateValue) {
+    return false;
   }
 
-  return selectedSeva && selectedSeva.id === 'tuesday-annadanam'
-    ? 'Tuesday Annadanam can be booked only for Tuesdays within the upcoming 4 weeks. After 5:00 PM, the next available Tuesday is skipped.'
-    : `For the first 5 sevas, booking starts only from ${bookingRules.regularAdvanceDays} days ahead. After 5:00 PM, the next available date is skipped. Booking remains limited to the upcoming ${bookingRules.regularWindowDays} days.`;
+  return seva.blockedDates.includes(dateValue);
+}
+
+function findNextValidDateForSeva(seva, startDateValue, maxDateValue, stepDays) {
+  let candidate = new Date(`${startDateValue}T00:00:00`);
+  const limit = new Date(`${maxDateValue}T00:00:00`);
+
+  while (candidate <= limit) {
+    const dateValue = formatDateInputValue(candidate);
+    if (!isDateBlockedForSeva(seva, dateValue)) {
+      return dateValue;
+    }
+    candidate = addDays(candidate, stepDays);
+  }
+
+  return null;
+}
+
+function getBookingWindowRestrictionMessage(selectedSeva) {
+  if (isTuesdayRuleSeva(selectedSeva)) {
+    return getBookingMessage('errors.bookingWindowTuesday', {
+      regularAdvanceDays: bookingRules.regularAdvanceDays,
+      tuesdayWindowDays: bookingRules.tuesdayWindowDays
+    });
+  }
+
+  return getBookingMessage('errors.bookingWindowRegular', {
+    regularAdvanceDays: bookingRules.regularAdvanceDays,
+    regularWindowDays: bookingRules.regularWindowDays
+  });
 }
 
 function updateDateConstraintsForSelectedSeva() {
@@ -555,16 +1530,18 @@ function updateDateConstraintsForSelectedSeva() {
     return;
   }
 
+  hideBlockedDateHint();
+
   const selectedSeva = getSelectedSeva();
   const bookingWindow = getBookingWindowForSeva(selectedSeva);
 
-  if (selectedSeva && selectedSeva.id === 'tuesday-annadanam') {
+  if (isTuesdayRuleSeva(selectedSeva)) {
     sevaDateInput.min = bookingWindow.minValue;
     sevaDateInput.max = bookingWindow.maxValue;
     sevaDateInput.step = '7';
 
     if (!sevaDateInput.value || !isTuesdayDate(sevaDateInput.value) || isDateOutsideWindow(sevaDateInput.value, bookingWindow)) {
-      sevaDateInput.value = bookingWindow.minValue;
+      sevaDateInput.value = findNextValidDateForSeva(selectedSeva, bookingWindow.minValue, bookingWindow.maxValue, 7) || bookingWindow.minValue;
     }
     return;
   }
@@ -574,7 +1551,7 @@ function updateDateConstraintsForSelectedSeva() {
   sevaDateInput.step = '1';
 
   if (!sevaDateInput.value || isDateOutsideWindow(sevaDateInput.value, bookingWindow)) {
-    sevaDateInput.value = bookingWindow.minValue;
+    sevaDateInput.value = findNextValidDateForSeva(selectedSeva, bookingWindow.minValue, bookingWindow.maxValue, 1) || bookingWindow.minValue;
   }
 }
 
@@ -585,7 +1562,7 @@ function updateSevaSelectedLabel() {
 
   const selectedSeva = getSelectedSeva();
   if (!selectedSeva) {
-    sevaSelected.textContent = currentLang === 'telugu' ? 'ఎంచుకున్న సేవ: లేదు' : 'Selected seva: None';
+    sevaSelected.textContent = getBookingMessage('selectedSeva.none');
     sevaSelected.setAttribute('hidden', '');
     sevaSelected.style.display = 'none';
     return;
@@ -593,9 +1570,10 @@ function updateSevaSelectedLabel() {
 
   const sevaName = currentLang === 'telugu' ? selectedSeva.telugu : selectedSeva.english;
   const sevaTiming = currentLang === 'telugu' ? selectedSeva.timingTelugu : selectedSeva.timingEnglish;
-  sevaSelected.textContent = currentLang === 'telugu'
-    ? `ఎంచుకున్న సేవ: ${sevaName} (${sevaTiming})`
-    : `Selected seva: ${sevaName} (${sevaTiming})`;
+  sevaSelected.textContent = getBookingMessage('selectedSeva.selected', {
+    sevaName,
+    sevaTiming
+  });
   sevaSelected.removeAttribute('hidden');
   sevaSelected.style.display = 'block';
 }
@@ -607,10 +1585,25 @@ function setSelectedSeva(sevaId) {
 
   const previousSevaId = sevaTypeInput.value;
   const nextSevaId = previousSevaId === sevaId ? '' : (sevaId || '');
+  const isSwitchingBetweenSevas = Boolean(previousSevaId) && Boolean(nextSevaId) && previousSevaId !== nextSevaId;
+
+  if (isSwitchingBetweenSevas && sevaDateInput) {
+    // Reset date on card-to-card switch so the new seva picks its next valid date.
+    sevaDateInput.value = '';
+  }
 
   sevaTypeInput.value = nextSevaId;
 
-  sevaOptionCards.forEach(card => {
+  if (sevaDateInput && nextSevaId && sevaDateInput.value) {
+    const nextSeva = sevaCatalog.find(seva => seva.id === nextSevaId);
+
+    // On first selection, drop carried date if that date is blocked for this seva.
+    if (nextSeva && isDateBlockedForSeva(nextSeva, sevaDateInput.value)) {
+      sevaDateInput.value = '';
+    }
+  }
+
+  getSevaOptionCards().forEach(card => {
     const isSelected = card.dataset.sevaId === nextSevaId;
     card.classList.toggle('is-selected', isSelected);
     card.setAttribute('aria-pressed', String(isSelected));
@@ -633,7 +1626,7 @@ function resetSevaBookingState() {
   setSelectedSeva('');
 }
 
-function setMinimumBookingDate() {
+function setMinimumSevaDate() {
   if (!sevaDateInput) {
     return;
   }
@@ -642,10 +1635,7 @@ function setMinimumBookingDate() {
   sevaDateInput.min = bookingWindow.minValue;
   sevaDateInput.max = bookingWindow.maxValue;
   sevaDateInput.step = '1';
-
-  if (!sevaDateInput.value || isDateOutsideWindow(sevaDateInput.value, bookingWindow)) {
-    sevaDateInput.value = bookingWindow.minValue;
-  }
+  sevaDateInput.value = bookingWindow.minValue;
 }
 
 function clearBookingMessage() {
@@ -666,7 +1656,7 @@ function showBookingMessage(type, message) {
   sevaBookingMessage.textContent = message;
 }
 
-function updateSevaBookingSummary() {
+async function updateSevaBookingSummary() {
   if (!sevaTypeInput || !sevaDateInput || !sevaSlotsInput || !sevaAvailability || !sevaTotal || !bookSevaBtn) {
     return;
   }
@@ -675,10 +1665,8 @@ function updateSevaBookingSummary() {
   const selectedDate = sevaDateInput.value;
 
   if (!selectedSeva || !selectedDate) {
-    sevaAvailability.textContent = currentLang === 'telugu'
-      ? 'తేదీ మరియు సేవా కార్డు ఎంచుకుంటే అందుబాటు స్లాట్లు కనిపిస్తాయి.'
-      : 'Choose a date and seva card to view available slots.';
-    sevaTotal.textContent = currentLang === 'telugu' ? 'మొత్తం: రూ. 0/-' : 'Total: Rs. 0/-';
+    sevaAvailability.textContent = getBookingMessage('availability.selectDateAndSeva');
+    sevaTotal.textContent = getBookingMessage('total.zero');
     sevaSlotsInput.value = '1';
     sevaSlotsInput.disabled = true;
     bookSevaBtn.disabled = true;
@@ -687,22 +1675,9 @@ function updateSevaBookingSummary() {
 
   const bookingWindow = getBookingWindowForSeva(selectedSeva);
 
-  if (isAfterSameDayServiceCutoff(selectedDate)) {
-    sevaAvailability.textContent = currentLang === 'telugu'
-      ? 'ఈ రోజు ఉదయం 8:00 తర్వాత సేవా బుకింగ్ అందుబాటులో ఉండదు.'
-      : 'Same-day seva booking is not available after 8:00 AM.';
-    sevaTotal.textContent = currentLang === 'telugu' ? 'మొత్తం: రూ. 0/-' : 'Total: Rs. 0/-';
-    sevaSlotsInput.value = '1';
-    sevaSlotsInput.disabled = true;
-    bookSevaBtn.disabled = true;
-    return;
-  }
-
-  if (selectedSeva.id === 'tuesday-annadanam' && !isTuesdayDate(selectedDate)) {
-    sevaAvailability.textContent = currentLang === 'telugu'
-      ? 'మంగళవారం అన్నదానం కోసం మంగళవారం తేదీలే ఎంచుకోవాలి.'
-      : 'For Tuesday Annadanam, only Tuesdays can be selected.';
-    sevaTotal.textContent = currentLang === 'telugu' ? 'మొత్తం: రూ. 0/-' : 'Total: Rs. 0/-';
+  if (isTuesdayRuleSeva(selectedSeva) && !isTuesdayDate(selectedDate)) {
+    sevaAvailability.textContent = getBookingMessage('availability.tuesdayOnly');
+    sevaTotal.textContent = getBookingMessage('total.zero');
     sevaSlotsInput.value = '1';
     sevaSlotsInput.disabled = true;
     bookSevaBtn.disabled = true;
@@ -711,22 +1686,53 @@ function updateSevaBookingSummary() {
 
   if (isDateOutsideWindow(selectedDate, bookingWindow)) {
     sevaAvailability.textContent = getBookingWindowRestrictionMessage(selectedSeva);
-    sevaTotal.textContent = currentLang === 'telugu' ? 'మొత్తం: రూ. 0/-' : 'Total: Rs. 0/-';
+    sevaTotal.textContent = getBookingMessage('total.zero');
     sevaSlotsInput.value = '1';
     sevaSlotsInput.disabled = true;
     bookSevaBtn.disabled = true;
     return;
   }
 
-  const bookedSlots = getBookedSlots(selectedSeva.id, selectedDate);
-  const availableSlots = Math.max(selectedSeva.dailySlots - bookedSlots, 0);
+  if (isDateBlockedForSeva(selectedSeva, selectedDate)) {
+    showBlockedDateHint();
+    sevaAvailability.textContent = currentLang === 'telugu' ? 'సేవ నిర్వహించబడదు' : 'Seva not performed';
+    sevaTotal.textContent = getBookingMessage('total.zero');
+    sevaSlotsInput.value = '1';
+    sevaSlotsInput.disabled = true;
+    bookSevaBtn.disabled = true;
+    return;
+  }
+
+  hideBlockedDateHint();
+
+  const requestId = ++bookingAvailabilityRequestId;
+  const cachedAvailability = getCachedBookingAvailability(selectedSeva.id, selectedDate);
+
+  if (isSharedAvailabilityEnabled() && !cachedAvailability) {
+    sevaAvailability.textContent = getBookingMessage('availability.loading');
+    sevaTotal.textContent = getBookingMessage('total.zero');
+    sevaSlotsInput.value = '1';
+    sevaSlotsInput.disabled = true;
+    bookSevaBtn.disabled = true;
+  }
+
+  const availability = await getBookingAvailability(selectedSeva, selectedDate);
+  if (requestId !== bookingAvailabilityRequestId) {
+    return;
+  }
+
+  if (!sevaTypeInput || sevaTypeInput.value !== selectedSeva.id || !sevaDateInput || sevaDateInput.value !== selectedDate) {
+    return;
+  }
+
+  const availableSlots = availability.availableSlots;
   sevaSlotsInput.max = String(Math.max(availableSlots, 1));
 
   if (availableSlots <= 0) {
-    sevaAvailability.textContent = currentLang === 'telugu'
-      ? `ఎంచుకున్న తేదీకి అందుబాటులో ఉన్న స్లాట్లు: 0 / ${selectedSeva.dailySlots}`
-      : `Available slots for selected date: 0 / ${selectedSeva.dailySlots}`;
-    sevaTotal.textContent = currentLang === 'telugu' ? 'మొత్తం: రూ. 0/-' : 'Total: Rs. 0/-';
+    sevaAvailability.textContent = getBookingMessage('availability.zeroSlots', {
+      dailySlots: availability.dailySlots
+    });
+    sevaTotal.textContent = getBookingMessage('total.zero');
     sevaSlotsInput.value = '0';
     sevaSlotsInput.disabled = true;
     bookSevaBtn.disabled = true;
@@ -742,15 +1748,16 @@ function updateSevaBookingSummary() {
   const effectiveSlots = Number.parseInt(sevaSlotsInput.value, 10) || 1;
   const totalAmount = effectiveSlots * selectedSeva.price;
 
-  sevaAvailability.textContent = currentLang === 'telugu'
-    ? `ఎంచుకున్న తేదీకి అందుబాటులో ఉన్న స్లాట్లు: ${availableSlots} / ${selectedSeva.dailySlots}`
-    : `Available slots for selected date: ${availableSlots} / ${selectedSeva.dailySlots}`;
-  sevaTotal.textContent = currentLang === 'telugu'
-    ? `మొత్తం: రూ. ${totalAmount}/-`
-    : `Total: Rs. ${totalAmount}/-`;
+  sevaAvailability.textContent = getBookingMessage('availability.availableSlots', {
+    availableSlots,
+    dailySlots: availability.dailySlots
+  });
+  sevaTotal.textContent = getBookingMessage('total.amount', {
+    totalAmount
+  });
 }
 
-function formatBookingDate(dateValue) {
+function formatSevaDate(dateValue) {
   const date = new Date(`${dateValue}T00:00:00`);
   return date.toLocaleDateString(currentLang === 'telugu' ? 'te-IN' : 'en-IN', {
     day: 'numeric',
@@ -769,20 +1776,28 @@ function buildBookingEmailLines(details) {
     `Seva (English): ${details.sevaNameEnglish}`,
     `Seva (Telugu): ${details.sevaNameTelugu}`,
     `Timing: ${details.sevaTimingEnglish}`,
-    `Date: ${details.selectedDate}`,
-    `Slots: ${details.requestedSlots}`,
+    `Seva Date: ${details.selectedDate}`,
+    `Slot: ${details.slotNumber}`,
     `Total: Rs. ${details.totalAmount}/-`
   ];
 }
 
-function getBookingSuccessMessage(selectedSeva) {
+function getBookingSuccessMessage(selectedSeva, bookingRef) {
   const sevaName = currentLang === 'telugu' ? selectedSeva.telugu : selectedSeva.english;
-  const requestDate = formatBookingDate(getTodayDateValue());
-  const nextRequestDate = formatBookingDate(formatDateInputValue(addDays(new Date(), 1)));
+  const nextRequestDate = formatSevaDate(formatDateInputValue(addDays(new Date(), 1)));
 
-  return currentLang === 'telugu'
-    ? `${sevaName} కోసం మీ సేవా అభ్యర్థన విజయవంతంగా స్వీకరించబడింది. ఆలయ ప్రతినిధి మీకు తుది నిర్ధారణను ${nextRequestDate} సాయంత్రం 6:00 లోపు పంపిస్తారు. మీ భక్తికి ధన్యవాదాలు.`
-    : `Your seva request for ${sevaName} has been received successfully. A temple representative will share the final confirmation with you before 6:00 PM on ${nextRequestDate}. Thank you for your devotion.`;
+  if (bookingRef) {
+    return getBookingMessage('success.bookingReceivedWithRef', {
+      sevaName,
+      nextRequestDate,
+      bookingRef
+    });
+  }
+
+  return getBookingMessage('success.bookingReceived', {
+    sevaName,
+    nextRequestDate
+  });
 }
 
 function loadSmtpLibrary() {
@@ -855,6 +1870,454 @@ async function sendBookingEmail(details) {
   }
 }
 
+function getBookingWebhookConfig() {
+  const integrations = isPlainObject(siteContent.integrations) ? siteContent.integrations : {};
+  const bookingWebhookUrl = typeof integrations.bookingWebhookUrl === 'string' ? integrations.bookingWebhookUrl.trim() : '';
+  const rawTimeout = Number(integrations.bookingWebhookTimeoutMs);
+  const bookingWebhookTimeoutMs = Number.isFinite(rawTimeout)
+    ? Math.min(Math.max(Math.trunc(rawTimeout), 2000), 60000)
+    : 12000;
+
+  const parseBooleanSetting = (value, defaultValue) => {
+    if (typeof value === 'boolean') {
+      return value;
+    }
+
+    if (typeof value === 'string') {
+      const normalized = value.trim().toLowerCase();
+      if (normalized === 'true') {
+        return true;
+      }
+
+      if (normalized === 'false') {
+        return false;
+      }
+    }
+
+    if (typeof value === 'number') {
+      return value !== 0;
+    }
+
+    return defaultValue;
+  };
+
+  const enableSheetUpdate = parseBooleanSetting(integrations.enableSheetUpdate, true);
+  const enableWhatsappMessage = parseBooleanSetting(integrations.enableWhatsappMessage, true);
+
+  return {
+    bookingWebhookUrl,
+    bookingWebhookTimeoutMs,
+    enableSheetUpdate,
+    enableWhatsappMessage
+  };
+}
+
+function isSharedAvailabilityEnabled() {
+  const { bookingWebhookUrl, enableSheetUpdate } = getBookingWebhookConfig();
+  return Boolean(bookingWebhookUrl && enableSheetUpdate);
+}
+
+function getBookingAvailabilityCacheKey(sevaId, dateValue) {
+  return `${dateValue}:${sevaId}`;
+}
+
+function getCachedBookingAvailability(sevaId, dateValue) {
+  const entry = bookingAvailabilityCache.get(getBookingAvailabilityCacheKey(sevaId, dateValue));
+  if (!entry || typeof entry !== 'object') {
+    return null;
+  }
+
+  if (Date.now() - entry.fetchedAt > BOOKING_AVAILABILITY_CACHE_TTL_MS) {
+    bookingAvailabilityCache.delete(getBookingAvailabilityCacheKey(sevaId, dateValue));
+    return null;
+  }
+
+  return entry.availability;
+}
+
+function syncBookingAvailability(availability) {
+  if (!availability) {
+    return;
+  }
+
+  bookingAvailabilityCache.set(getBookingAvailabilityCacheKey(availability.sevaId, availability.selectedDate), {
+    availability,
+    fetchedAt: Date.now()
+  });
+  setBookedSlots(availability.sevaId, availability.selectedDate, availability.bookedSlots);
+}
+
+function clearBookingAvailabilityCache(sevaId, dateValue) {
+  bookingAvailabilityCache.delete(getBookingAvailabilityCacheKey(sevaId, dateValue));
+}
+
+function buildBookingWebhookPayload(details, controls) {
+  return {
+    source: 'svs-temple-seva-booking',
+    bookingTimestamp: new Date().toISOString(),
+    language: currentLang,
+    controls: {
+      enableSheetUpdate: controls.enableSheetUpdate,
+      enableWhatsappMessage: controls.enableWhatsappMessage
+    },
+    booking: {
+      devoteeName: details.devoteeName,
+      devoteeGotram: details.devoteeGotram,
+      devoteePhone: details.devoteePhone,
+      sevaId: details.sevaId,
+      sevaNameEnglish: details.sevaNameEnglish,
+      sevaNameTelugu: details.sevaNameTelugu,
+      sevaTimingEnglish: details.sevaTimingEnglish,
+      sevaTimingTelugu: details.sevaTimingTelugu,
+      selectedDate: details.selectedDate,
+      dailySlots: details.dailySlots,
+      slotNumber: details.slotNumber,
+      requestedSlots: details.requestedSlots,
+      totalAmount: details.totalAmount
+    }
+  };
+}
+
+async function postBookingWebhook(url, requestInit, timeoutMs) {
+  const abortController = typeof AbortController === 'function' ? new AbortController() : null;
+  let timeoutId = 0;
+
+  try {
+    if (abortController) {
+      timeoutId = window.setTimeout(() => abortController.abort(), timeoutMs);
+    }
+
+    const response = await fetch(url, {
+      ...requestInit,
+      signal: abortController ? abortController.signal : undefined
+    });
+
+    return { ok: true, response };
+  } catch (error) {
+    return { ok: false, error };
+  } finally {
+    if (timeoutId) {
+      window.clearTimeout(timeoutId);
+    }
+  }
+}
+
+async function requestBookingWebhookJson(url, requestInit, timeoutMs) {
+  const request = await postBookingWebhook(url, requestInit, timeoutMs);
+  if (!request.ok) {
+    return { ok: false, error: request.error };
+  }
+
+  let data = null;
+  try {
+    data = await request.response.json();
+  } catch {
+    data = null;
+  }
+
+  if (!request.response.ok) {
+    return {
+      ok: false,
+      status: request.response.status,
+      data
+    };
+  }
+
+  return {
+    ok: true,
+    status: request.response.status,
+    data
+  };
+}
+
+function normalizeBookingAvailabilityPayload(payload, selectedSeva, selectedDate) {
+  if (!payload || typeof payload !== 'object' || !selectedSeva || !selectedDate) {
+    return null;
+  }
+
+  const sevaId = typeof payload.sevaId === 'string' && payload.sevaId.trim()
+    ? payload.sevaId.trim()
+    : selectedSeva.id;
+  const dateValue = typeof payload.selectedDate === 'string' && payload.selectedDate.trim()
+    ? payload.selectedDate.trim()
+    : selectedDate;
+  const bookedSlots = Number(payload.bookedSlots);
+  const dailySlots = Number(payload.dailySlots);
+  const availableSlots = Number(payload.availableSlots);
+
+  if (sevaId !== selectedSeva.id || dateValue !== selectedDate) {
+    return null;
+  }
+
+  if (!Number.isFinite(bookedSlots) || bookedSlots < 0) {
+    return null;
+  }
+
+  if (!Number.isFinite(dailySlots) || dailySlots < 1) {
+    return null;
+  }
+
+  if (!Number.isFinite(availableSlots) || availableSlots < 0) {
+    return null;
+  }
+
+  return {
+    sevaId,
+    selectedDate: dateValue,
+    bookedSlots: Math.trunc(bookedSlots),
+    dailySlots: Math.trunc(dailySlots),
+    availableSlots: Math.max(0, Math.trunc(availableSlots))
+  };
+}
+
+function buildBookingAvailabilityUrl(bookingWebhookUrl, selectedSeva, selectedDate) {
+  const availabilityUrl = new URL(bookingWebhookUrl);
+  availabilityUrl.searchParams.set('action', 'availability');
+  availabilityUrl.searchParams.set('sevaId', selectedSeva.id);
+  availabilityUrl.searchParams.set('selectedDate', selectedDate);
+  availabilityUrl.searchParams.set('dailySlots', String(selectedSeva.dailySlots));
+  return availabilityUrl.toString();
+}
+
+async function fetchSharedBookingAvailability(selectedSeva, selectedDate, options = {}) {
+  const {
+    bookingWebhookUrl,
+    bookingWebhookTimeoutMs,
+    enableSheetUpdate
+  } = getBookingWebhookConfig();
+
+  if (!bookingWebhookUrl || !enableSheetUpdate || !selectedSeva || !selectedDate) {
+    return null;
+  }
+
+  const forceRefresh = Boolean(options.forceRefresh);
+  const cachedAvailability = forceRefresh ? null : getCachedBookingAvailability(selectedSeva.id, selectedDate);
+  if (cachedAvailability) {
+    return {
+      ...cachedAvailability,
+      source: 'server'
+    };
+  }
+
+  let availabilityUrl = '';
+  try {
+    availabilityUrl = buildBookingAvailabilityUrl(bookingWebhookUrl, selectedSeva, selectedDate);
+  } catch {
+    return null;
+  }
+
+  const response = await requestBookingWebhookJson(availabilityUrl, {
+    method: 'GET',
+    headers: {
+      Accept: 'application/json'
+    },
+    cache: 'no-store'
+  }, bookingWebhookTimeoutMs);
+
+  if (!response.ok || !response.data || response.data.ok !== true) {
+    console.warn('[Temple] Live booking availability fetch failed.', response);
+    return null;
+  }
+
+  const availability = normalizeBookingAvailabilityPayload(response.data.availability, selectedSeva, selectedDate);
+  if (!availability) {
+    console.warn('[Temple] Live booking availability response was invalid.', response.data);
+    return null;
+  }
+
+  syncBookingAvailability(availability);
+  return {
+    ...availability,
+    source: 'server'
+  };
+}
+
+function getLocalBookingAvailability(selectedSeva, selectedDate) {
+  const bookedSlots = getBookedSlots(selectedSeva.id, selectedDate);
+
+  return {
+    sevaId: selectedSeva.id,
+    selectedDate,
+    bookedSlots,
+    dailySlots: selectedSeva.dailySlots,
+    availableSlots: Math.max(selectedSeva.dailySlots - bookedSlots, 0),
+    source: 'local'
+  };
+}
+
+async function getBookingAvailability(selectedSeva, selectedDate, options = {}) {
+  const sharedAvailability = await fetchSharedBookingAvailability(selectedSeva, selectedDate, options);
+  if (sharedAvailability) {
+    return sharedAvailability;
+  }
+
+  return getLocalBookingAvailability(selectedSeva, selectedDate);
+}
+
+function getBookingSubmissionErrorMessage(webhookResult) {
+  const payload = webhookResult && webhookResult.data && typeof webhookResult.data === 'object'
+    ? webhookResult.data
+    : null;
+
+  if (payload && payload.errorCode === 'INSUFFICIENT_SLOTS') {
+    const availableSlots = Number(payload.availableSlots);
+    if (Number.isFinite(availableSlots)) {
+      return getBookingMessage('errors.onlySlotsLeft', {
+        availableSlots: Math.max(0, Math.trunc(availableSlots))
+      });
+    }
+  }
+
+  if (payload && payload.errorCode === 'PHONE_RATE_LIMIT') {
+    return getBookingMessage('errors.rateLimited');
+  }
+
+  if (currentLang === 'english' && payload && typeof payload.error === 'string' && payload.error.trim()) {
+    return payload.error.trim();
+  }
+
+  return getBookingMessage('errors.bookingUnavailable');
+}
+
+async function sendBookingWebhook(details) {
+  const {
+    bookingWebhookUrl,
+    bookingWebhookTimeoutMs,
+    enableSheetUpdate,
+    enableWhatsappMessage
+  } = getBookingWebhookConfig();
+
+  if (!bookingWebhookUrl) {
+    return { sent: false, reason: 'booking-webhook-not-configured' };
+  }
+
+  if (!enableSheetUpdate && !enableWhatsappMessage) {
+    return { sent: false, reason: 'booking-webhook-actions-disabled' };
+  }
+
+  const payload = JSON.stringify(buildBookingWebhookPayload(details, {
+    enableSheetUpdate,
+    enableWhatsappMessage
+  }));
+
+  const directRequest = await requestBookingWebhookJson(bookingWebhookUrl, {
+    method: 'POST',
+    headers: {
+      // Apps Script web apps do not answer CORS preflight OPTIONS for application/json.
+      // Send JSON as text/plain so this remains a simple request and the response stays readable.
+      'Content-Type': 'text/plain;charset=UTF-8'
+    },
+    body: payload,
+    keepalive: true
+  }, bookingWebhookTimeoutMs);
+
+  if (directRequest.ok && directRequest.data && directRequest.data.ok === true) {
+    return {
+      sent: true,
+      data: directRequest.data
+    };
+  }
+
+  if (directRequest.ok && directRequest.data && directRequest.data.ok === false) {
+    return {
+      sent: false,
+      reason: 'booking-webhook-rejected',
+      data: directRequest.data
+    };
+  }
+
+  if (enableSheetUpdate) {
+    return {
+      sent: false,
+      reason: 'booking-webhook-send-failed',
+      data: directRequest.data || null
+    };
+  }
+
+  const fallbackRequest = await postBookingWebhook(bookingWebhookUrl, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: {
+      'Content-Type': 'text/plain;charset=UTF-8'
+    },
+    body: payload,
+    keepalive: true
+  }, bookingWebhookTimeoutMs);
+
+  if (fallbackRequest.ok) {
+    return { sent: true, reason: 'booking-webhook-no-cors-fallback' };
+  }
+
+  return {
+    sent: false,
+    reason: 'booking-webhook-send-failed',
+    data: directRequest.data || null
+  };
+}
+
+function normalizeBookingRateLimitPhone(phone) {
+  return String(phone || '').replace(/\D/g, '');
+}
+
+function isBookingRateLimited(phone) {
+  try {
+    const normalizedPhone = normalizeBookingRateLimitPhone(phone);
+    if (!normalizedPhone) {
+      return false;
+    }
+
+    const now = Date.now();
+    const raw = localStorage.getItem(bookingRateLimitKey);
+    const attemptsByPhone = raw ? JSON.parse(raw) : {};
+    if (!attemptsByPhone || typeof attemptsByPhone !== 'object' || Array.isArray(attemptsByPhone)) {
+      return false;
+    }
+
+    const timestamps = Array.isArray(attemptsByPhone[normalizedPhone]) ? attemptsByPhone[normalizedPhone] : [];
+    const recent = timestamps.filter(t => typeof t === 'number' && now - t < BOOKING_RATE_WINDOW_MS);
+    return recent.length >= BOOKING_RATE_LIMIT_MAX;
+  } catch {
+    return false;
+  }
+}
+
+function recordBookingAttempt(phone) {
+  try {
+    const normalizedPhone = normalizeBookingRateLimitPhone(phone);
+    if (!normalizedPhone) {
+      return;
+    }
+
+    const now = Date.now();
+    const raw = localStorage.getItem(bookingRateLimitKey);
+    const attemptsByPhone = raw ? JSON.parse(raw) : {};
+    const safeAttempts = attemptsByPhone && typeof attemptsByPhone === 'object' && !Array.isArray(attemptsByPhone)
+      ? attemptsByPhone
+      : {};
+
+    Object.keys(safeAttempts).forEach(key => {
+      if (!Array.isArray(safeAttempts[key])) {
+        delete safeAttempts[key];
+        return;
+      }
+
+      const recentForKey = safeAttempts[key].filter(t => typeof t === 'number' && now - t < BOOKING_RATE_WINDOW_MS);
+      if (recentForKey.length > 0) {
+        safeAttempts[key] = recentForKey;
+      } else {
+        delete safeAttempts[key];
+      }
+    });
+
+    const recent = Array.isArray(safeAttempts[normalizedPhone]) ? safeAttempts[normalizedPhone] : [];
+    recent.push(now);
+    safeAttempts[normalizedPhone] = recent;
+    localStorage.setItem(bookingRateLimitKey, JSON.stringify(safeAttempts));
+  } catch {
+    // Ignore localStorage errors.
+  }
+}
+
 async function handleSevaBookingSubmit(event) {
   event.preventDefault();
 
@@ -863,35 +2326,49 @@ async function handleSevaBookingSubmit(event) {
   }
 
   clearBookingMessage();
+
+  // Honeypot: silently discard automated submissions without revealing detection.
+  if (honeypotInput && honeypotInput.value) {
+    devoteeNameInput.value = '';
+    devoteeGotramInput.value = '';
+    devoteePhoneInput.value = '';
+    sevaSlotsInput.value = '1';
+    honeypotInput.value = '';
+    return;
+  }
+
+  // Timing guard: legitimate users take more than a few seconds to fill the form.
+  if (Date.now() - pageLoadTime < BOOKING_MIN_TIME_MS) {
+    showBookingMessage('error', getBookingMessage('errors.tooFast'));
+    return;
+  }
+
   sanitizePhoneNumberInput();
 
   const devoteeName = devoteeNameInput.value.trim();
   const devoteeGotram = devoteeGotramInput.value.trim();
   const devoteePhone = devoteePhoneInput.value.trim();
+
+  // Client-side rate limit: prevent burst submissions per WhatsApp number in the same browser.
+  if (isBookingRateLimited(devoteePhone)) {
+    showBookingMessage('error', getBookingMessage('errors.rateLimited'));
+    return;
+  }
+
   const selectedSeva = getSelectedSeva();
   const selectedDate = sevaDateInput.value;
   const requestedSlots = Number.parseInt(sevaSlotsInput.value, 10);
+  const slotNumber = requestedSlots;
   const phonePattern = /^[0-9]{10}$/;
   const bookingWindow = getBookingWindowForSeva(selectedSeva);
 
   if (!devoteeName || !devoteeGotram || !phonePattern.test(devoteePhone) || !selectedSeva || !selectedDate || !Number.isInteger(requestedSlots) || requestedSlots < 1) {
-    showBookingMessage('error', currentLang === 'telugu'
-      ? 'దయచేసి సరైన వివరాలు నమోదు చేయండి. గోత్రం ఇవ్వాలి, ఫోన్ నంబర్ 10 అంకెలుగా ఉండాలి మరియు సేవా కార్డు ఎంచుకోవాలి.'
-      : 'Please enter valid details. Gotram is required, phone number must contain 10 digits, and a seva card must be selected.');
+    showBookingMessage('error', getBookingMessage('errors.invalidDetails'));
     return;
   }
 
-  if (selectedSeva.id === 'tuesday-annadanam' && !isTuesdayDate(selectedDate)) {
-    showBookingMessage('error', currentLang === 'telugu'
-      ? 'మంగళవారం అన్నదానం కోసం మంగళవారం తేదీలే ఎంచుకోవాలి.'
-      : 'For Tuesday Annadanam, only Tuesdays can be selected.');
-    return;
-  }
-
-  if (isAfterSameDayServiceCutoff(selectedDate)) {
-    showBookingMessage('error', currentLang === 'telugu'
-      ? 'ఈ రోజు ఉదయం 8:00 తర్వాత సేవా బుకింగ్ చేయలేరు.'
-      : 'You cannot book seva for today after 8:00 AM.');
+  if (isTuesdayRuleSeva(selectedSeva) && !isTuesdayDate(selectedDate)) {
+    showBookingMessage('error', getBookingMessage('errors.tuesdayOnly'));
     return;
   }
 
@@ -900,44 +2377,118 @@ async function handleSevaBookingSubmit(event) {
     return;
   }
 
-  const bookedSlots = getBookedSlots(selectedSeva.id, selectedDate);
-  const availableSlots = Math.max(selectedSeva.dailySlots - bookedSlots, 0);
-
-  if (requestedSlots > availableSlots) {
-    showBookingMessage('error', currentLang === 'telugu'
-      ? `ఈ తేదీకి ${availableSlots} స్లాట్(లు) మాత్రమే మిగిలి ఉన్నాయి.`
-      : `Only ${availableSlots} slot(s) are available for this date.`);
-    updateSevaBookingSummary();
+  if (isDateBlockedForSeva(selectedSeva, selectedDate)) {
+    showBlockedDateHint();
     return;
   }
 
-  const bookings = getStoredBookings();
-  const bookingKey = getBookingKey(selectedSeva.id, selectedDate);
-  bookings[bookingKey] = bookedSlots + requestedSlots;
-  setStoredBookings(bookings);
+  const usesSharedAvailability = isSharedAvailabilityEnabled();
+  if (!usesSharedAvailability) {
+    const bookedSlots = getBookedSlots(selectedSeva.id, selectedDate);
+    const availableSlots = Math.max(selectedSeva.dailySlots - bookedSlots, 0);
+
+    if (requestedSlots > availableSlots) {
+      showBookingMessage('error', getBookingMessage('errors.onlySlotsLeft', {
+        availableSlots
+      }));
+      await updateSevaBookingSummary();
+      return;
+    }
+  }
 
   const totalAmount = requestedSlots * selectedSeva.price;
-  showBookingMessage('success', getBookingSuccessMessage(selectedSeva));
-
   const bookingDetails = {
     devoteeName,
     devoteeGotram,
     devoteePhone,
+    sevaId: selectedSeva.id,
     sevaNameEnglish: selectedSeva.english,
     sevaNameTelugu: selectedSeva.telugu,
     sevaTimingEnglish: selectedSeva.timingEnglish,
+    sevaTimingTelugu: selectedSeva.timingTelugu,
     selectedDate,
+    dailySlots: selectedSeva.dailySlots,
+    slotNumber,
     requestedSlots,
     totalAmount
   };
 
-  await sendBookingEmail(bookingDetails);
+  if (bookSevaBtn) {
+    bookSevaBtn.disabled = true;
+  }
+
+  let emailResult = { sent: false, reason: 'not-attempted' };
+  let webhookResult = { sent: false, reason: 'not-attempted' };
+
+  if (usesSharedAvailability) {
+    webhookResult = await sendBookingWebhook(bookingDetails);
+
+    if (!webhookResult.sent) {
+      showBookingMessage('error', getBookingSubmissionErrorMessage(webhookResult));
+      clearBookingAvailabilityCache(selectedSeva.id, selectedDate);
+      await updateSevaBookingSummary();
+      if (honeypotInput) {
+        honeypotInput.value = '';
+      }
+      if (bookSevaBtn) {
+        bookSevaBtn.disabled = false;
+      }
+      return;
+    }
+
+    const confirmedAvailability = normalizeBookingAvailabilityPayload(
+      webhookResult.data && webhookResult.data.availabilityAfter,
+      selectedSeva,
+      selectedDate
+    );
+
+    if (confirmedAvailability) {
+      syncBookingAvailability(confirmedAvailability);
+    } else {
+      const bookedSlots = getBookedSlots(selectedSeva.id, selectedDate);
+      setBookedSlots(selectedSeva.id, selectedDate, bookedSlots + requestedSlots);
+      clearBookingAvailabilityCache(selectedSeva.id, selectedDate);
+    }
+
+    const bookingRef = webhookResult.data && webhookResult.data.sheetUpdate && typeof webhookResult.data.sheetUpdate.bookingRef === 'string'
+      ? webhookResult.data.sheetUpdate.bookingRef
+      : '';
+    showBookingMessage('success', getBookingSuccessMessage(selectedSeva, bookingRef));
+    recordBookingAttempt(devoteePhone);
+    emailResult = await sendBookingEmail(bookingDetails);
+  } else {
+    const bookedSlots = getBookedSlots(selectedSeva.id, selectedDate);
+    setBookedSlots(selectedSeva.id, selectedDate, bookedSlots + requestedSlots);
+    clearBookingAvailabilityCache(selectedSeva.id, selectedDate);
+
+    showBookingMessage('success', getBookingSuccessMessage(selectedSeva));
+    recordBookingAttempt(devoteePhone);
+
+    [emailResult, webhookResult] = await Promise.all([
+      sendBookingEmail(bookingDetails),
+      sendBookingWebhook(bookingDetails)
+    ]);
+  }
+
+  if (!emailResult.sent && emailResult.reason !== 'smtp-not-configured' && emailResult.reason !== 'not-attempted') {
+    console.warn('[Temple] Booking email send failed.', emailResult);
+  }
+
+  if (!usesSharedAvailability && !webhookResult.sent && webhookResult.reason !== 'booking-webhook-not-configured' && webhookResult.reason !== 'booking-webhook-actions-disabled') {
+    console.warn('[Temple] Booking webhook send failed.', webhookResult);
+  }
 
   devoteeNameInput.value = '';
   devoteeGotramInput.value = '';
   devoteePhoneInput.value = '';
   sevaSlotsInput.value = '1';
-  updateSevaBookingSummary();
+  if (honeypotInput) {
+    honeypotInput.value = '';
+  }
+  if (bookSevaBtn) {
+    bookSevaBtn.disabled = false;
+  }
+  await updateSevaBookingSummary();
 }
 
 function setActiveLink(sectionId) {
@@ -955,22 +2506,20 @@ function setActiveLink(sectionId) {
 
 function switchLanguage(lang) {
   currentLang = lang;
-
-  allTextElements.forEach(el => {
+  document.querySelectorAll('[data-telugu]').forEach(el => {
     el.textContent = lang === 'telugu' ? el.dataset.telugu : el.dataset.english;
   });
-
-  galleryImages.forEach(image => {
+  document.querySelectorAll('.gallery img').forEach(image => {
     image.alt = lang === 'telugu' ? image.dataset.teluguAlt : image.dataset.englishAlt;
   });
-
   navLinks.forEach(link => {
     const section = link.dataset.section;
-    if (section && navLabels[lang][section]) {
+    if (section && navLabels[lang] && navLabels[lang][section]) {
       link.textContent = navLabels[lang][section];
     }
   });
 
+  renderSevaCards();
   updateFormLockState();
   updateSevaSelectedLabel();
   updateSevaSelectionHint();
@@ -997,6 +2546,8 @@ function switchLanguage(lang) {
     lightboxImage.alt = getImageCaption(lightboxImage);
     lightboxCaption.textContent = getImageCaption(lightboxImage);
   }
+
+  updateMusicToggleButtonLabel();
 }
 
 const observer = new IntersectionObserver(entries => {
@@ -1023,13 +2574,24 @@ navLinks.forEach(link => {
     navigateToSection(link.dataset.section || '');
   });
 });
+const galleryContainer = document.getElementById('galleryContainer');
+if (galleryContainer) {
+  galleryContainer.addEventListener('click', event => {
+    const target = event.target;
+    if (!(target instanceof Element)) {
+      return;
+    }
 
-galleryButtons.forEach(button => {
-  button.addEventListener('click', () => {
+    const button = target.closest('.gallery-item');
+    if (!button) {
+      return;
+    }
     const image = button.querySelector('img');
-    openLightbox(image, button);
+    if (image) {
+      openLightbox(image, button);
+    }
   });
-});
+}
 
 document.addEventListener('click', event => {
   const target = event.target;
@@ -1072,6 +2634,25 @@ document.addEventListener('keydown', event => {
 
 if (sevaDateInput) {
   sevaDateInput.addEventListener('change', () => {
+    const selectedSeva = getSelectedSeva();
+    if (sevaDateInput.value && selectedSeva) {
+      const bookingWindow = getBookingWindowForSeva(selectedSeva);
+      const outsideWindow = isDateOutsideWindow(sevaDateInput.value, bookingWindow);
+      const notTuesday = isTuesdayRuleSeva(selectedSeva) && !isTuesdayDate(sevaDateInput.value);
+      const isBlocked = isDateBlockedForSeva(selectedSeva, sevaDateInput.value);
+      if (outsideWindow || notTuesday) {
+        const stepDays = isTuesdayRuleSeva(selectedSeva) ? 7 : 1;
+        const startFrom = bookingWindow.minValue;
+        sevaDateInput.value = findNextValidDateForSeva(selectedSeva, startFrom, bookingWindow.maxValue, stepDays) || bookingWindow.minValue;
+        hideBlockedDateHint();
+      } else if (isBlocked) {
+        showBlockedDateHint();
+      } else {
+        hideBlockedDateHint();
+      }
+    } else {
+      hideBlockedDateHint();
+    }
     updateFormLockState();
     clearBookingMessage();
     updateSevaBookingSummary();
@@ -1098,6 +2679,30 @@ menuToggle.addEventListener('click', () => {
 });
 teluguBtn.addEventListener('click', () => switchLanguage('telugu'));
 englishBtn.addEventListener('click', () => switchLanguage('english'));
+if (musicToggleBtn && backgroundMusic) {
+  musicToggleBtn.addEventListener('click', () => {
+    if (!backgroundMusic.getAttribute('src')) {
+      updateMusicToggleButtonLabel();
+      return;
+    }
+
+    const nextMuted = !backgroundMusic.muted;
+    backgroundMusic.muted = nextMuted;
+    setStoredMusicMutedPreference(nextMuted);
+    updateMusicToggleButtonLabel();
+
+    if (nextMuted) {
+      backgroundMusic.pause();
+    } else {
+      try {
+        backgroundMusic.currentTime = 0;
+      } catch (error) {
+        // Ignore seek errors before metadata is ready.
+      }
+      void tryPlayBackgroundMusic();
+    }
+  });
+}
 lightboxClose.addEventListener('click', closeLightbox);
 lightbox.addEventListener('click', event => {
   if (event.target === lightbox) {
@@ -1139,9 +2744,12 @@ if (pageLoaderIsReady) {
 }
 
 updateFormLockState();
-setMinimumBookingDate();
+setMinimumSevaDate();
 updateSevaSelectedLabel();
 updateSevaSelectionHint();
 updateSevaBookingSummary();
 updateMenuState(false);
 syncActiveLinkToViewport();
+loadContent();
+loadGallery();
+loadSevaCatalog();

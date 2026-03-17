@@ -38,6 +38,19 @@
         <button id="teluguBtn" class="active" aria-pressed="true">తెలుగు</button>
         <button id="englishBtn" aria-pressed="false">English</button>
       </div>
+      <button
+        id="musicToggleBtn"
+        class="music-toggle-btn"
+        type="button"
+        aria-pressed="false"
+        data-telugu-muted="సంగీతం ఆన్"
+        data-english-muted="Unmute Music"
+        data-telugu-unmuted="సంగీతం ఆఫ్"
+        data-english-unmuted="Mute Music"
+        data-telugu-unavailable="సంగీతం లేదు"
+        data-english-unavailable="Music unavailable"
+        aria-label="Mute Music"
+        title="Mute Music"></button>
       <button id="menuToggle" class="menu-toggle" type="button" aria-expanded="false" aria-controls="primaryNav">
         <span class="menu-toggle-bars" aria-hidden="true">
           <span></span>
@@ -51,7 +64,6 @@
   <nav id="primaryNav" aria-label="Primary navigation">
     <a href="#about" class="nav-link active" data-section="about">ఆలయం గురించి</a>
     <a href="#pooja" class="nav-link" data-section="pooja">పూజలు</a>
-    <a href="#festivals" class="nav-link" data-section="festivals">పండుగలు</a>
     <a href="#seva-booking" class="nav-link" data-section="seva-booking">సేవా బుకింగ్</a>
     <a href="#gallery" class="nav-link" data-section="gallery">గ్యాలరీ</a>
     <a href="#location" class="nav-link" data-section="location">లోకేషన్</a>
@@ -60,16 +72,8 @@
 
 <div class="event-banner" aria-label="Upcoming events banner">
   <div class="event-banner-marquee">
-    <div class="event-banner-track">
-      <span class="event-banner-label" data-telugu="రాబోయే కార్యక్రమాలు" data-english="Upcoming Events">రాబోయే కార్యక్రమాలు</span>
-      <span class="event-banner-item" data-telugu="ప్రతి శనివారం సాయంత్రం 6:00 కు హనుమాన్ చాలీసా పారాయణం" data-english="Every Saturday at 6:00 PM, Hanuman Chalisa recital">ప్రతి శనివారం సాయంత్రం 6:00 కు హనుమాన్ చాలీసా పారాయణం</span>
-      <span class="event-banner-item" data-telugu="ప్రతి మంగళవారం భక్తులకు అన్నదానం మధ్యాహ్నం 12:30 కు" data-english="Annadanam for devotees every Tuesday at 12:30 PM">ప్రతి మంగళవారం భక్తులకు అన్నదానం మధ్యాహ్నం 12:30 కు</span>
-    </div>
-    <div class="event-banner-track" aria-hidden="true">
-      <span class="event-banner-label" data-telugu="రాబోయే కార్యక్రమాలు" data-english="Upcoming Events">రాబోయే కార్యక్రమాలు</span>
-      <span class="event-banner-item" data-telugu="ప్రతి శనివారం సాయంత్రం 6:00 కు హనుమాన్ చాలీసా పారాయణం" data-english="Every Saturday at 6:00 PM, Hanuman Chalisa recital">ప్రతి శనివారం సాయంత్రం 6:00 కు హనుమాన్ చాలీసా పారాయణం</span>
-      <span class="event-banner-item" data-telugu="ప్రతి మంగళవారం భక్తులకు అన్నదానం మధ్యాహ్నం 12:30 కు" data-english="Annadanam for devotees every Tuesday at 12:30 PM">ప్రతి మంగళవారం భక్తులకు అన్నదానం మధ్యాహ్నం 12:30 కు</span>
-    </div>
+    <div id="eventBannerTrack1" class="event-banner-track"></div>
+    <div id="eventBannerTrack2" class="event-banner-track" aria-hidden="true"></div>
   </div>
 </div>
 
@@ -78,40 +82,21 @@
   <!-- Hero Section -->
   <div class="hero" aria-label="Temple welcome banner">
     <div class="hero-content">
-      <p class="hero-kicker" data-telugu="శ్రీ ఆంజనేయ స్వామి ఆశీస్సులతో" data-english="With the blessings of Sri Anjaneya Swamy">శ్రీ ఆంజనేయ స్వామి ఆశీస్సులతో</p>
-      <h2 class="hero-title" data-telugu="జై శ్రీ రామ్" data-english="Jai Sri Ram">జై శ్రీ రామ్</h2>
+      <p id="heroKicker" class="hero-kicker" data-telugu="శ్రీ ఆంజనేయ స్వామి ఆశీస్సులతో" data-english="With the blessings of Sri Anjaneya Swamy">శ్రీ ఆంజనేయ స్వామి ఆశీస్సులతో</p>
+      <h2 id="heroTitle" class="hero-title" data-telugu="జై శ్రీ రామ్" data-english="Jai Sri Ram">జై శ్రీ రామ్</h2>
     </div>
   </div>
 
   <!-- About -->
   <section id="about">
     <h2 data-telugu="ఆలయం గురించి" data-english="About Temple">ఆలయం గురించి</h2>
-    <p class="content-p" data-telugu="శ్రీ శ్రీ శ్రీ వరధాంజనేయ స్వామి వారి దేవాలయం హైదరాబాద్, ఎల్. బి. నగర్ లోని పవిత్రమైన ఆంజనేయ స్వామి ఆలయం.ఈ ఆలయానికి భక్తులు దూర ప్రాంతాల నుండి దర్శనం కోసం వస్తారు."
-       data-english="Sri Sri Sri Varadhan Janeya Swamy Temple is a sacred Hanuman temple located in Hyderabad. Devotees come from distant places to seek blessings and darshan.">
-      శ్రీ శ్రీ శ్రీ వరధాంజనేయ స్వామి వారి దేవాలయం హైదరాబాద్, ఎల్. బి. నగర్ లోని పవిత్రమైన ఆంజనేయ స్వామి ఆలయం.
-      ఈ ఆలయానికి భక్తులు దూర ప్రాంతాల నుండి దర్శనం కోసం వస్తారు.
-    </p>
+    <div id="aboutContent"></div>
   </section>
 
   <!-- Pooja Services -->
   <section id="pooja">
     <h2 data-telugu="పూజలు మరియు సేవలు" data-english="Pooja & Services">పూజలు మరియు సేవలు</h2>
-    <ul>
-      <li data-telugu="అర్చన" data-english="Archana">అర్చన</li>
-      <li data-telugu="అభిషేకం" data-english="Abhishekam">అభిషేకం</li>
-      <li data-telugu="హనుమాన్ చాలీసా పారాయణం" data-english="Hanuman Chalisa Recitation">హనుమాన్ చాలీసా పారాయణం</li>
-      <li data-telugu="ప్రత్యేక పూజలు" data-english="Special Poojas">ప్రత్యేక పూజలు</li>
-    </ul>
-  </section>
-
-  <!-- Festivals -->
-  <section id="festivals">
-    <h2 data-telugu="పండుగలు" data-english="Festivals">పండుగలు</h2>
-    <ul>
-      <li data-telugu="ఉగాది" data-english="Ugadi">ఉగాది</li>
-      <li data-telugu="నవరాత్రులు" data-english="Navaratri">నవరాత్రులు</li>
-      <li data-telugu="శివరాత్రి" data-english="Shivaratri">శివరాత్రి</li>
-    </ul>
+    <ul id="poojaList"></ul>
   </section>
 
   <!-- Seva Booking -->
@@ -124,38 +109,7 @@
     <div class="seva-booking-layout">
       <div>
         <h3 class="seva-subtitle" data-telugu="అందుబాటులో ఉన్న సేవలు" data-english="Available Sevas">అందుబాటులో ఉన్న సేవలు</h3>
-        <ul class="seva-list">
-          <li class="seva-card seva-option" data-seva-id="rahu-kethu-pooja" role="button" tabindex="0" aria-pressed="false">
-            <h4 data-telugu="శ్రీ రాహు & కేతు పూజ" data-english="Sri Rahu & Kethu Pooja">శ్రీ రాహు & కేతు పూజ</h4>
-            <p data-telugu="ధర: రూ. 750/-" data-english="Price: Rs. 750/-">ధర: రూ. 750/-</p>
-            <p data-telugu="రోజుకు స్లాట్లు: 20" data-english="Slots per day: 20">రోజుకు స్లాట్లు: 20</p>
-            <p data-telugu="సమయం: ఉదయం 8:00" data-english="Timing: 8:00 AM">సమయం: ఉదయం 8:00</p>
-          </li>
-          <li class="seva-card seva-option" data-seva-id="varadhanjaneya-abhishekam" role="button" tabindex="0" aria-pressed="false">
-            <h4 data-telugu="శ్రీ వరధాంజనేయ స్వామి అభిషేకం" data-english="Sri Varadhanjaneya Swamy Abhishekam">శ్రీ వరధాంజనేయ స్వామి అభిషేకం</h4>
-            <p data-telugu="ధర: రూ. 500/-" data-english="Price: Rs. 500/-">ధర: రూ. 500/-</p>
-            <p data-telugu="రోజుకు స్లాట్లు: 20" data-english="Slots per day: 20">రోజుకు స్లాట్లు: 20</p>
-            <p data-telugu="సమయం: ఉదయం 8:00" data-english="Timing: 8:00 AM">సమయం: ఉదయం 8:00</p>
-          </li>
-          <li class="seva-card seva-option" data-seva-id="ramalingeswara-abhishekam" role="button" tabindex="0" aria-pressed="false">
-            <h4 data-telugu="శ్రీ రామలింగేశ్వర స్వామి అభిషేకం" data-english="Sri Ramalingeswara Swamy Abhishekam">శ్రీ రామలింగేశ్వర స్వామి అభిషేకం</h4>
-            <p data-telugu="ధర: రూ. 500/-" data-english="Price: Rs. 500/-">ధర: రూ. 500/-</p>
-            <p data-telugu="రోజుకు స్లాట్లు: 20" data-english="Slots per day: 20">రోజుకు స్లాట్లు: 20</p>
-            <p data-telugu="సమయం: ఉదయం 8:00" data-english="Timing: 8:00 AM">సమయం: ఉదయం 8:00</p>
-          </li>
-          <li class="seva-card seva-option" data-seva-id="rajarajeshwari-abhishekam" role="button" tabindex="0" aria-pressed="false">
-            <h4 data-telugu="శ్రీ రాజరాజేశ్వరి మాత అభిషేకం" data-english="Sri Rajarajeshwari Matha Abhishekam">శ్రీ రాజరాజేశ్వరి మాత అభిషేకం</h4>
-            <p data-telugu="ధర: రూ. 500/-" data-english="Price: Rs. 500/-">ధర: రూ. 500/-</p>
-            <p data-telugu="రోజుకు స్లాట్లు: 20" data-english="Slots per day: 20">రోజుకు స్లాట్లు: 20</p>
-            <p data-telugu="సమయం: ఉదయం 8:00" data-english="Timing: 8:00 AM">సమయం: ఉదయం 8:00</p>
-          </li>
-          <li class="seva-card seva-option" data-seva-id="tuesday-annadanam" role="button" tabindex="0" aria-pressed="false">
-            <h4 data-telugu="మంగళవారం అన్నదానం" data-english="Tuesday Annadanam">మంగళవారం అన్నదానం</h4>
-            <p data-telugu="ధర: రూ. 6500/-" data-english="Price: Rs. 6500/-">ధర: రూ. 6500/-</p>
-            <p data-telugu="రోజుకు స్లాట్లు: 1" data-english="Slots per day: 1">రోజుకు స్లాట్లు: 1</p>
-            <p data-telugu="సమయం: ఉదయం 8:00" data-english="Timing: 8:00 AM">సమయం: ఉదయం 8:00</p>
-          </li>
-        </ul>
+        <ul id="sevaList" class="seva-list"></ul>
       </div>
 
       <div>
@@ -164,30 +118,34 @@
           <input id="sevaType" name="sevaType" type="hidden" required />
 
           <label class="seva-field full-width seva-date-field" for="sevaDate">
-            <span data-telugu="తేదీ (దశ 1)" data-english="Date (Step 1)">తేదీ (దశ 1)</span>
+            <span class="seva-field-label" data-telugu="తేదీ" data-english="Date">తేదీ</span>
             <input id="sevaDate" name="sevaDate" type="date" required />
+                      <span id="sevaDateBlockedHint" class="seva-date-blocked-hint" data-telugu="సేవ నిర్వహించబడదు" data-english="Seva not performed" hidden>సేవ నిర్వహించబడదు</span>
           </label>
 
           <p id="sevaSelected" class="seva-meta seva-selected" data-telugu="ఎంచుకున్న సేవ: లేదు" data-english="Selected seva: None" hidden>ఎంచుకున్న సేవ: లేదు</p>
 
           <div class="seva-form-grid">
             <label class="seva-field full-width" for="devoteeName">
-              <span data-telugu="భక్తుని పేరు" data-english="Devotee Name">భక్తుని పేరు</span>
+              <span class="seva-field-label" data-telugu="భక్తుని పేరు" data-english="Devotee Name">భక్తుని పేరు</span>
               <input id="devoteeName" name="devoteeName" type="text" autocomplete="name" required disabled />
             </label>
 
             <label class="seva-field full-width" for="devoteeGotram">
-              <span data-telugu="గోత్రం" data-english="Gotram">గోత్రం</span>
+              <span class="seva-field-label" data-telugu="గోత్రం" data-english="Gotram">గోత్రం</span>
               <input id="devoteeGotram" name="devoteeGotram" type="text" autocomplete="off" required disabled />
             </label>
 
             <label class="seva-field full-width" for="devoteePhone">
-              <span data-telugu="ఫోన్ నంబర్" data-english="Phone Number">ఫోన్ నంబర్</span>
+              <span class="seva-field-label">
+                <span class="seva-wa-icon" aria-hidden="true"></span>
+                <span class="seva-field-label-text" data-telugu="వాట్సాప్ నంబర్" data-english="WhatsApp Number">వాట్సాప్ నంబర్</span>
+              </span>
               <input id="devoteePhone" name="devoteePhone" type="tel" inputmode="numeric" autocomplete="tel" pattern="[0-9]{10}" maxlength="10" required disabled />
             </label>
 
             <label class="seva-field full-width" for="sevaSlots">
-              <span data-telugu="స్లాట్లు" data-english="Slots">స్లాట్లు</span>
+              <span class="seva-field-label" data-telugu="స్లాట్" data-english="Slot">స్లాట్</span>
               <input id="sevaSlots" name="sevaSlots" type="number" min="1" step="1" value="1" required disabled />
             </label>
           </div>
@@ -196,6 +154,11 @@
             తేదీ మరియు సేవా కార్డు ఎంచుకుంటే అందుబాటు స్లాట్లు కనిపిస్తాయి.
           </p>
           <p id="sevaTotal" class="seva-meta" data-telugu="మొత్తం: రూ. 0/-" data-english="Total: Rs. 0/-">మొత్తం: రూ. 0/-</p>
+
+          <!-- Honeypot: must remain empty — bots that auto-fill fields will be silently blocked -->
+          <div class="booking-honeypot" aria-hidden="true">
+            <label>Leave empty <input id="bookingHoneypot" name="website" type="text" tabindex="-1" autocomplete="new-password" /></label>
+          </div>
 
           <button id="bookSevaBtn" class="book-seva-btn" type="submit" data-telugu="సేవా బుక్ చేయండి" data-english="Book Seva" disabled>సేవా బుక్ చేయండి</button>
           <p id="sevaBookingMessage" class="seva-booking-message" role="status" aria-live="polite"></p>
@@ -208,30 +171,17 @@
   <section id="gallery">
     <h2 data-telugu="గ్యాలరీ" data-english="Gallery">గ్యాలరీ</h2>
     <div class="gallery" role="list">
-      <button class="gallery-item" type="button" role="listitem">
-        <img src="assets/images/t1.jpg" alt="Temple front view" data-telugu-alt="శ్రీ వరధాంజనేయ స్వామి వారు" data-english-alt="Sri Varadhanjeneya Swamy" loading="lazy" decoding="async" />
-      </button>
-      <button class="gallery-item" type="button" role="listitem">
-        <img src="assets/images/t2.jpg" alt="Temple sanctum sanctorum" data-telugu-alt="శ్రీ రాజరాజేశ్వరి అమ్మ వారు" data-english-alt="Sri Rajarajeshwari Amman" loading="lazy" decoding="async" />
-      </button>
-      <button class="gallery-item" type="button" role="listitem">
-        <img src="assets/images/t3.jpg" alt="Temple festival celebration" data-telugu-alt="శ్రీ రామలింగేశ్వర స్వామి వారు" data-english-alt="Sri Ramalingeswara Swamy" loading="lazy" decoding="async" />
-      </button>
-      <button class="gallery-item" type="button" role="listitem">
-        <img src="assets/images/t4.jpg" alt="Devotees at temple" data-telugu-alt="గుడి ముఖద్వారం" data-english-alt="Temple Arch" loading="lazy" decoding="async" />
-      </button>
-    </div>
+      <div id="galleryContainer" class="gallery" role="list"></div>
   </section>
 
   <!-- Location -->
   <section id="location">
     <h2 data-telugu="లోకేషన్" data-english="Location">లోకేషన్</h2>
-    <p data-telugu="Google Maps లో ఆలయ లోకేషన్:" data-english="Temple location on Google Maps:">
-      Google Maps లో ఆలయ లోకేషన్:
-    </p>
+    <p id="locationMapIntro" data-telugu="Google Maps లో ఆలయ లోకేషన్:" data-english="Temple location on Google Maps:">Google Maps లో ఆలయ లోకేషన్:</p>
     <p class="location-actions">
       <a
         class="map-link"
+        id="locationMapLink"
         href="https://maps.app.goo.gl/aPE5P6qyGQTjuyRh7"
         target="_blank"
         rel="noopener noreferrer"
@@ -242,6 +192,7 @@
     </p>
     <div class="map-container" aria-label="Google Maps location">
       <iframe
+        id="locationMap"
         src="https://www.google.com/maps?q=17.347357,78.545501&z=17&output=embed"
         loading="lazy"
         allowfullscreen
@@ -262,7 +213,8 @@
 </div>
 
 <footer>
-  <p data-telugu="© 2026 శ్రీ శ్రీ శ్రీ వరధాంజనేయ స్వామి వారి దేవాలయం | దానాపురం, ఎల్. బి. నగర్, హైదరాబాదు-74, తెలంగాణ | ఫోన్: 040-12345678 | ఇమెయిల్: info@example.com" data-english="© 2026 Sri Sri Sri Varadhan Janeya Swamy Temple | Danapuram, L. B. Nagar, Hyderabad-74, Telangana | Phone: 040-12345678 | Email: svanjaneya.temple@gmail.com">© 2026 శ్రీ శ్రీ శ్రీ వరధాంజనేయ స్వామి వారి దేవాలయం | దానాపురం, ఎల్. బి. నగర్, హైదరాబాదు-74, తెలంగాణ | ఫోన్: 040-12345678 | ఇమెయిల్: svanjaneya.temple@gmail.com</p>
+  <p id="siteFooterText" data-telugu="© 2026 శ్రీ శ్రీ శ్రీ వరధాంజనేయ స్వామి వారి దేవాలయం | దానాపురం, ఎల్. బి. నగర్, హైదరాబాదు-74, తెలంగాణ | ఫోన్: 040-12345678 | ఇమెయిల్: svanjaneya.temple@gmail.com" data-english="© 2026 Sri Sri Sri Varadhan Janeya Swamy Temple | Danapuram, L. B. Nagar, Hyderabad-74, Telangana | Phone: 040-12345678 | Email: svanjaneya.temple@gmail.com">© 2026 శ్రీ శ్రీ శ్రీ వరధాంజనేయ స్వామి వారి దేవాలయం | దానాపురం, ఎల్. బి. నగర్, హైదరాబాదు-74, తెలంగాణ | ఫోన్: 040-12345678 | ఇమెయిల్: svanjaneya.temple@gmail.com</p>
+  <div id="siteFooterContacts" class="footer-contacts" hidden></div>
 </footer>
 
 <script>
@@ -272,6 +224,7 @@
     toEmail: "svanjaneya.temple@gmail.com"
   };
 </script>
+<audio id="backgroundMusic" preload="none" loop hidden></audio>
 <script src="js/main.js"></script>
 
 </body>

@@ -32,6 +32,7 @@
     min-height: 100vh;
     color: var(--text);
     -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
   }
 
   /* ── Auth view ─────────────────────────────────────────────── */
@@ -136,6 +137,7 @@
     display: none;
     min-height: 100vh;
     flex-direction: column;
+    overflow-x: hidden;
   }
 
   .dash-header {
@@ -224,6 +226,7 @@
     max-width: 1080px;
     margin: 0 auto;
     width: 100%;
+    overflow-x: hidden;
   }
 
   .dash-toolbar {
@@ -776,9 +779,14 @@
       border: none;
       padding: 0.38rem 0;
       display: grid;
-      grid-template-columns: 7.2rem 1fr;
+      grid-template-columns: minmax(6.1rem, 38%) minmax(0, 1fr);
       gap: 0.5rem;
       align-items: start;
+      overflow: hidden;
+    }
+
+    td > * {
+      min-width: 0;
     }
 
     td::before {
@@ -804,9 +812,35 @@
 
   @media (max-width: 640px) {
     .dash-main { padding: 1.25rem 0.85rem; }
-    .dash-header { padding: 0.75rem 0.9rem; }
-    .dash-brand h1 { font-size: 0.95rem; }
-    .user-pill { max-width: 130px; }
+    .dash-header {
+      padding: 0.75rem 0.9rem;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      gap: 0.6rem;
+    }
+    .dash-brand {
+      min-width: 0;
+      width: 100%;
+    }
+    .dash-brand h1 {
+      font-size: 0.95rem;
+      white-space: normal;
+      line-height: 1.2;
+    }
+    .dash-header-right {
+      width: 100%;
+      justify-content: space-between;
+      gap: 0.5rem;
+      flex-wrap: nowrap;
+    }
+    .user-pill {
+      max-width: none;
+      min-width: 0;
+      flex: 1;
+    }
+    .btn-signout {
+      flex-shrink: 0;
+    }
     .s-value { font-size: 1.6rem; }
     .modal-grid { grid-template-columns: 1fr; }
     .modal-actions { justify-content: stretch; }
@@ -1277,12 +1311,12 @@ function renderRow(selectedDate, r, idx) {
   return '<tr>' +
     '<td data-label="#">' + idx + '</td>' +
     '<td class="col-ref" data-label="Ref">' + refWithAction + '</td>' +
-    '<td data-label="Booking Request" style="white-space:nowrap">' + esc(fmtBookingRequest(r.bookingRequest || r.createdAt)) + '</td>' +
+    '<td data-label="Booking Request">' + esc(fmtBookingRequest(r.bookingRequest || r.createdAt)) + '</td>' +
     '<td class="col-name" data-label="Devotee">'   + esc(r.devoteeName  || '\u2014') + '</td>' +
     '<td data-label="Gotram">'                    + esc(r.gotram        || '\u2014') + '</td>' +
     '<td class="col-phone" data-label="WhatsApp">'  + esc(r.phone         || '\u2014') + '</td>' +
     '<td data-label="Seva">'                    + esc(r.sevaName      || '\u2014') + '</td>' +
-    '<td data-label="Timing" style="white-space:nowrap">' + esc(r.sevaTiming || '\u2014') + '</td>' +
+    '<td data-label="Timing">' + esc(r.sevaTiming || '\u2014') + '</td>' +
     '<td data-label="Slot">'                    + esc(String(r.slot > 0 ? r.slot : '\u2014')) + '</td>' +
     '<td class="col-amount" data-label="Amount">\u20B9' + esc(amt.toLocaleString('en-IN')) + '</td>' +
     '<td data-label="Status"><span class="' + cls + '">' + esc(r.status || '\u2014') + '</span></td>' +
@@ -1573,6 +1607,8 @@ async function submitReviewTransition() {
     const data = await response.json();
     if (!data.ok) {
       setReviewModalError(formatTransitionError(data));
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Send WhatsApp & Mark Reviewed';
       return;
     }
 

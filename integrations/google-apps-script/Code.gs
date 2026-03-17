@@ -16,11 +16,14 @@ const BOOKING_STATUS_CANCELLED = 'Cancelled';
 // Column positions in date sheets (1-indexed, for use with the Sheets API).
 const BOOKING_COL_SEVA_DATE = 3;
 const BOOKING_COL_SEVA_NAME = 5;
+const BOOKING_COL_SEVA_TIMING = 6;
 const BOOKING_COL_DEVOTEE_NAME = 7;
 const BOOKING_COL_PHONE = 9;
 const BOOKING_COL_SLOT = 10;
 const BOOKING_COL_BOOKING_REF = 12;
 const BOOKING_COL_STATUS = 13;
+
+const CONFIRMED_CANCELLATION_MIN_HOURS = 14;
 
 const BOOKING_HEADERS = [
   'Created At',
@@ -482,11 +485,18 @@ function transitionBookingToStatus_(spreadsheet, request) {
 
     const row = sheet.getRange(rowIndex, 1, 1, BOOKING_HEADERS.length).getValues()[0];
     const currentStatus = String(row[BOOKING_COL_STATUS - 1] || BOOKING_STATUS_SUBMITTED).trim() || BOOKING_STATUS_SUBMITTED;
+    const sevaDate = String(row[BOOKING_COL_SEVA_DATE - 1] || request.selectedDate).trim();
+    const sevaTiming = String(row[BOOKING_COL_SEVA_TIMING - 1] || '').trim();
 
-    validateAdminStatusTransition_(currentStatus, request.targetStatus, request.paymentReceived);
+    validateAdminStatusTransition_(
+      currentStatus,
+      request.targetStatus,
+      request.paymentReceived,
+      { sevaDate: sevaDate, sevaTiming: sevaTiming }
+    );
 
     const bookingData = {
-      sevaDate: String(row[BOOKING_COL_SEVA_DATE - 1] || request.selectedDate).trim(),
+      sevaDate: sevaDate,
       sevaName: String(row[BOOKING_COL_SEVA_NAME - 1] || '').trim(),
       devoteeName: String(row[BOOKING_COL_DEVOTEE_NAME - 1] || '').trim(),
       bookingRef: String(row[BOOKING_COL_BOOKING_REF - 1] || request.bookingRef).trim()
@@ -536,7 +546,7 @@ function transitionBookingToStatus_(spreadsheet, request) {
   }
 }
 
-function validateAdminStatusTransition_(currentStatus, targetStatus, paymentReceived) {
+function validateAdminStatusTransition_(currentStatus, targetStatus, paymentReceived, bookingMeta) {
   if (targetStatus === BOOKING_STATUS_CONFIRMED) {
     if (currentStatus !== BOOKING_STATUS_REVIEWED) {
       throw createBookingError_(
@@ -558,10 +568,15 @@ function validateAdminStatusTransition_(currentStatus, targetStatus, paymentRece
   }
 
   if (targetStatus === BOOKING_STATUS_CANCELLED) {
+    if (currentStatus === BOOKING_STATUS_CONFIRMED) {
+      ensureConfirmedCancellationWithinWindow_(bookingMeta);
+      return;
+    }
+
     if (currentStatus !== BOOKING_STATUS_SUBMITTED && currentStatus !== BOOKING_STATUS_REVIEWED) {
       throw createBookingError_(
         'INVALID_TRANSITION',
-        'Only Submitted or Reviewed bookings can be moved to Cancelled.',
+        'Only Submitted, Reviewed, or eligible Confirmed bookings can be moved to Cancelled.',
         { currentStatus: currentStatus, targetStatus: targetStatus }
       );
     }
@@ -570,6 +585,93 @@ function validateAdminStatusTransition_(currentStatus, targetStatus, paymentRece
   }
 
   throw createBookingError_('INVALID_ADMIN_REQUEST', 'Unsupported target status: ' + targetStatus);
+}
+
+function ensureConfirmedCancellationWithinWindow_(bookingMeta) {
+  const sevaDate = bookingMeta && bookingMeta.sevaDate ? String(bookingMeta.sevaDate).trim() : '';
+  const sevaTiming = bookingMeta && bookingMeta.sevaTiming ? String(bookingMeta.sevaTiming).trim() : '';
+  const sevaDateTime = parseSevaDateTime_(sevaDate, sevaTiming);
+
+  if (!sevaDateTime) {
+    throw createBookingError_(
+      'SEVA_DATETIME_REQUIRED',
+      'Confirmed booking cancellation requires valid seva date and time.',
+      {
+        currentStatus: BOOKING_STATUS_CONFIRMED,
+        targetStatus: BOOKING_STATUS_CANCELLED
+      }
+    );
+  }
+
+  const cutoffMillis = sevaDateTime.getTime() - (CONFIRMED_CANCELLATION_MIN_HOURS * 60 * 60 * 1000);
+  if (Date.now() > cutoffMillis) {
+    throw createBookingError_(
+      'CONFIRMED_CANCELLATION_WINDOW_EXPIRED',
+      'Confirmed booking can be cancelled only up to ' + CONFIRMED_CANCELLATION_MIN_HOURS + ' hours before seva date and time.',
+      {
+        currentStatus: BOOKING_STATUS_CONFIRMED,
+        targetStatus: BOOKING_STATUS_CANCELLED
+      }
+    );
+  }
+}
+
+function parseSevaDateTime_(sevaDate, sevaTiming) {
+  const dateText = String(sevaDate || '').trim();
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(dateText)) {
+    return null;
+  }
+
+  const timeParts = parseSevaTimeParts_(sevaTiming);
+  if (!timeParts) {
+    return null;
+  }
+
+  const dateParts = dateText.split('-').map(function (part) { return Number(part); });
+  if (dateParts.length !== 3 || dateParts.some(function (part) { return !Number.isFinite(part); })) {
+    return null;
+  }
+
+  return new Date(dateParts[0], dateParts[1] - 1, dateParts[2], timeParts.hour, timeParts.minute, 0, 0);
+}
+
+function parseSevaTimeParts_(timingText) {
+  const raw = String(timingText || '').trim();
+  if (!raw) {
+    return null;
+  }
+
+  const timeMatch = /(\d{1,2})\s*[:.]\s*(\d{2})/.exec(raw);
+  if (!timeMatch) {
+    return null;
+  }
+
+  let hour = Number(timeMatch[1]);
+  const minute = Number(timeMatch[2]);
+
+  if (!Number.isFinite(hour) || !Number.isFinite(minute) || hour < 0 || hour > 23 || minute < 0 || minute > 59) {
+    return null;
+  }
+
+  const lowerRaw = raw.toLowerCase();
+  const hasAmEnglish = /\bam\b|morning/.test(lowerRaw);
+  const hasPmEnglish = /\bpm\b|afternoon|evening|night/.test(lowerRaw);
+  const hasAmTelugu = /ఉదయం|ప్రభాతం|తెల్లవారు/.test(raw);
+  const hasPmTelugu = /మధ్యాహ్నం|సాయంత్రం|రాత్రి/.test(raw);
+
+  const isAm = hasAmEnglish || hasAmTelugu;
+  const isPm = hasPmEnglish || hasPmTelugu;
+
+  if (isPm && hour < 12) {
+    hour += 12;
+  } else if (isAm && hour === 12) {
+    hour = 0;
+  }
+
+  return {
+    hour: hour,
+    minute: minute
+  };
 }
 
 function findBookingRowByRef_(sheet, bookingRef) {
@@ -1489,6 +1591,10 @@ function bookingErrorResponse_(error) {
 
   if (error && error.targetStatus) {
     payload.targetStatus = String(error.targetStatus);
+  }
+
+  if (error && error.cutoffAt) {
+    payload.cutoffAt = String(error.cutoffAt);
   }
 
   if (error && error.whatsappReason) {

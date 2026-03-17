@@ -6,6 +6,7 @@
 <meta name="robots" content="noindex,nofollow" />
 <title>Booking Admin — Sri Varadhanjaneya Swamy Temple</title>
 <script src="https://accounts.google.com/gsi/client" async></script>
+<noscript><style>body.is-loading{overflow-x:hidden;overflow-y:auto;}#adminPageLoader{display:none!important;}</style></noscript>
 <style>
   :root {
     --bg: #f7efe3;
@@ -33,6 +34,82 @@
     color: var(--text);
     -webkit-font-smoothing: antialiased;
     overflow-x: hidden;
+  }
+
+  body.is-loading {
+    overflow: hidden;
+  }
+
+  .admin-page-loader {
+    position: fixed;
+    inset: 0;
+    z-index: 120;
+    display: grid;
+    place-items: center;
+    padding: 1rem;
+    background:
+      radial-gradient(circle at top, rgba(255, 217, 153, 0.34), transparent 34%),
+      linear-gradient(180deg, rgba(255, 248, 236, 0.96), rgba(247, 239, 227, 0.98));
+    backdrop-filter: blur(8px);
+    transition: opacity 0.35s ease, visibility 0.35s ease;
+  }
+
+  .admin-page-loader.is-hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  .admin-page-loader-panel {
+    width: min(100%, 360px);
+    padding: 1.4rem 1.2rem;
+    border-radius: 24px;
+    border: 1px solid rgba(168, 92, 32, 0.18);
+    background: rgba(255, 252, 247, 0.9);
+    box-shadow: 0 24px 48px rgba(107, 57, 14, 0.12);
+    text-align: center;
+  }
+
+  .admin-page-loader-kicker {
+    margin: 0;
+    color: var(--brand);
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+  }
+
+  .admin-page-loader-title {
+    margin: 0.45rem 0 0;
+    color: var(--brand-strong);
+    font-family: "Palatino Linotype", "Book Antiqua", Georgia, serif;
+    font-size: 1.15rem;
+    font-weight: 700;
+  }
+
+  .admin-page-loader-countdown-wrap {
+    width: 76px;
+    height: 76px;
+    margin: 1rem auto 0;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(255, 214, 142, 0.8), rgba(240, 169, 26, 0.28));
+    border: 1px solid rgba(168, 92, 32, 0.16);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  }
+
+  .admin-page-loader-countdown {
+    color: var(--brand-strong);
+    font-size: 2rem;
+    font-weight: 800;
+    line-height: 1;
+  }
+
+  .admin-page-loader-status {
+    margin: 0.9rem 0 0;
+    color: var(--muted);
+    font-size: 0.92rem;
+    font-weight: 600;
   }
 
   /* ── Auth view ─────────────────────────────────────────────── */
@@ -930,7 +1007,18 @@
   }
 </style>
 </head>
-<body>
+<body class="is-loading">
+
+<div id="adminPageLoader" class="admin-page-loader" role="status" aria-live="polite">
+  <div class="admin-page-loader-panel">
+    <p class="admin-page-loader-kicker">Please wait</p>
+    <p id="adminPageLoaderTitle" class="admin-page-loader-title">Preparing admin page</p>
+    <div class="admin-page-loader-countdown-wrap" aria-hidden="true">
+      <span id="adminPageLoaderCountdown" class="admin-page-loader-countdown">3</span>
+    </div>
+    <p id="adminPageLoaderStatus" class="admin-page-loader-status">Preparing admin page... 3</p>
+  </div>
+</div>
 
 <!-- ── Auth gate ─────────────────────────────────────────────── -->
 <div id="authView">
@@ -1068,9 +1156,17 @@ let reviewQrDataUrl = '';
 let reviewQrFileName = '';
 let reviewWired     = false;
 let reviewRefreshPending = false;
+let adminLoaderMode = 'open';
+let adminLoaderCountdownValue = 3;
+let adminLoaderTimer = 0;
+let adminLoaderHideTimer = 0;
+let adminLoaderCountdownDone = false;
+let adminLoaderWorkDone = false;
 
 // ── Boot ───────────────────────────────────────────────────────────────────────
 (async function boot() {
+  showAdminPageLoader('open');
+
   // Load webhook URL from content.json (same as the main site).
   try {
     const resp = await fetch(CONTENT_JSON_URL, { cache: 'no-store' });
@@ -1096,6 +1192,7 @@ let reviewRefreshPending = false;
       '<a href="https://console.cloud.google.com/apis/credentials" ' +
       'target="_blank" rel="noopener noreferrer">Google Cloud Console OAuth client</a>.';
     el.style.display = 'block';
+    markAdminPageLoaderWorkDone();
     return;
   }
 
@@ -1108,6 +1205,7 @@ let reviewRefreshPending = false;
       'Create one at <a href="https://console.cloud.google.com/apis/credentials" ' +
       'target="_blank" rel="noopener noreferrer">Google Cloud Console</a>.';
     el.style.display = 'block';
+    markAdminPageLoaderWorkDone();
     return;
   }
 
@@ -1125,7 +1223,85 @@ let reviewRefreshPending = false;
   }
 
   initGsi();
+  markAdminPageLoaderWorkDone();
 }());
+
+function updateAdminPageLoaderText() {
+  const countdownEl = document.getElementById('adminPageLoaderCountdown');
+  const statusEl = document.getElementById('adminPageLoaderStatus');
+  const titleEl = document.getElementById('adminPageLoaderTitle');
+
+  if (!countdownEl || !statusEl || !titleEl) {
+    return;
+  }
+
+  const isRefreshMode = adminLoaderMode === 'refresh';
+  const titleText = isRefreshMode ? 'Refreshing bookings' : 'Preparing admin page';
+  const doneText = isRefreshMode ? 'Almost refreshed...' : 'Almost ready...';
+
+  titleEl.textContent = titleText;
+  countdownEl.textContent = String(adminLoaderCountdownDone ? 0 : adminLoaderCountdownValue);
+  statusEl.textContent = adminLoaderCountdownDone
+    ? doneText
+    : (titleText + '... ' + adminLoaderCountdownValue);
+}
+
+function maybeHideAdminPageLoader() {
+  const loader = document.getElementById('adminPageLoader');
+  if (!loader || !adminLoaderCountdownDone || !adminLoaderWorkDone) {
+    return;
+  }
+
+  clearTimeout(adminLoaderHideTimer);
+  loader.classList.add('is-hidden');
+  document.body.classList.remove('is-loading');
+
+  adminLoaderHideTimer = window.setTimeout(function () {
+    loader.setAttribute('hidden', '');
+  }, 380);
+}
+
+function markAdminPageLoaderWorkDone() {
+  adminLoaderWorkDone = true;
+  maybeHideAdminPageLoader();
+}
+
+function showAdminPageLoader(mode) {
+  const loader = document.getElementById('adminPageLoader');
+  if (!loader) {
+    return;
+  }
+
+  adminLoaderMode = mode === 'refresh' ? 'refresh' : 'open';
+  adminLoaderCountdownValue = 3;
+  adminLoaderCountdownDone = false;
+  adminLoaderWorkDone = false;
+
+  clearInterval(adminLoaderTimer);
+  adminLoaderTimer = 0;
+  clearTimeout(adminLoaderHideTimer);
+
+  loader.removeAttribute('hidden');
+  loader.classList.remove('is-hidden');
+  document.body.classList.add('is-loading');
+
+  updateAdminPageLoaderText();
+
+  adminLoaderTimer = window.setInterval(function () {
+    if (adminLoaderCountdownValue > 1) {
+      adminLoaderCountdownValue -= 1;
+      updateAdminPageLoaderText();
+      return;
+    }
+
+    adminLoaderCountdownValue = 0;
+    adminLoaderCountdownDone = true;
+    clearInterval(adminLoaderTimer);
+    adminLoaderTimer = 0;
+    updateAdminPageLoaderText();
+    maybeHideAdminPageLoader();
+  }, 400);
+}
 
 // ── Google Identity Services ─────────────────────────────────────────────────
 function initGsi() {
@@ -1224,12 +1400,15 @@ function signOut() {
 
 // ── Fetch bookings ─────────────────────────────────────────────────────────────
 async function loadBookings(force) {
+  showAdminPageLoader('refresh');
+
   if (!webhookUrl) {
     setContent(
       '<div class="dash-status is-error">' +
       'Webhook URL not configured in <code>assets/data/content.json</code>.' +
       '</div>'
     );
+    markAdminPageLoaderWorkDone();
     return;
   }
 
@@ -1272,6 +1451,7 @@ async function loadBookings(force) {
   } finally {
     btn.disabled    = false;
     btn.textContent = '\u21BB Refresh';
+    markAdminPageLoaderWorkDone();
   }
 }
 
@@ -1451,6 +1631,7 @@ function renderRowAction(selectedDate, row, statusLower) {
     return '<div class="ref-with-action">' +
       '<span class="ref-code">' + bookingRef + '</span>' +
       '<span class="ref-state-icon ref-state-confirmed" title="Confirmed" aria-label="Confirmed">✓</span>' +
+      makeButton('cancelled', 'Cancel confirmed booking (allowed only before 14 hours of seva time)', 'cancel-icon') +
       '</div>';
   }
 
@@ -1546,7 +1727,7 @@ function getReviewModeConfig(mode) {
       sendingText: 'Sending...',
       completedText: 'Transition Complete ✓',
       successText: '✓ Booking transitioned to Cancelled and WhatsApp message sent successfully.',
-      note: 'This sends cancellation information on WhatsApp and updates booking status to Cancelled.',
+      note: 'This sends cancellation information on WhatsApp and updates booking status to Cancelled. Confirmed bookings can be cancelled only when seva time is more than 14 hours away.',
       action: 'admin-transition-status',
       targetStatus: 'Cancelled',
       requiresQr: false,
@@ -1723,9 +1904,10 @@ function buildDefaultReviewMessage(mode, language, context) {
         'సేవ: ' + (context && context.sevaName ? context.sevaName : ''),
         '',
         '*మీ బుకింగ్ ఇప్పుడు ధృవీకరించబడింది.*',
-        'ఆలయానికి రానప్పుడు బుకింగ్ రిఫరెన్స్ చూపించండి.',
+        'ఆలయానికి వచ్చినప్పుడు బుకింగ్ రిఫరెన్స్ చూపించండి.',
         '',
-        '🙏 *జై శ్రీరామ్* 🙏'
+        '🙏 *జై శ్రీరామ్* 🙏',
+        '*ధన్యవాదాలు మీ భక్తి మరియు శ్రీ వరధాంజనేయ స్వామి ఆలయానికి మద్దతుకు.*'
       ].join('\n');
     }
 
@@ -1741,7 +1923,8 @@ function buildDefaultReviewMessage(mode, language, context) {
       '*Your booking is now confirmed.*',
       'Please carry this booking reference when you visit the temple.',
       '',
-      '🙏 *Jai Sri Ram* 🙏'
+      '🙏 *Jai Sri Ram* 🙏',
+      '*Thank you for your devotion and support to Sri Varadhanjaneya Swamy Temple.*'
     ].join('\n');
   }
 
@@ -1756,9 +1939,10 @@ function buildDefaultReviewMessage(mode, language, context) {
         'సేవ తేదీ: ' + sevaDateText,
         'సేవ: ' + (context && context.sevaName ? context.sevaName : ''),
         '',
-        'సహాయం కోసం ఆలయ కార్యాలయాన్ని సంప్రదించండి.',
+        'అనుకోని పరిస్థితుల కారణంగా, మేము మీ బుకింగ్‌ను రద్దు చేయాల్సి వచ్చింది. అసౌకర్యానికి క్షమించండి.',
         '',
-        'ధన్యవాదాలు'
+        '🙏 *జై శ్రీరామ్* 🙏',
+        '*ధన్యవాదాలు మీ భక్తి మరియు శ్రీ వరధాంజనేయ స్వామి ఆలయానికి మద్దతుకు.*'
       ].join('\n');
     }
 
@@ -1771,9 +1955,10 @@ function buildDefaultReviewMessage(mode, language, context) {
       'Seva Date: ' + sevaDateText,
       'Seva: ' + (context && context.sevaName ? context.sevaName : ''),
       '',
-      'For assistance, please contact the temple office.',
+      'Due to unforeseen circumstances, we had to cancel your booking. Sorry for the inconvenience caused.',
       '',
-      'Thank you'
+      '🙏 *Jai Sri Ram* 🙏',
+      '*Thank you for your devotion and support to Sri Varadhanjaneya Swamy Temple.*'
     ].join('\n');
   }
 
@@ -1790,7 +1975,8 @@ function buildDefaultReviewMessage(mode, language, context) {
       '',
       'చెల్లింపు పూర్తయ్యాక, మేము మీ బుకింగ్‌ను ధృవీకరిస్తాము.',
       '',
-      '🙏 *శ్రీ వరధంజనేయ స్వామి దేవస్థానానికి మీ భక్తి మరియు మద్దతుకు ధన్యవాదాలు.* 🙏'
+      '🙏 *జై శ్రీరామ్* 🙏',
+      '*ధన్యవాదాలు మీ భక్తి మరియు శ్రీ వరధాంజనేయ స్వామి ఆలయానికి మద్దతుకు.*'
     ].join('\n');
   }
 
@@ -1806,7 +1992,8 @@ function buildDefaultReviewMessage(mode, language, context) {
     '',
     'Share payment receipt/screenshot on WhatsApp, after receiving payment, we will confirm your booking.',
     '',
-    '🙏 *Thank you for your devotion and support to Sri Varadhanjaneya Swamy Temple.* 🙏'
+    '🙏 *Jai Sri Ram* 🙏',
+    '*Thank you for your devotion and support to Sri Varadhanjaneya Swamy Temple.*'
   ].join('\n');
 }
 
@@ -1992,6 +2179,18 @@ function formatTransitionError(data) {
     return data && data.error
       ? String(data.error)
       : 'Please confirm payment receipt before marking as Confirmed.';
+  }
+
+  if (code === 'CONFIRMED_CANCELLATION_WINDOW_EXPIRED') {
+    return data && data.error
+      ? String(data.error)
+      : 'Confirmed booking can be cancelled only up to 14 hours before seva date and time.';
+  }
+
+  if (code === 'SEVA_DATETIME_REQUIRED') {
+    return data && data.error
+      ? String(data.error)
+      : 'Seva date/time is required to validate confirmed booking cancellation window.';
   }
 
   if (code === 'WHATSAPP_SEND_FAILED') {

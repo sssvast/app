@@ -2690,6 +2690,12 @@ function closeReviewModal(forceClose) {
   setReviewModalCloseState_(false);
 
   const submit = document.getElementById('reviewSubmitBtn');
+  if (submit) {
+    // Clear text so the sendingText/completedText guard in updateReviewSubmitButtonState
+    // does not fire and keep the button disabled the next time the modal is opened.
+    submit.textContent = '';
+    submit.disabled = false;
+  }
   const modeConfig = applyReviewModeConfig(reviewMode);
   if (submit) {
     updateReviewSubmitButtonState(modeConfig);

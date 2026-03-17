@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="te">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -165,6 +165,35 @@
     display: flex;
     justify-content: center;
     min-height: 44px;
+  }
+
+  .lang-switch {
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid rgba(168, 92, 32, 0.28);
+    border-radius: 999px;
+    background: rgba(255, 245, 232, 0.78);
+    overflow: hidden;
+  }
+
+  .lang-switch button {
+    border: none;
+    background: transparent;
+    color: var(--brand-strong);
+    font-size: 0.78rem;
+    font-weight: 700;
+    padding: 0.34rem 0.78rem;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+  }
+
+  .lang-switch button.active {
+    background: var(--brand);
+    color: #fff;
+  }
+
+  .auth-lang-switch {
+    margin: 0 auto 0.9rem;
   }
 
   .auth-note {
@@ -624,12 +653,6 @@
     line-height: 1;
   }
 
-  .ref-state-reviewed {
-    color: #1b5e20;
-    background: rgba(46, 125, 50, 0.12);
-    border: 1px solid rgba(46, 125, 50, 0.25);
-  }
-
   .ref-state-confirmed {
     color: #0f4a18;
     background: rgba(27, 94, 32, 0.14);
@@ -792,7 +815,7 @@
   }
 
   .field textarea {
-    min-height: 96px;
+    min-height: 160px;
     resize: vertical;
     line-height: 1.4;
   }
@@ -897,6 +920,30 @@
   }
 
   /* ── Responsive ───────────────────────────────────────────── */
+  @media (max-width: 980px) {
+    .dash-header {
+      flex-wrap: wrap;
+      align-items: flex-start;
+    }
+
+    .dash-brand {
+      width: 100%;
+      min-width: 0;
+    }
+
+    .dash-header-right {
+      width: 100%;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+
+    .user-pill {
+      flex: 1 1 220px;
+      max-width: none;
+      min-width: 0;
+    }
+  }
+
   @media (max-width: 860px) {
     .date-group-body {
       overflow-x: visible;
@@ -990,7 +1037,7 @@
       width: 100%;
       justify-content: space-between;
       gap: 0.5rem;
-      flex-wrap: nowrap;
+      flex-wrap: wrap;
     }
     .user-pill {
       max-width: none;
@@ -999,6 +1046,10 @@
     }
     .btn-signout {
       flex-shrink: 0;
+    }
+    .lang-switch button {
+      padding: 0.32rem 0.62rem;
+      font-size: 0.74rem;
     }
     .s-value { font-size: 1.6rem; }
     .modal-grid { grid-template-columns: 1fr; }
@@ -1011,12 +1062,12 @@
 
 <div id="adminPageLoader" class="admin-page-loader" role="status" aria-live="polite">
   <div class="admin-page-loader-panel">
-    <p class="admin-page-loader-kicker">Please wait</p>
-    <p id="adminPageLoaderTitle" class="admin-page-loader-title">Preparing admin page</p>
+    <p id="adminPageLoaderKicker" class="admin-page-loader-kicker">దయచేసి వేచి ఉండండి</p>
+    <p id="adminPageLoaderTitle" class="admin-page-loader-title">అడ్మిన్ పేజీ సిద్ధమవుతోంది</p>
     <div class="admin-page-loader-countdown-wrap" aria-hidden="true">
       <span id="adminPageLoaderCountdown" class="admin-page-loader-countdown">3</span>
     </div>
-    <p id="adminPageLoaderStatus" class="admin-page-loader-status">Preparing admin page... 3</p>
+    <p id="adminPageLoaderStatus" class="admin-page-loader-status">అడ్మిన్ పేజీ సిద్ధమవుతోంది... 3</p>
   </div>
 </div>
 
@@ -1024,12 +1075,16 @@
 <div id="authView">
   <div class="auth-panel">
     <div class="auth-logo" aria-hidden="true">🛕</div>
-    <h1>Sri Varadhanjaneya Swamy Temple</h1>
-    <p class="auth-subtitle">Booking Admin Portal &mdash; Authorised access only</p>
+    <h1 id="authTempleTitle">Sri Varadhanjaneya Swamy Temple</h1>
+    <p id="authSubtitle" class="auth-subtitle">బుకింగ్ అడ్మిన్ పోర్టల్ &mdash; అనుమతి ఉన్నవారికే</p>
+    <div class="lang-switch auth-lang-switch" id="authLangSwitch" role="group" aria-label="Language switcher">
+      <button type="button" id="authTeluguBtn" class="active" aria-pressed="true">తెలుగు</button>
+      <button type="button" id="authEnglishBtn" aria-pressed="false">English</button>
+    </div>
     <div id="gsiButtonWrap"></div>
     <div id="authError" class="alert alert-error" role="alert"></div>
     <div id="setupWarning" class="alert alert-warn"></div>
-    <p class="auth-note">Sign in with the temple administrator Google account.<br>Unauthorised accounts will be rejected.</p>
+    <p id="authNote" class="auth-note">ఆలయ అడ్మిన్ గూగుల్ ఖాతాతో సైన్ ఇన్ చేయండి.<br>అనధికార ఖాతాలు తిరస్కరించబడతాయి.</p>
   </div>
 </div>
 
@@ -1037,26 +1092,30 @@
 <div id="dashboardView">
   <header class="dash-header">
     <div class="dash-brand">
-      <h1>Sri Varadhanjaneya Swamy Temple</h1>
-      <p>Booking Admin Portal</p>
+      <h1 id="dashTempleTitle">Sri Varadhanjaneya Swamy Temple</h1>
+      <p id="dashPortalSubtitle">Booking Admin Portal</p>
     </div>
     <div class="dash-header-right">
+      <div class="lang-switch" id="dashLangSwitch" role="group" aria-label="Language switcher">
+        <button type="button" id="dashTeluguBtn" class="active" aria-pressed="true">తెలుగు</button>
+        <button type="button" id="dashEnglishBtn" aria-pressed="false">English</button>
+      </div>
       <div class="user-pill" id="userPill" style="display:none">
         <img id="adminAvatar" class="user-avatar" src="" alt="" width="24" height="24" />
         <span class="user-email" id="adminEmail"></span>
       </div>
-      <button class="btn-signout" id="signOutBtn">Sign out</button>
+      <button class="btn-signout" id="signOutBtn">సైన్ అవుట్</button>
     </div>
   </header>
 
   <main class="dash-main">
     <div class="dash-toolbar">
-      <h2>Seva Bookings</h2>
-      <button class="btn-refresh" id="refreshBtn">&#8635; Refresh</button>
+      <h2 id="dashBookingsTitle">సేవా బుకింగ్స్</h2>
+      <button class="btn-refresh" id="refreshBtn">&#8635; రిఫ్రెష్</button>
     </div>
     <div id="summaryBar" class="summary-bar" style="display:none"></div>
     <div id="bookingContent">
-      <div class="dash-status">Loading bookings&hellip;</div>
+      <div class="dash-status">బుకింగ్స్ లోడ్ అవుతున్నాయి&hellip;</div>
     </div>
   </main>
 </div>
@@ -1065,64 +1124,42 @@
   <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="reviewModalTitle">
     <div class="modal-head">
       <h3 id="reviewModalTitle">Submitted -&gt; Reviewed</h3>
-      <button type="button" class="btn-modal-close" id="reviewCloseBtn" aria-label="Close">&times;</button>
+      <button type="button" class="btn-modal-close" id="reviewCloseBtn" aria-label="మూసివేయి">&times;</button>
     </div>
     <div class="modal-body">
       <div class="modal-grid">
         <div class="field">
-          <label>Booking Reference</label>
-          <div id="reviewBookingRef" class="field-static">-</div>
-        </div>
-        <div class="field">
-          <label>Devotee</label>
-          <div id="reviewDevotee" class="field-static">-</div>
-        </div>
-        <div class="field">
-          <label>Seva Date</label>
-          <div id="reviewSevaDate" class="field-static">-</div>
-        </div>
-      </div>
-
-      <div class="modal-grid">
-        <div class="field">
-          <label for="reviewPhone"><span class="wa-icon wa-icon-small" aria-hidden="true"></span> WhatsApp Number</label>
-          <input id="reviewPhone" type="text" inputmode="tel" placeholder="Auto-filled from booking" readonly disabled />
-        </div>
-        <div class="field">
-          <label for="reviewLanguage">Message Language</label>
-          <select id="reviewLanguage">
-            <option value="te" selected>Telugu</option>
-            <option value="en">English</option>
-          </select>
+          <label for="reviewPhone" id="reviewLabelPhone"><span class="wa-icon wa-icon-small" aria-hidden="true"></span> <span id="reviewLabelPhoneText">వాట్సాప్ నంబర్</span></label>
+          <input id="reviewPhone" type="text" inputmode="tel" placeholder="బుకింగ్ నుండి ఆటో-ఫిల్ అవుతుంది" readonly disabled />
         </div>
       </div>
 
       <div class="field">
-        <label for="reviewMessage">Text Message</label>
+        <label for="reviewMessage" id="reviewLabelTextMessage">టెక్స్ట్ సందేశం</label>
         <textarea id="reviewMessage" placeholder="Optional additional note for the devotee"></textarea>
       </div>
 
       <div class="field" id="reviewQrSection">
-        <label for="reviewQrInput">QR Code Image</label>
+        <label for="reviewQrInput" id="reviewLabelQrCode">QR కోడ్ చిత్రం</label>
         <input id="reviewQrInput" type="file" accept="image/*" />
-        <div id="reviewQrMeta" class="qr-meta">Please upload the QR image to send with this WhatsApp message.</div>
+        <div id="reviewQrMeta" class="qr-meta">ఈ వాట్సాప్ సందేశంతో పంపడానికి QR చిత్రం అప్లోడ్ చేయండి.</div>
         <img id="reviewQrPreview" class="qr-preview" alt="QR preview" />
       </div>
 
       <div id="reviewPaymentWrap" class="modal-check" style="display:none">
         <label for="reviewPaymentAck">
           <input id="reviewPaymentAck" type="checkbox" />
-          <span>I confirm payment receipt has been received for this booking.</span>
+          <span id="reviewPaymentAckText">ఈ బుకింగ్‌కు చెల్లింపు రసీదు వచ్చినట్లు ధృవీకరిస్తున్నాను.</span>
         </label>
       </div>
 
       <div id="reviewModalError" class="alert alert-error" role="alert"></div>
       <div id="reviewModalStatus" class="modal-status" role="status"></div>
-      <div id="reviewModalNote" class="modal-note">When submitted, this sends WhatsApp with booking reference + uploaded QR image and updates status to Reviewed.</div>
+      <div id="reviewModalNote" class="modal-note">సబ్మిట్ చేసిన వెంటనే QRతో వాట్సాప్ పంపి స్టేటస్‌ను Reviewed కు అప్డేట్ చేస్తుంది.</div>
 
       <div class="modal-actions">
-        <button type="button" class="btn-modal-cancel" id="reviewCancelBtn">Close</button>
-        <button type="button" class="btn-modal-submit" id="reviewSubmitBtn">Send WhatsApp &amp; Mark Reviewed</button>
+        <button type="button" class="btn-modal-cancel" id="reviewCancelBtn">మూసివేయి</button>
+        <button type="button" class="btn-modal-submit" id="reviewSubmitBtn">వాట్సాప్ పంపి Reviewed గా మార్చు</button>
       </div>
     </div>
   </div>
@@ -1146,10 +1183,371 @@ const ADMIN_GOOGLE_CLIENT_ID = '526573444187-ha7resl17svcp1f7dmosa07jquom2f62.ap
 const ADMIN_ALLOWED_EMAIL = 'svanjaneya.temple@gmail.com';
 const CONTENT_JSON_URL    = 'assets/data/content.json';
 
+const DEFAULT_ADMIN_CONTENT = {
+  defaultLanguage: 'telugu',
+  languages: {
+    telugu: {
+      documentTitle: 'బుకింగ్ అడ్మిన్ — శ్రీ వరధాంజనేయ స్వామి ఆలయం',
+      loader: {
+        kicker: 'దయచేసి వేచి ఉండండి',
+        preparingTitle: 'అడ్మిన్ పేజీ సిద్ధమవుతోంది',
+        refreshingTitle: 'బుకింగ్స్ రిఫ్రెష్ అవుతున్నాయి',
+        almostReady: 'దాదాపు సిద్ధమైంది...',
+        almostRefreshed: 'దాదాపు రిఫ్రెష్ అయింది...'
+      },
+      auth: {
+        subtitle: 'బుకింగ్ అడ్మిన్ పోర్టల్ — అనుమతి ఉన్నవారికే',
+        note: 'ఆలయ అడ్మిన్ గూగుల్ ఖాతాతో సైన్ ఇన్ చేయండి.<br>అనధికార ఖాతాలు తిరస్కరించబడతాయి.',
+        denied: 'అయ్యో... ప్రవేశం నిరాకరించబడింది.',
+        invalidCredential: 'సైన్-ఇన్ వివరాలు చదవలేకపోయాం. మళ్లీ ప్రయత్నించండి.'
+      },
+      dashboard: {
+        portalSubtitle: 'బుకింగ్ అడ్మిన్ పోర్టల్',
+        heading: 'సేవా బుకింగ్స్',
+        refresh: '\u21BB రిఫ్రెష్',
+        loadingButton: 'లోడ్ అవుతోంది…',
+        loadingBookings: 'బుకింగ్స్ లోడ్ అవుతున్నాయి…',
+        signOut: 'సైన్ అవుట్',
+        noRecords: 'స్ప్రెడ్షీట్‌లో బుకింగ్ రికార్డులు లేవు.',
+        noRowsForDate: 'ఈ తేదీకి బుకింగ్స్ లేవు.',
+        bookingCount: '{count} బుకింగ్(లు)'
+      },
+      summary: {
+        totalBookings: 'మొత్తం బుకింగ్స్',
+        totalAmount: 'మొత్తం ',
+        submitted: 'సమర్పించబడింది',
+        reviewed: 'పరిశీలించబడింది',
+        confirmed: 'ధృవీకరించబడింది',
+        cancelled: 'రద్దు'
+      },
+      table: {
+        index: '#',
+        ref: 'రిఫ్',
+        bookingRequest: 'బుకింగ్ అభ్యర్థన',
+        devotee: 'భక్తుడు',
+        gotram: 'గోత్రం',
+        whatsapp: 'వాట్సాప్',
+        seva: 'సేవ',
+        timing: 'సమయం',
+        slot: 'స్లాట్',
+        amount: 'మొత్తం',
+        status: 'స్థితి'
+      },
+      status: {
+        submitted: 'సమర్పించబడింది',
+        reviewed: 'పరిశీలించబడింది',
+        confirmed: 'ధృవీకరించబడింది',
+        cancelled: 'రద్దు'
+      },
+      actions: {
+        review: 'పరిశీలించి చెల్లింపు QR వాట్సాప్ పంపండి',
+        confirm: 'ధృవీకరించి తుది వాట్సాప్ సందేశం పంపండి',
+        cancel: 'బుకింగ్‌ను రద్దు చేసి వాట్సాప్‌లో తెలియజేయండి',
+        cancelConfirmed: 'ధృవీకరించిన బుకింగ్‌ను రద్దు చేయండి (సేవ సమయానికి 14 గంటల ముందు మాత్రమే)'
+      },
+      modal: {
+        bookingRef: 'బుకింగ్ రిఫరెన్స్',
+        devotee: 'భక్తుడు',
+        sevaDate: 'సేవ తేదీ',
+        whatsappNumber: 'వాట్సాప్ నంబర్',
+        messageLanguage: 'సందేశ భాష',
+        optionTelugu: 'తెలుగు',
+        optionEnglish: 'English',
+        textMessage: 'టెక్స్ట్ సందేశం',
+        messagePlaceholder: 'భక్తుడికి ఐచ్ఛికంగా అదనపు సందేశం',
+        phonePlaceholder: 'బుకింగ్ నుండి ఆటో-ఫిల్ అవుతుంది',
+        qrImage: 'QR కోడ్ చిత్రం',
+        qrMetaRequired: 'ఈ వాట్సాప్ సందేశంతో పంపడానికి QR చిత్రం అప్లోడ్ చేయండి.',
+        qrMetaNotRequired: 'ఈ ట్రాన్సిషన్‌కు QR చిత్రం అవసరం లేదు.',
+        paymentAck: 'ఈ బుకింగ్‌కు చెల్లింపు రసీదు వచ్చినట్లు ధృవీకరిస్తున్నాను.',
+        close: 'మూసివేయి',
+        sending: 'పంపిస్తోంది...',
+        completed: 'ట్రాన్సిషన్ పూర్తయింది ✓',
+        refundLineConfirmedCancellation: 'చెల్లించిన మొత్తం తదుపరి 5 రోజుల్లో తిరిగి చెల్లించబడుతుంది.',
+        selectedFilePrefix: 'ఎంచుకున్నది:',
+        mode: {
+          reviewed: {
+            title: 'Submitted -> Reviewed',
+            submit: 'వాట్సాప్ పంపి Reviewed గా మార్చు',
+            success: '✓ బుకింగ్ Reviewed కి మార్చబడింది, వాట్సాప్ సందేశం విజయవంతంగా పంపబడింది.',
+            note: 'సబ్మిట్ చేసిన వెంటనే QRతో వాట్సాప్ పంపి స్టేటస్‌ను Reviewed కు అప్డేట్ చేస్తుంది.',
+            whatsappHelp: 'వాట్సాప్ టోకెన్, ఫోన్ నంబర్ ID, QR చిత్రం సరిచూడండి.',
+            missingQr: 'దయచేసి QR కోడ్ చిత్రం అప్లోడ్ చేయండి.'
+          },
+          confirmed: {
+            title: 'Reviewed -> Confirmed',
+            submit: 'వాట్సాప్ పంపి Confirmed గా మార్చు',
+            success: '✓ బుకింగ్ Confirmed కి మార్చబడింది, తుది వాట్సాప్ సందేశం విజయవంతంగా పంపబడింది.',
+            note: 'చెల్లింపు రసీదు వచ్చిన తర్వాత మాత్రమే Confirm చేయండి. ఇది తుది ధృవీకరణ వాట్సాప్ పంపుతుంది.',
+            whatsappHelp: 'వాట్సాప్ టోకెన్ మరియు ఫోన్ నంబర్ ID సరిచూడండి.',
+            paymentRequired: 'Confirmed గా మార్చే ముందు చెల్లింపు రసీదు ధృవీకరించండి.'
+          },
+          cancelled: {
+            title: 'బుకింగ్‌ను Cancelled గా మార్చు',
+            submit: 'వాట్సాప్ పంపి Cancelled గా మార్చు',
+            success: '✓ బుకింగ్ Cancelled కి మార్చబడింది, వాట్సాప్ సందేశం విజయవంతంగా పంపబడింది.',
+            note: 'ఇది రద్దు సమాచారం వాట్సాప్‌లో పంపి స్టేటస్‌ను Cancelled కి మార్చుతుంది. Confirmed బుకింగ్‌లు సేవ సమయానికి 14 గంటల ముందు మాత్రమే రద్దు చేయవచ్చు.',
+            whatsappHelp: 'వాట్సాప్ టోకెన్ మరియు ఫోన్ నంబర్ ID సరిచూడండి.'
+          }
+        }
+      },
+      errors: {
+        webhookNotConfigured: 'Webhook URL <code>assets/data/content.json</code> లో కాన్ఫిగర్ కాలేదు.',
+        failedLoadBookingsPrefix: 'బుకింగ్స్ లోడ్ చేయడం విఫలమైంది:',
+        unknownServerError: 'తెలియని సర్వర్ లోపం.',
+        unknownError: 'తెలియని లోపం.',
+        sessionExpired: 'సెషన్ ముగిసింది. మళ్లీ సైన్ ఇన్ చేయండి.',
+        invalidTransition: 'ఈ ట్రాన్సిషన్ అనుమతించబడలేదు.',
+        invalidTransitionCurrent: 'ఈ బుకింగ్ ప్రస్తుతం {currentStatus} లో ఉంది. సరైన ట్రాన్సిషన్ ఎంచుకోండి.',
+        invalidTransitionTarget: 'ఈ బుకింగ్ ప్రస్తుతం {currentStatus} లో ఉంది. దీనిని {targetStatus} కి మార్చలేం.',
+        paymentConfirmationRequired: 'Confirmed గా మార్చే ముందు చెల్లింపు రసీదు ధృవీకరించండి.',
+        confirmedCancellationWindowExpired: 'Confirmed బుకింగ్ సేవ తేదీ/సమయానికి 14 గంటల ముందు వరకే రద్దు చేయవచ్చు.',
+        sevaDatetimeRequired: 'Confirmed రద్దు విండోను చెక్ చేయడానికి సేవ తేదీ/సమయం అవసరం.',
+        whatsappFailedPrefix: 'WhatsApp పంపడం విఫలమైంది',
+        invalidQrImage: 'QR చిత్రం సరైనది కాదు.',
+        selectQrImageFile: 'దయచేసి QR కోసం చిత్రం ఫైల్ ఎంచుకోండి.',
+        qrImageTooLarge: 'QR చిత్రం 4MB కంటే ఎక్కువ కాకూడదు.',
+        qrReadFailed: 'QR చిత్రం చదవలేకపోయాం. మళ్లీ ప్రయత్నించండి.',
+        whatsappRequired: 'వాట్సాప్ నంబర్ అవసరం.',
+        missingWebhook: 'Webhook URL కాన్ఫిగర్ కాలేదు.',
+        transitionFailedPrefix: 'ట్రాన్సిషన్ విఫలమైంది:'
+      }
+    },
+    english: {
+      documentTitle: 'Booking Admin — Sri Varadhanjaneya Swamy Temple',
+      loader: {
+        kicker: 'Please wait',
+        preparingTitle: 'Preparing admin page',
+        refreshingTitle: 'Refreshing bookings',
+        almostReady: 'Almost ready...',
+        almostRefreshed: 'Almost refreshed...'
+      },
+      auth: {
+        subtitle: 'Booking Admin Portal — Authorised access only',
+        note: 'Sign in with the temple administrator Google account.<br>Unauthorised accounts will be rejected.',
+        denied: 'Oops... Access denied.',
+        invalidCredential: 'Could not read sign-in credentials. Please try again.'
+      },
+      dashboard: {
+        portalSubtitle: 'Booking Admin Portal',
+        heading: 'Seva Bookings',
+        refresh: '\u21BB Refresh',
+        loadingButton: 'Loading…',
+        loadingBookings: 'Loading bookings…',
+        signOut: 'Sign out',
+        noRecords: 'No booking records found in the spreadsheet.',
+        noRowsForDate: 'No bookings for this date.',
+        bookingCount: '{count} booking(s)'
+      },
+      summary: {
+        totalBookings: 'Total Bookings',
+        totalAmount: 'Total Amount',
+        submitted: 'Submitted',
+        reviewed: 'Reviewed',
+        confirmed: 'Confirmed',
+        cancelled: 'Cancelled'
+      },
+      table: {
+        index: '#',
+        ref: 'Ref',
+        bookingRequest: 'Booking Request',
+        devotee: 'Devotee',
+        gotram: 'Gotram',
+        whatsapp: 'WhatsApp',
+        seva: 'Seva',
+        timing: 'Timing',
+        slot: 'Slot',
+        amount: 'Amount',
+        status: 'Status'
+      },
+      status: {
+        submitted: 'Submitted',
+        reviewed: 'Reviewed',
+        confirmed: 'Confirmed',
+        cancelled: 'Cancelled'
+      },
+      actions: {
+        review: 'Review and send payment QR on WhatsApp',
+        confirm: 'Confirm booking and send final WhatsApp message',
+        cancel: 'Cancel booking and notify on WhatsApp',
+        cancelConfirmed: 'Cancel confirmed booking (allowed only before 14 hours of seva time)'
+      },
+      modal: {
+        bookingRef: 'Booking Reference',
+        devotee: 'Devotee',
+        sevaDate: 'Seva Date',
+        whatsappNumber: 'WhatsApp Number',
+        messageLanguage: 'Message Language',
+        optionTelugu: 'Telugu',
+        optionEnglish: 'English',
+        textMessage: 'Text Message',
+        messagePlaceholder: 'Optional additional note for the devotee',
+        phonePlaceholder: 'Auto-filled from booking',
+        qrImage: 'QR Code Image',
+        qrMetaRequired: 'Please upload the QR image to send with this WhatsApp message.',
+        qrMetaNotRequired: 'QR image is not required for this transition.',
+        paymentAck: 'I confirm payment receipt has been received for this booking.',
+        close: 'Close',
+        sending: 'Sending...',
+        completed: 'Transition Complete ✓',
+        refundLineConfirmedCancellation: 'Amount paid will be refunded in next 5 days.',
+        selectedFilePrefix: 'Selected:',
+        mode: {
+          reviewed: {
+            title: 'Submitted -> Reviewed',
+            submit: 'Send WhatsApp & Mark Reviewed',
+            success: '✓ Booking transitioned to Reviewed and WhatsApp message sent successfully.',
+            note: 'When submitted, this sends WhatsApp with booking reference + uploaded QR image and updates status to Reviewed.',
+            whatsappHelp: 'Verify WhatsApp token, phone number ID, and QR image.',
+            missingQr: 'Please upload the QR code image.'
+          },
+          confirmed: {
+            title: 'Reviewed -> Confirmed',
+            submit: 'Send WhatsApp & Mark Confirmed',
+            success: '✓ Booking transitioned to Confirmed and final WhatsApp message sent successfully.',
+            note: 'Confirm only after payment receipt is received. This sends final confirmation on WhatsApp.',
+            whatsappHelp: 'Verify WhatsApp token and phone number ID.',
+            paymentRequired: 'Please confirm payment receipt before marking as Confirmed.'
+          },
+          cancelled: {
+            title: 'Mark Booking as Cancelled',
+            submit: 'Send WhatsApp & Mark Cancelled',
+            success: '✓ Booking transitioned to Cancelled and WhatsApp message sent successfully.',
+            note: 'This sends cancellation information on WhatsApp and updates booking status to Cancelled. Confirmed bookings can be cancelled only when seva time is more than 14 hours away.',
+            whatsappHelp: 'Verify WhatsApp token and phone number ID.'
+          }
+        }
+      },
+      errors: {
+        webhookNotConfigured: 'Webhook URL not configured in <code>assets/data/content.json</code>.',
+        failedLoadBookingsPrefix: 'Failed to load bookings:',
+        unknownServerError: 'Unknown server error.',
+        unknownError: 'Unknown error.',
+        sessionExpired: 'Session expired. Please sign in again.',
+        invalidTransition: 'This transition is not allowed.',
+        invalidTransitionCurrent: 'This booking is currently {currentStatus}. Refresh and try a valid transition.',
+        invalidTransitionTarget: 'This booking is currently {currentStatus}. It cannot be moved to {targetStatus}.',
+        paymentConfirmationRequired: 'Please confirm payment receipt before marking as Confirmed.',
+        confirmedCancellationWindowExpired: 'Confirmed booking can be cancelled only up to 14 hours before seva date and time.',
+        sevaDatetimeRequired: 'Seva date/time is required to validate confirmed booking cancellation window.',
+        whatsappFailedPrefix: 'WhatsApp send failed',
+        invalidQrImage: 'QR image is invalid.',
+        selectQrImageFile: 'Please select an image file for the QR code.',
+        qrImageTooLarge: 'QR image must be 4MB or smaller.',
+        qrReadFailed: 'Could not read QR image. Please try again.',
+        whatsappRequired: 'WhatsApp number is required.',
+        missingWebhook: 'Webhook URL is not configured.',
+        transitionFailedPrefix: 'Transition failed:'
+      }
+    }
+  },
+  modalTemplates: {
+    reviewed: {
+      telugu: [
+        'నమస్తే, *{devoteeName}*,',
+        '',
+        'మేము మీ సేవ * {sevaName}* బుకింగ్ అభ్యర్థనను పరిశీలించాము.',
+        '',
+        'బుకింగ్ రిఫరెన్స్: {bookingRef}',
+        'సేవ తేదీ: {sevaDate}',
+        '',
+        '*_దయచేసి జత చేసిన QR కోడ్ ద్వారా సేవ రుసుము: {paymentAmount} చెల్లింపు పూర్తి చేయండి._*',
+        '',
+        'చెల్లింపు పూర్తయ్యాక, మేము మీ బుకింగ్‌ను ధృవీకరిస్తాము.',
+        '',
+        '🙏 *జై శ్రీరామ్* 🙏',
+        '*ధన్యవాదాలు మీ భక్తి మరియు శ్రీ వరధాంజనేయ స్వామి ఆలయానికి మద్దతుకు.*'
+      ],
+      english: [
+        'Namaste, *{devoteeName}*,',
+        '',
+        'We are pleased to inform you that your seva * {sevaName}* booking request has been reviewed.',
+        '',
+        'Booking reference: {bookingRef}',
+        'Seva Date: {sevaDate}',
+        '',
+        '*_Please complete seva payment of {paymentAmount} using the attached QR code._*',
+        '',
+        'Share payment receipt/screenshot on WhatsApp, after receiving payment, we will confirm your booking.',
+        '',
+        '🙏 *Jai Sri Ram* 🙏',
+        '*Thank you for your devotion and support to Sri Varadhanjaneya Swamy Temple.*'
+      ]
+    },
+    confirmed: {
+      telugu: [
+        'నమస్తే, *{devoteeName}*,',
+        '',
+        'మీ సేవ బుకింగ్ చెల్లింపును మేము స్వీకరించాము.',
+        '',
+        'బుకింగ్ రిఫరెన్స్: {bookingRef}',
+        'సేవ తేదీ: {sevaDate}',
+        'సేవ: {sevaName}',
+        '',
+        '*మీ బుకింగ్ ఇప్పుడు ధృవీకరించబడింది.*',
+        'ఆలయానికి వచ్చినప్పుడు బుకింగ్ రిఫరెన్స్ చూపించండి.',
+        '',
+        '🙏 *జై శ్రీరామ్* 🙏',
+        '*ధన్యవాదాలు మీ భక్తి మరియు శ్రీ వరధాంజనేయ స్వామి ఆలయానికి మద్దతుకు.*'
+      ],
+      english: [
+        'Namaste, *{devoteeName}*,',
+        '',
+        'We have received your payment for the seva booking.',
+        '',
+        'Booking reference: {bookingRef}',
+        'Seva Date: {sevaDate}',
+        'Seva: {sevaName}',
+        '',
+        '*Your booking is now confirmed.*',
+        'Please carry this booking reference when you visit the temple.',
+        '',
+        '🙏 *Jai Sri Ram* 🙏',
+        '*Thank you for your devotion and support to Sri Varadhanjaneya Swamy Temple.*'
+      ]
+    },
+    cancelled: {
+      telugu: [
+        'నమస్తే, *{devoteeName}*,',
+        '',
+        'మీ సేవ బుకింగ్ రద్దు చేయబడింది.',
+        '',
+        'బుకింగ్ రిఫరెన్స్: {bookingRef}',
+        'సేవ తేదీ: {sevaDate}',
+        'సేవ: {sevaName}',
+        '',
+        '{refundLine}',
+        '',
+        'అనుకోని పరిస్థితుల కారణంగా, మేము మీ బుకింగ్‌ను రద్దు చేయాల్సి వచ్చింది. అసౌకర్యానికి క్షమించండి.',
+        '',
+        '🙏 *జై శ్రీరామ్* 🙏',
+        '*ధన్యవాదాలు మీ భక్తి మరియు శ్రీ వరధాంజనేయ స్వామి ఆలయానికి మద్దతుకు.*'
+      ],
+      english: [
+        'Namaste, *{devoteeName}*,',
+        '',
+        'Your seva booking has been cancelled.',
+        '',
+        'Booking reference: {bookingRef}',
+        'Seva Date: {sevaDate}',
+        'Seva: {sevaName}',
+        '',
+        '{refundLine}',
+        '',
+        'Due to unforeseen circumstances, we had to cancel your booking. Sorry for the inconvenience caused.',
+        '',
+        '🙏 *Jai Sri Ram* 🙏',
+        '*Thank you for your devotion and support to Sri Varadhanjaneya Swamy Temple.*'
+      ]
+    }
+  }
+};
+
 // ── State ──────────────────────────────────────────────────────────────────────
 let webhookUrl      = '';
 let adminCredential = '';
 let bookingLookup   = {};
+let lastBookingsData = [];
 let reviewContext   = null;
 let reviewMode      = 'reviewed';
 let reviewQrDataUrl = '';
@@ -1162,12 +1560,15 @@ let adminLoaderTimer = 0;
 let adminLoaderHideTimer = 0;
 let adminLoaderCountdownDone = false;
 let adminLoaderWorkDone = false;
+let languageToggleWired = false;
+let adminContent = JSON.parse(JSON.stringify(DEFAULT_ADMIN_CONTENT));
+let currentAdminLanguage = 'telugu';
 
 // ── Boot ───────────────────────────────────────────────────────────────────────
 (async function boot() {
   showAdminPageLoader('open');
 
-  // Load webhook URL from content.json (same as the main site).
+  // Load webhook URL + admin localization config from content.json.
   try {
     const resp = await fetch(CONTENT_JSON_URL, { cache: 'no-store' });
     if (resp.ok) {
@@ -1175,8 +1576,16 @@ let adminLoaderWorkDone = false;
       webhookUrl = (data.integrations && typeof data.integrations.bookingWebhookUrl === 'string')
         ? data.integrations.bookingWebhookUrl.trim()
         : '';
+      adminContent = normalizeAdminContent_(data && data.admin ? data.admin : null);
+      currentAdminLanguage = normalizeAdminLanguage_((data && data.admin && data.admin.defaultLanguage) || adminContent.defaultLanguage);
     }
-  } catch (_) { /* webhook missing — shown when bookings are fetched */ }
+  } catch (_) {
+    adminContent = normalizeAdminContent_(null);
+    currentAdminLanguage = normalizeAdminLanguage_(adminContent.defaultLanguage);
+  }
+
+  wireLanguageToggleEvents_();
+  applyAdminLanguage(currentAdminLanguage, { rerender: false, syncModalMessage: false });
 
   // ── Guard: file:// protocol not supported by Google OAuth ──────────────────
   if (window.location.protocol === 'file:') {
@@ -1226,6 +1635,269 @@ let adminLoaderWorkDone = false;
   markAdminPageLoaderWorkDone();
 }());
 
+function normalizeAdminContent_(incoming) {
+  return deepMergeObjects_(DEFAULT_ADMIN_CONTENT, incoming && typeof incoming === 'object' ? incoming : {});
+}
+
+function deepMergeObjects_(base, incoming) {
+  if (!base || typeof base !== 'object' || Array.isArray(base)) {
+    return incoming;
+  }
+
+  const result = Array.isArray(base) ? [] : {};
+  Object.keys(base).forEach(function (key) {
+    const baseValue = base[key];
+    const incomingValue = incoming && Object.prototype.hasOwnProperty.call(incoming, key)
+      ? incoming[key]
+      : undefined;
+
+    if (Array.isArray(baseValue)) {
+      result[key] = Array.isArray(incomingValue) ? incomingValue : baseValue;
+      return;
+    }
+
+    if (baseValue && typeof baseValue === 'object') {
+      result[key] = deepMergeObjects_(baseValue, incomingValue && typeof incomingValue === 'object' ? incomingValue : {});
+      return;
+    }
+
+    result[key] = incomingValue !== undefined ? incomingValue : baseValue;
+  });
+
+  return result;
+}
+
+function normalizeAdminLanguage_(value) {
+  return String(value || '').trim().toLowerCase() === 'english' ? 'english' : 'telugu';
+}
+
+function getPathValue_(source, path) {
+  return String(path || '').split('.').reduce(function (node, part) {
+    if (!node || typeof node !== 'object' || !Object.prototype.hasOwnProperty.call(node, part)) {
+      return undefined;
+    }
+
+    return node[part];
+  }, source);
+}
+
+function applyTemplate_(template, replacements) {
+  if (typeof template !== 'string') {
+    return '';
+  }
+
+  return template.replace(/\{([a-zA-Z0-9_]+)\}/g, function (_, token) {
+    if (replacements && Object.prototype.hasOwnProperty.call(replacements, token)) {
+      return String(replacements[token]);
+    }
+
+    return '{' + token + '}';
+  });
+}
+
+function getAdminTextForLanguage_(language, path, replacements) {
+  const normalizedLang = normalizeAdminLanguage_(language);
+  const langNode = getPathValue_(adminContent.languages[normalizedLang], path);
+  const fallbackNode = getPathValue_(adminContent.languages.english, path);
+  const template = typeof langNode === 'string'
+    ? langNode
+    : (typeof fallbackNode === 'string' ? fallbackNode : '');
+
+  return applyTemplate_(template, replacements || {});
+}
+
+function getAdminText(path, replacements) {
+  return getAdminTextForLanguage_(currentAdminLanguage, path, replacements);
+}
+
+function getStatusLabel_(status) {
+  const key = String(status || '').trim().toLowerCase();
+  const label = key ? getAdminText('status.' + key) : '';
+  return label || String(status || '');
+}
+
+function resolveTemplateLanguage_(value) {
+  const normalized = String(value || '').trim().toLowerCase();
+  return normalized === 'en' || normalized === 'english' ? 'english' : 'telugu';
+}
+
+function getModalTemplateLines_(mode, language) {
+  const normalizedMode = normalizeReviewMode(mode);
+  const langKey = resolveTemplateLanguage_(language);
+
+  const current = adminContent
+    && adminContent.modalTemplates
+    && adminContent.modalTemplates[normalizedMode]
+    && Array.isArray(adminContent.modalTemplates[normalizedMode][langKey])
+      ? adminContent.modalTemplates[normalizedMode][langKey]
+      : null;
+
+  if (current && current.length) {
+    return current;
+  }
+
+  const fallback = DEFAULT_ADMIN_CONTENT
+    && DEFAULT_ADMIN_CONTENT.modalTemplates
+    && DEFAULT_ADMIN_CONTENT.modalTemplates[normalizedMode]
+    && Array.isArray(DEFAULT_ADMIN_CONTENT.modalTemplates[normalizedMode][langKey])
+      ? DEFAULT_ADMIN_CONTENT.modalTemplates[normalizedMode][langKey]
+      : [];
+
+  return fallback;
+}
+
+function getPreferredModalLanguage_() {
+  return normalizeAdminLanguage_(currentAdminLanguage) === 'telugu' ? 'te' : 'en';
+}
+
+function syncLanguageToggleUi_() {
+  const pairs = [
+    ['authTeluguBtn', 'authEnglishBtn'],
+    ['dashTeluguBtn', 'dashEnglishBtn']
+  ];
+
+  const isTelugu = normalizeAdminLanguage_(currentAdminLanguage) === 'telugu';
+  pairs.forEach(function (pair) {
+    const teBtn = document.getElementById(pair[0]);
+    const enBtn = document.getElementById(pair[1]);
+    if (!teBtn || !enBtn) {
+      return;
+    }
+
+    teBtn.classList.toggle('active', isTelugu);
+    teBtn.setAttribute('aria-pressed', String(isTelugu));
+    enBtn.classList.toggle('active', !isTelugu);
+    enBtn.setAttribute('aria-pressed', String(!isTelugu));
+  });
+}
+
+function applyAdminLanguage(language, options) {
+  const settings = options || {};
+  currentAdminLanguage = normalizeAdminLanguage_(language);
+
+  document.documentElement.lang = currentAdminLanguage === 'telugu' ? 'te' : 'en';
+  document.title = getAdminText('documentTitle');
+
+  const loaderKicker = document.getElementById('adminPageLoaderKicker');
+  if (loaderKicker) {
+    loaderKicker.textContent = getAdminText('loader.kicker');
+  }
+
+  const authSubtitle = document.getElementById('authSubtitle');
+  if (authSubtitle) {
+    authSubtitle.textContent = getAdminText('auth.subtitle');
+  }
+
+  const authNote = document.getElementById('authNote');
+  if (authNote) {
+    authNote.innerHTML = getAdminText('auth.note');
+  }
+
+  const dashPortalSubtitle = document.getElementById('dashPortalSubtitle');
+  if (dashPortalSubtitle) {
+    dashPortalSubtitle.textContent = getAdminText('dashboard.portalSubtitle');
+  }
+
+  const dashBookingsTitle = document.getElementById('dashBookingsTitle');
+  if (dashBookingsTitle) {
+    dashBookingsTitle.textContent = getAdminText('dashboard.heading');
+  }
+
+  const signOutBtn = document.getElementById('signOutBtn');
+  if (signOutBtn) {
+    signOutBtn.textContent = getAdminText('dashboard.signOut');
+  }
+
+  const refreshBtn = document.getElementById('refreshBtn');
+  if (refreshBtn) {
+    refreshBtn.textContent = refreshBtn.disabled
+      ? getAdminText('dashboard.loadingButton')
+      : getAdminText('dashboard.refresh');
+  }
+
+  const reviewCloseBtn = document.getElementById('reviewCancelBtn');
+  if (reviewCloseBtn) {
+    reviewCloseBtn.textContent = getAdminText('modal.close');
+  }
+
+  const reviewCloseIconBtn = document.getElementById('reviewCloseBtn');
+  if (reviewCloseIconBtn) {
+    reviewCloseIconBtn.setAttribute('aria-label', getAdminText('modal.close'));
+  }
+
+  const reviewLabelPhoneText = document.getElementById('reviewLabelPhoneText');
+  if (reviewLabelPhoneText) {
+    reviewLabelPhoneText.textContent = getAdminText('modal.whatsappNumber');
+  }
+
+  const reviewPhone = document.getElementById('reviewPhone');
+  if (reviewPhone) {
+    reviewPhone.placeholder = getAdminText('modal.phonePlaceholder');
+  }
+
+  const reviewLabelTextMessage = document.getElementById('reviewLabelTextMessage');
+  if (reviewLabelTextMessage) {
+    reviewLabelTextMessage.textContent = getAdminText('modal.textMessage');
+  }
+
+  const reviewMessage = document.getElementById('reviewMessage');
+  if (reviewMessage) {
+    reviewMessage.placeholder = getAdminText('modal.messagePlaceholder');
+  }
+
+  const reviewLabelQrCode = document.getElementById('reviewLabelQrCode');
+  if (reviewLabelQrCode) {
+    reviewLabelQrCode.textContent = getAdminText('modal.qrImage');
+  }
+
+  const reviewPaymentAckText = document.getElementById('reviewPaymentAckText');
+  if (reviewPaymentAckText) {
+    reviewPaymentAckText.textContent = getAdminText('modal.paymentAck');
+  }
+
+  syncLanguageToggleUi_();
+  updateAdminPageLoaderText();
+
+  if (settings.rerender !== false && Array.isArray(lastBookingsData) && lastBookingsData.length && document.getElementById('dashboardView').style.display === 'flex') {
+    renderBookings(lastBookingsData);
+  }
+
+  if (settings.syncModalMessage !== false) {
+    const language = getPreferredModalLanguage_();
+
+    if (reviewContext) {
+      document.getElementById('reviewMessage').value = buildDefaultReviewMessage(reviewMode, language, reviewContext);
+    }
+
+    applyReviewModeConfig(reviewMode);
+  }
+}
+
+function wireLanguageToggleEvents_() {
+  if (languageToggleWired) {
+    return;
+  }
+
+  [
+    ['authTeluguBtn', 'telugu'],
+    ['dashTeluguBtn', 'telugu'],
+    ['authEnglishBtn', 'english'],
+    ['dashEnglishBtn', 'english']
+  ]
+    .forEach(function (entry) {
+      const el = document.getElementById(entry[0]);
+      if (!el) {
+        return;
+      }
+
+      el.addEventListener('click', function () {
+        applyAdminLanguage(entry[1]);
+      });
+    });
+
+  languageToggleWired = true;
+}
+
 function updateAdminPageLoaderText() {
   const countdownEl = document.getElementById('adminPageLoaderCountdown');
   const statusEl = document.getElementById('adminPageLoaderStatus');
@@ -1236,8 +1908,12 @@ function updateAdminPageLoaderText() {
   }
 
   const isRefreshMode = adminLoaderMode === 'refresh';
-  const titleText = isRefreshMode ? 'Refreshing bookings' : 'Preparing admin page';
-  const doneText = isRefreshMode ? 'Almost refreshed...' : 'Almost ready...';
+  const titleText = isRefreshMode
+    ? getAdminText('loader.refreshingTitle')
+    : getAdminText('loader.preparingTitle');
+  const doneText = isRefreshMode
+    ? getAdminText('loader.almostRefreshed')
+    : getAdminText('loader.almostReady');
 
   titleEl.textContent = titleText;
   countdownEl.textContent = String(adminLoaderCountdownDone ? 0 : adminLoaderCountdownValue);
@@ -1326,14 +2002,12 @@ function onGsiCredential(response) {
   const token   = response.credential;
   const payload = decodeJwtPayload(token);
   if (!payload) {
-    showAuthError('Could not read sign-in credentials. Please try again.');
+    showAuthError(getAdminText('auth.invalidCredential'));
     return;
   }
 
   if (payload.email !== ADMIN_ALLOWED_EMAIL) {
-    showAuthError(
-      'Oops... Access denied.'
-    );
+    showAuthError(getAdminText('auth.denied'));
     return;
   }
 
@@ -1405,7 +2079,7 @@ async function loadBookings(force) {
   if (!webhookUrl) {
     setContent(
       '<div class="dash-status is-error">' +
-      'Webhook URL not configured in <code>assets/data/content.json</code>.' +
+      getAdminText('errors.webhookNotConfigured') +
       '</div>'
     );
     markAdminPageLoaderWorkDone();
@@ -1414,8 +2088,8 @@ async function loadBookings(force) {
 
   const btn = document.getElementById('refreshBtn');
   btn.disabled    = true;
-  btn.textContent = 'Loading\u2026';
-  setContent('<div class="dash-status">Loading bookings\u2026</div>');
+  btn.textContent = getAdminText('dashboard.loadingButton');
+  setContent('<div class="dash-status">' + esc(getAdminText('dashboard.loadingBookings')) + '</div>');
   document.getElementById('summaryBar').style.display = 'none';
 
   try {
@@ -1436,21 +2110,24 @@ async function loadBookings(force) {
     if (!data.ok) {
       setContent(
         '<div class="dash-status is-error">' +
-        esc(data.error || 'Unknown server error.') +
+        esc(data.error || getAdminText('errors.unknownServerError')) +
         '</div>'
       );
       return;
     }
 
-    renderBookings(data.bookings || []);
+    lastBookingsData = Array.isArray(data.bookings) ? data.bookings : [];
+    renderBookings(lastBookingsData);
 
   } catch (err) {
     setContent(
-      '<div class="dash-status is-error">Failed to load bookings: ' + esc(err.message) + '</div>'
+      '<div class="dash-status is-error">' +
+      esc(getAdminText('errors.failedLoadBookingsPrefix')) + ' ' + esc(err.message) +
+      '</div>'
     );
   } finally {
     btn.disabled    = false;
-    btn.textContent = '\u21BB Refresh';
+    btn.textContent = getAdminText('dashboard.refresh');
     markAdminPageLoaderWorkDone();
   }
 }
@@ -1458,7 +2135,7 @@ async function loadBookings(force) {
 // ── Render ─────────────────────────────────────────────────────────────────────
 function renderBookings(bookings) {
   if (!bookings.length) {
-    setContent('<div class="dash-status">No booking records found in the spreadsheet.</div>');
+    setContent('<div class="dash-status">' + esc(getAdminText('dashboard.noRecords')) + '</div>');
     return;
   }
 
@@ -1494,12 +2171,12 @@ function renderBookings(bookings) {
 
   const bar = document.getElementById('summaryBar');
   bar.innerHTML =
-    summaryCard(total, 'Total Bookings') +
-    summaryCard('\u20B9' + amount.toLocaleString('en-IN'), 'Total Amount') +
-    summaryCard(submitted,  'Submitted') +
-    summaryCard(reviewed,   'Reviewed') +
-    summaryCard(confirmed,  'Confirmed') +
-    summaryCard(cancelled,  'Cancelled');
+    summaryCard(total, getAdminText('summary.totalBookings')) +
+    summaryCard('\u20B9' + amount.toLocaleString('en-IN'), getAdminText('summary.totalAmount')) +
+    summaryCard(submitted,  getAdminText('summary.submitted')) +
+    summaryCard(reviewed,   getAdminText('summary.reviewed')) +
+    summaryCard(confirmed,  getAdminText('summary.confirmed')) +
+    summaryCard(cancelled,  getAdminText('summary.cancelled'));
   bar.style.display = 'flex';
 
   const html = bookings.map(function (group, i) {
@@ -1545,24 +2222,27 @@ function renderDateGroup(group, isOpen) {
   const expandedVal = isOpen ? 'true' : 'false';
 
   // Mini status counts for header badges.
-  const counts = { Submitted: 0, Reviewed: 0, Confirmed: 0, Cancelled: 0 };
+  const counts = { submitted: 0, reviewed: 0, confirmed: 0, cancelled: 0 };
   group.rows.forEach(function (r) {
-    if (Object.prototype.hasOwnProperty.call(counts, r.status)) counts[r.status]++;
+    const statusKey = String(r && r.status || '').trim().toLowerCase();
+    if (Object.prototype.hasOwnProperty.call(counts, statusKey)) {
+      counts[statusKey] += 1;
+    }
   });
 
   const badges = Object.entries(counts)
     .filter(function (e) { return e[1] > 0; })
     .map(function (e) {
-      const cls = 'badge badge-' + e[0].toLowerCase();
-      return '<span class="' + cls + '">' + e[1] + '\u00A0' + esc(e[0]) + '</span>';
+      const cls = 'badge badge-' + e[0];
+      return '<span class="' + cls + '">' + e[1] + '\u00A0' + esc(getStatusLabel_(e[0])) + '</span>';
     }).join(' ');
 
   const body = count === 0
-    ? '<div class="no-rows">No bookings for this date.</div>'
+    ? '<div class="no-rows">' + esc(getAdminText('dashboard.noRowsForDate')) + '</div>'
     : '<table><thead><tr>' +
-        '<th>#</th><th>Ref</th><th>Booking Request</th><th>Devotee</th><th>Gotram</th>' +
-        '<th>WhatsApp</th><th>Seva</th><th>Timing</th>' +
-        '<th>Slot</th><th>Amount</th><th>Status</th>' +
+        '<th>' + esc(getAdminText('table.index')) + '</th><th>' + esc(getAdminText('table.ref')) + '</th><th>' + esc(getAdminText('table.bookingRequest')) + '</th><th>' + esc(getAdminText('table.devotee')) + '</th><th>' + esc(getAdminText('table.gotram')) + '</th>' +
+        '<th>' + esc(getAdminText('table.whatsapp')) + '</th><th>' + esc(getAdminText('table.seva')) + '</th><th>' + esc(getAdminText('table.timing')) + '</th>' +
+        '<th>' + esc(getAdminText('table.slot')) + '</th><th>' + esc(getAdminText('table.amount')) + '</th><th>' + esc(getAdminText('table.status')) + '</th>' +
       '</tr></thead><tbody>' +
       group.rows.map(function (r, idx) { return renderRow(group.date, r, idx + 1); }).join('') +
       '</tbody></table>';
@@ -1572,7 +2252,7 @@ function renderDateGroup(group, isOpen) {
       '<span class="date-label">' + esc(dateLabel) + '</span>' +
       '<div class="date-meta">' +
         badges +
-        '<span class="date-count">' + count + ' booking' + (count === 1 ? '' : 's') + '</span>' +
+        '<span class="date-count">' + esc(getAdminText('dashboard.bookingCount', { count: count })) + '</span>' +
         '<span class="chevron" aria-hidden="true">&#9660;</span>' +
       '</div>' +
     '</div>' +
@@ -1581,23 +2261,25 @@ function renderDateGroup(group, isOpen) {
 }
 
 function renderRow(selectedDate, r, idx) {
-  const s   = String(r.status || '').toLowerCase() || 'unknown';
-  const cls = 'badge badge-' + (s === 'submitted' || s === 'reviewed' || s === 'confirmed' || s === 'cancelled' ? s : 'unknown');
+  const s = String(r.status || '').toLowerCase() || 'unknown';
+  const isKnownStatus = s === 'submitted' || s === 'reviewed' || s === 'confirmed' || s === 'cancelled';
+  const cls = 'badge badge-' + (isKnownStatus ? s : 'unknown');
   const amt = Number(r.totalAmount) || 0;
   const refWithAction = renderRowAction(selectedDate, r, s);
+  const statusLabel = isKnownStatus ? getStatusLabel_(s) : String(r.status || '\u2014');
 
   return '<tr>' +
-    '<td data-label="#">' + idx + '</td>' +
-    '<td class="col-ref" data-label="Ref">' + refWithAction + '</td>' +
-    '<td data-label="Booking Request">' + esc(fmtBookingRequest(r.bookingRequest || r.createdAt)) + '</td>' +
-    '<td class="col-name" data-label="Devotee">'   + esc(r.devoteeName  || '\u2014') + '</td>' +
-    '<td data-label="Gotram">'                    + esc(r.gotram        || '\u2014') + '</td>' +
-    '<td class="col-phone" data-label="WhatsApp">'  + esc(r.phone         || '\u2014') + '</td>' +
-    '<td data-label="Seva">'                    + esc(r.sevaName      || '\u2014') + '</td>' +
-    '<td data-label="Timing">' + esc(r.sevaTiming || '\u2014') + '</td>' +
-    '<td data-label="Slot">'                    + esc(String(r.slot > 0 ? r.slot : '\u2014')) + '</td>' +
-    '<td class="col-amount" data-label="Amount">\u20B9' + esc(amt.toLocaleString('en-IN')) + '</td>' +
-    '<td data-label="Status"><span class="' + cls + '">' + esc(r.status || '\u2014') + '</span></td>' +
+    '<td data-label="' + esc(getAdminText('table.index')) + '">' + idx + '</td>' +
+    '<td class="col-ref" data-label="' + esc(getAdminText('table.ref')) + '">' + refWithAction + '</td>' +
+    '<td data-label="' + esc(getAdminText('table.bookingRequest')) + '">' + esc(fmtBookingRequest(r.bookingRequest || r.createdAt)) + '</td>' +
+    '<td class="col-name" data-label="' + esc(getAdminText('table.devotee')) + '">' + esc(r.devoteeName || '\u2014') + '</td>' +
+    '<td data-label="' + esc(getAdminText('table.gotram')) + '">' + esc(r.gotram || '\u2014') + '</td>' +
+    '<td class="col-phone" data-label="' + esc(getAdminText('table.whatsapp')) + '">' + esc(r.phone || '\u2014') + '</td>' +
+    '<td data-label="' + esc(getAdminText('table.seva')) + '">' + esc(r.sevaName || '\u2014') + '</td>' +
+    '<td data-label="' + esc(getAdminText('table.timing')) + '">' + esc(r.sevaTiming || '\u2014') + '</td>' +
+    '<td data-label="' + esc(getAdminText('table.slot')) + '">' + esc(String(r.slot > 0 ? r.slot : '\u2014')) + '</td>' +
+    '<td class="col-amount" data-label="' + esc(getAdminText('table.amount')) + '">\u20B9' + esc(amt.toLocaleString('en-IN')) + '</td>' +
+    '<td data-label="' + esc(getAdminText('table.status')) + '"><span class="' + cls + '">' + esc(statusLabel) + '</span></td>' +
   '</tr>';
 }
 
@@ -1614,31 +2296,31 @@ function renderRowAction(selectedDate, row, statusLower) {
   if (statusLower === 'submitted' && row && row.bookingRef) {
     return '<div class="ref-with-action">' +
       '<span class="ref-code">' + bookingRef + '</span>' +
-      makeButton('reviewed', 'Review and send payment QR on WhatsApp', 'process-icon') +
-      makeButton('cancelled', 'Cancel booking and notify on WhatsApp', 'cancel-icon') +
+      makeButton('reviewed', getAdminText('actions.review'), 'process-icon') +
+      makeButton('cancelled', getAdminText('actions.cancel'), 'cancel-icon') +
       '</div>';
   }
 
   if (statusLower === 'reviewed' && row && row.bookingRef) {
     return '<div class="ref-with-action">' +
       '<span class="ref-code">' + bookingRef + '</span>' +
-      makeButton('confirmed', 'Confirm booking and send final WhatsApp message', 'confirm-icon') +
-      makeButton('cancelled', 'Cancel booking and notify on WhatsApp', 'cancel-icon') +
+      makeButton('confirmed', getAdminText('actions.confirm'), 'confirm-icon') +
+      makeButton('cancelled', getAdminText('actions.cancel'), 'cancel-icon') +
       '</div>';
   }
 
   if (statusLower === 'confirmed') {
     return '<div class="ref-with-action">' +
       '<span class="ref-code">' + bookingRef + '</span>' +
-      '<span class="ref-state-icon ref-state-confirmed" title="Confirmed" aria-label="Confirmed">✓</span>' +
-      makeButton('cancelled', 'Cancel confirmed booking (allowed only before 14 hours of seva time)', 'cancel-icon') +
+      '<span class="ref-state-icon ref-state-confirmed" title="' + esc(getStatusLabel_('confirmed')) + '" aria-label="' + esc(getStatusLabel_('confirmed')) + '">✓</span>' +
+      makeButton('cancelled', getAdminText('actions.cancelConfirmed'), 'cancel-icon') +
       '</div>';
   }
 
   if (statusLower === 'cancelled') {
     return '<div class="ref-with-action">' +
       '<span class="ref-code">' + bookingRef + '</span>' +
-      '<span class="ref-state-icon ref-state-cancelled" title="Cancelled" aria-label="Cancelled">✕</span>' +
+      '<span class="ref-state-icon ref-state-cancelled" title="' + esc(getStatusLabel_('cancelled')) + '" aria-label="' + esc(getStatusLabel_('cancelled')) + '">✕</span>' +
       '</div>';
   }
 
@@ -1670,7 +2352,6 @@ function wireReviewModalEvents() {
   const modal = document.getElementById('reviewModal');
   document.getElementById('reviewCloseBtn').addEventListener('click', closeReviewModal);
   document.getElementById('reviewCancelBtn').addEventListener('click', closeReviewModal);
-  document.getElementById('reviewLanguage').addEventListener('change', onReviewLanguageChange);
   document.getElementById('reviewQrInput').addEventListener('change', onReviewQrInputChange);
   document.getElementById('reviewSubmitBtn').addEventListener('click', submitReviewTransition);
 
@@ -1698,63 +2379,29 @@ function normalizeReviewMode(mode) {
 
 function getReviewModeConfig(mode) {
   const normalized = normalizeReviewMode(mode);
-
-  if (normalized === 'confirmed') {
-    return {
-      mode: normalized,
-      title: 'Reviewed -> Confirmed',
-      submitText: 'Send WhatsApp & Mark Confirmed',
-      sendingText: 'Sending...',
-      completedText: 'Transition Complete ✓',
-      successText: '✓ Booking transitioned to Confirmed and final WhatsApp message sent successfully.',
-      note: 'Confirm only after payment receipt is received. This sends final confirmation on WhatsApp.',
-      action: 'admin-transition-status',
-      targetStatus: 'Confirmed',
-      requiresQr: false,
-      requiresPaymentAck: true,
-      qrMeta: 'QR image is not required for this transition.',
-      missingQrError: '',
-      paymentRequiredError: 'Please confirm payment receipt before marking as Confirmed.',
-      whatsappHelp: 'Verify WhatsApp token and phone number ID.'
-    };
-  }
-
-  if (normalized === 'cancelled') {
-    return {
-      mode: normalized,
-      title: 'Mark Booking as Cancelled',
-      submitText: 'Send WhatsApp & Mark Cancelled',
-      sendingText: 'Sending...',
-      completedText: 'Transition Complete ✓',
-      successText: '✓ Booking transitioned to Cancelled and WhatsApp message sent successfully.',
-      note: 'This sends cancellation information on WhatsApp and updates booking status to Cancelled. Confirmed bookings can be cancelled only when seva time is more than 14 hours away.',
-      action: 'admin-transition-status',
-      targetStatus: 'Cancelled',
-      requiresQr: false,
-      requiresPaymentAck: false,
-      qrMeta: 'QR image is not required for this transition.',
-      missingQrError: '',
-      paymentRequiredError: '',
-      whatsappHelp: 'Verify WhatsApp token and phone number ID.'
-    };
-  }
+  const basePath = 'modal.mode.' + normalized;
+  const targetStatus = normalized === 'confirmed'
+    ? 'Confirmed'
+    : (normalized === 'cancelled' ? 'Cancelled' : 'Reviewed');
+  const requiresQr = normalized === 'reviewed';
+  const requiresPaymentAck = normalized === 'confirmed';
 
   return {
-    mode: 'reviewed',
-    title: 'Submitted -> Reviewed',
-    submitText: 'Send WhatsApp & Mark Reviewed',
-    sendingText: 'Sending...',
-    completedText: 'Transition Complete ✓',
-    successText: '✓ Booking transitioned to Reviewed and WhatsApp message sent successfully.',
-    note: 'When submitted, this sends WhatsApp with booking reference + uploaded QR image and updates status to Reviewed.',
-    action: 'admin-transition-reviewed',
-    targetStatus: 'Reviewed',
-    requiresQr: true,
-    requiresPaymentAck: false,
-    qrMeta: 'Please upload the QR image to send with this WhatsApp message.',
-    missingQrError: 'Please upload the QR code image.',
-    paymentRequiredError: '',
-    whatsappHelp: 'Verify WhatsApp token, phone number ID, and QR image.'
+    mode: normalized,
+    title: getAdminText(basePath + '.title'),
+    submitText: getAdminText(basePath + '.submit'),
+    sendingText: getAdminText('modal.sending'),
+    completedText: getAdminText('modal.completed'),
+    successText: getAdminText(basePath + '.success'),
+    note: getAdminText(basePath + '.note'),
+    action: normalized === 'reviewed' ? 'admin-transition-reviewed' : 'admin-transition-status',
+    targetStatus: targetStatus,
+    requiresQr: requiresQr,
+    requiresPaymentAck: requiresPaymentAck,
+    qrMeta: getAdminText(requiresQr ? 'modal.qrMetaRequired' : 'modal.qrMetaNotRequired'),
+    missingQrError: requiresQr ? getAdminText('modal.mode.reviewed.missingQr') : '',
+    paymentRequiredError: requiresPaymentAck ? getAdminText('modal.mode.confirmed.paymentRequired') : '',
+    whatsappHelp: getAdminText(basePath + '.whatsappHelp')
   };
 }
 
@@ -1787,6 +2434,11 @@ function applyReviewModeConfig(mode) {
     paymentAck.checked = false;
   }
 
+  const submitBtn = document.getElementById('reviewSubmitBtn');
+  if (submitBtn && !submitBtn.disabled) {
+    submitBtn.textContent = config.submitText;
+  }
+
   return config;
 }
 
@@ -1801,6 +2453,7 @@ function openReviewModalByKey(key, mode) {
   reviewContext = {
     selectedDate: String(item.selectedDate || ''),
     bookingRef: String(item.row.bookingRef || ''),
+    status: String(item.row.status || ''),
     devoteeName: String(item.row.devoteeName || ''),
     phone: String(item.row.phone || ''),
     sevaName: String(item.row.sevaName || ''),
@@ -1814,12 +2467,9 @@ function openReviewModalByKey(key, mode) {
 
   const modeConfig = applyReviewModeConfig(reviewMode);
 
-  document.getElementById('reviewBookingRef').textContent = reviewContext.bookingRef || '-';
-  document.getElementById('reviewDevotee').textContent = reviewContext.devoteeName || '-';
-  document.getElementById('reviewSevaDate').textContent = fmtSevaDateSimple(reviewContext.sevaDate);
   document.getElementById('reviewPhone').value = reviewContext.phone || '';
-  document.getElementById('reviewLanguage').value = 'te';
-  document.getElementById('reviewMessage').value = buildDefaultReviewMessage(reviewMode, 'te', reviewContext);
+  const modalLanguage = getPreferredModalLanguage_();
+  document.getElementById('reviewMessage').value = buildDefaultReviewMessage(reviewMode, modalLanguage, reviewContext);
   document.getElementById('reviewQrInput').value = '';
   document.getElementById('reviewPaymentAck').checked = false;
 
@@ -1878,123 +2528,35 @@ function closeReviewModal() {
   }
 }
 
-function onReviewLanguageChange(event) {
-  if (!reviewContext) {
-    return;
-  }
-
-  const language = event && event.target && event.target.value === 'te' ? 'te' : 'en';
-  document.getElementById('reviewMessage').value = buildDefaultReviewMessage(reviewMode, language, reviewContext);
-}
-
 function buildDefaultReviewMessage(mode, language, context) {
   const activeMode = normalizeReviewMode(mode);
+  const langKey = resolveTemplateLanguage_(language);
   const sevaDateText = fmtSevaDateSimple(context && context.sevaDate ? context.sevaDate : '');
-  const sevaAmountText = formatAmountInr(context && context.totalAmount);
+  const rawAmount = formatAmountInr(context && context.totalAmount);
+  const paymentAmount = rawAmount === '-' ? '-' : ('\u20B9 ' + rawAmount);
+  const bookingStatus = String(context && context.status || '').trim().toLowerCase();
+  const refundLine = activeMode === 'cancelled' && bookingStatus === 'confirmed'
+    ? getAdminTextForLanguage_(langKey, 'modal.refundLineConfirmedCancellation')
+    : '';
 
-  if (activeMode === 'confirmed') {
-    if (language === 'te') {
-      return [
-        'నమస్తే, *' + (context && context.devoteeName ? context.devoteeName : '') + '*,',
-        '',
-        'మీ సేవ బుకింగ్ చెల్లింపును మేము స్వీకరించాము.',
-        '',
-        'బుకింగ్ రిఫరెన్స్: ' + (context && context.bookingRef ? context.bookingRef : ''),
-        'సేవ తేదీ: ' + sevaDateText,
-        'సేవ: ' + (context && context.sevaName ? context.sevaName : ''),
-        '',
-        '*మీ బుకింగ్ ఇప్పుడు ధృవీకరించబడింది.*',
-        'ఆలయానికి వచ్చినప్పుడు బుకింగ్ రిఫరెన్స్ చూపించండి.',
-        '',
-        '🙏 *జై శ్రీరామ్* 🙏',
-        '*ధన్యవాదాలు మీ భక్తి మరియు శ్రీ వరధాంజనేయ స్వామి ఆలయానికి మద్దతుకు.*'
-      ].join('\n');
-    }
+  const replacements = {
+    devoteeName: context && context.devoteeName ? context.devoteeName : '',
+    bookingRef: context && context.bookingRef ? context.bookingRef : '',
+    sevaDate: sevaDateText,
+    sevaName: context && context.sevaName ? context.sevaName : '',
+    paymentAmount: paymentAmount,
+    refundLine: refundLine
+  };
 
-    return [
-      'Namaste, *' + (context && context.devoteeName ? context.devoteeName : '') + '*,',
-      '',
-      'We have received your payment for the seva booking.',
-      '',
-      'Booking reference: ' + (context && context.bookingRef ? context.bookingRef : ''),
-      'Seva Date: ' + sevaDateText,
-      'Seva: ' + (context && context.sevaName ? context.sevaName : ''),
-      '',
-      '*Your booking is now confirmed.*',
-      'Please carry this booking reference when you visit the temple.',
-      '',
-      '🙏 *Jai Sri Ram* 🙏',
-      '*Thank you for your devotion and support to Sri Varadhanjaneya Swamy Temple.*'
-    ].join('\n');
-  }
+  const lines = getModalTemplateLines_(activeMode, langKey)
+    .map(function (line) {
+      return applyTemplate_(line, replacements);
+    })
+    .filter(function (_, index, arr) {
+      return !(arr[index] === '' && index > 0 && arr[index - 1] === '');
+    });
 
-  if (activeMode === 'cancelled') {
-    if (language === 'te') {
-      return [
-        'నమస్తే, *' + (context && context.devoteeName ? context.devoteeName : '') + '*,',
-        '',
-        'మీ సేవ బుకింగ్ రద్దు చేయబడింది.',
-        '',
-        'బుకింగ్ రిఫరెన్స్: ' + (context && context.bookingRef ? context.bookingRef : ''),
-        'సేవ తేదీ: ' + sevaDateText,
-        'సేవ: ' + (context && context.sevaName ? context.sevaName : ''),
-        '',
-        'అనుకోని పరిస్థితుల కారణంగా, మేము మీ బుకింగ్‌ను రద్దు చేయాల్సి వచ్చింది. అసౌకర్యానికి క్షమించండి.',
-        '',
-        '🙏 *జై శ్రీరామ్* 🙏',
-        '*ధన్యవాదాలు మీ భక్తి మరియు శ్రీ వరధాంజనేయ స్వామి ఆలయానికి మద్దతుకు.*'
-      ].join('\n');
-    }
-
-    return [
-      'Namaste, *' + (context && context.devoteeName ? context.devoteeName : '') + '*,',
-      '',
-      'Your seva booking has been cancelled.',
-      '',
-      'Booking reference: ' + (context && context.bookingRef ? context.bookingRef : ''),
-      'Seva Date: ' + sevaDateText,
-      'Seva: ' + (context && context.sevaName ? context.sevaName : ''),
-      '',
-      'Due to unforeseen circumstances, we had to cancel your booking. Sorry for the inconvenience caused.',
-      '',
-      '🙏 *Jai Sri Ram* 🙏',
-      '*Thank you for your devotion and support to Sri Varadhanjaneya Swamy Temple.*'
-    ].join('\n');
-  }
-
-  if (language === 'te') {
-    return [
-      'నమస్తే, *' + (context && context.devoteeName ? context.devoteeName : '') + '*,',
-      '',
-      'మేము మీ సేవ *' + (context && context.sevaName ? ' ' + context.sevaName : '') + '* బుకింగ్ అభ్యర్థనను పరిశీలించాము.',
-      '',
-      'బుకింగ్ రిఫరెన్స్: ' + (context && context.bookingRef ? context.bookingRef : ''),
-      'సేవ తేదీ: ' + sevaDateText,
-      '',
-      '*_దయచేసి జత చేసిన QR కోడ్ ద్వారా సేవ రుసుము: రూ. ' + sevaAmountText + ' చెల్లింపు పూర్తి చేయండి._*',
-      '',
-      'చెల్లింపు పూర్తయ్యాక, మేము మీ బుకింగ్‌ను ధృవీకరిస్తాము.',
-      '',
-      '🙏 *జై శ్రీరామ్* 🙏',
-      '*ధన్యవాదాలు మీ భక్తి మరియు శ్రీ వరధాంజనేయ స్వామి ఆలయానికి మద్దతుకు.*'
-    ].join('\n');
-  }
-
-  return [
-    'Namaste, *' + (context && context.devoteeName ? context.devoteeName : '') + '*,',
-    '',
-    'We are pleased to inform you that your seva *' + (context && context.sevaName ? ' ' + context.sevaName : '') + '* booking request has been reviewed.',
-    '',
-    'Booking reference: ' + (context && context.bookingRef ? context.bookingRef : ''),
-    'Seva Date: ' + sevaDateText,
-    '',
-    '*_Please complete seva payment of Rs. ' + sevaAmountText + ' using the attached QR code._*',
-    '',
-    'Share payment receipt/screenshot on WhatsApp, after receiving payment, we will confirm your booking.',
-    '',
-    '🙏 *Jai Sri Ram* 🙏',
-    '*Thank you for your devotion and support to Sri Varadhanjaneya Swamy Temple.*'
-  ].join('\n');
+  return lines.join('\n');
 }
 
 function formatAmountInr(value) {
@@ -2029,14 +2591,14 @@ function onReviewQrInputChange(event) {
   }
 
   if (!/^image\//.test(file.type || '')) {
-    setReviewModalError('Please select an image file for the QR code.');
+    setReviewModalError(getAdminText('errors.selectQrImageFile'));
     input.value = '';
     meta.textContent = modeConfig.qrMeta;
     return;
   }
 
   if (file.size > 4 * 1024 * 1024) {
-    setReviewModalError('QR image must be 4MB or smaller.');
+    setReviewModalError(getAdminText('errors.qrImageTooLarge'));
     input.value = '';
     meta.textContent = modeConfig.qrMeta;
     return;
@@ -2045,7 +2607,7 @@ function onReviewQrInputChange(event) {
   const reader = new FileReader();
   reader.onload = function () {
     if (typeof reader.result !== 'string') {
-      setReviewModalError('Could not read QR image. Please try again.');
+      setReviewModalError(getAdminText('errors.qrReadFailed'));
       return;
     }
 
@@ -2053,12 +2615,12 @@ function onReviewQrInputChange(event) {
     reviewQrFileName = file.name || 'qr-code.png';
     preview.src = reviewQrDataUrl;
     preview.style.display = 'block';
-    meta.textContent = 'Selected: ' + reviewQrFileName + ' (' + formatBytes(file.size) + ')';
+    meta.textContent = getAdminText('modal.selectedFilePrefix') + ' ' + reviewQrFileName + ' (' + formatBytes(file.size) + ')';
     setReviewModalError('');
   };
 
   reader.onerror = function () {
-    setReviewModalError('Could not read QR image. Please try again.');
+    setReviewModalError(getAdminText('errors.qrReadFailed'));
     meta.textContent = modeConfig.qrMeta;
   };
 
@@ -2071,29 +2633,29 @@ async function submitReviewTransition() {
   }
 
   if (!webhookUrl) {
-    setReviewModalError('Webhook URL is not configured.');
+    setReviewModalError(getAdminText('errors.missingWebhook'));
     return;
   }
 
   const phone = String(document.getElementById('reviewPhone').value || '').trim();
   if (!phone) {
-    setReviewModalError('WhatsApp number is required.');
+    setReviewModalError(getAdminText('errors.whatsappRequired'));
     return;
   }
 
   const modeConfig = getReviewModeConfig(reviewMode);
   if (modeConfig.requiresQr && !reviewQrDataUrl) {
-    setReviewModalError(modeConfig.missingQrError || 'Please upload the QR code image.');
+    setReviewModalError(modeConfig.missingQrError || getAdminText('errors.selectQrImageFile'));
     return;
   }
 
   const paymentAck = document.getElementById('reviewPaymentAck');
   if (modeConfig.requiresPaymentAck && (!paymentAck || !paymentAck.checked)) {
-    setReviewModalError(modeConfig.paymentRequiredError || 'Please confirm payment receipt before proceeding.');
+    setReviewModalError(modeConfig.paymentRequiredError || getAdminText('errors.paymentConfirmationRequired'));
     return;
   }
 
-  const language = document.getElementById('reviewLanguage').value === 'te' ? 'te' : 'en';
+  const language = getPreferredModalLanguage_();
   const customMessage = String(document.getElementById('reviewMessage').value || '').trim();
   const submitBtn = document.getElementById('reviewSubmitBtn');
   submitBtn.disabled = true;
@@ -2147,7 +2709,7 @@ async function submitReviewTransition() {
 
     reviewRefreshPending = true;
   } catch (error) {
-    setReviewModalError('Transition failed: ' + String(error.message || 'Unknown error.'));
+    setReviewModalError(getAdminText('errors.transitionFailedPrefix') + ' ' + String(error.message || getAdminText('errors.unknownError')));
     submitBtn.disabled = false;
     submitBtn.textContent = modeConfig.submitText;
   }
@@ -2158,52 +2720,60 @@ function formatTransitionError(data) {
 
   if (code === 'ADMIN_UNAUTHORIZED') {
     signOut();
-    return 'Session expired. Please sign in again.';
+    return getAdminText('errors.sessionExpired');
   }
 
   if (code === 'INVALID_TRANSITION') {
     const currentStatus = String(data && data.currentStatus || '').trim();
     const targetStatus = String(data && data.targetStatus || '').trim();
-    if (currentStatus && targetStatus) {
-      return 'This booking is currently ' + currentStatus + '. It cannot be moved to ' + targetStatus + '.';
+    const currentStatusLabel = currentStatus ? getStatusLabel_(currentStatus) : '';
+    const targetStatusLabel = targetStatus ? getStatusLabel_(targetStatus) : '';
+
+    if (currentStatusLabel && targetStatusLabel) {
+      return getAdminText('errors.invalidTransitionTarget', {
+        currentStatus: currentStatusLabel,
+        targetStatus: targetStatusLabel
+      });
     }
 
-    if (currentStatus) {
-      return 'This booking is currently ' + currentStatus + '. Refresh and try a valid transition.';
+    if (currentStatusLabel) {
+      return getAdminText('errors.invalidTransitionCurrent', {
+        currentStatus: currentStatusLabel
+      });
     }
 
-    return String(data && data.error || 'This transition is not allowed.');
+    return String(data && data.error || getAdminText('errors.invalidTransition'));
   }
 
   if (code === 'PAYMENT_CONFIRMATION_REQUIRED') {
     return data && data.error
       ? String(data.error)
-      : 'Please confirm payment receipt before marking as Confirmed.';
+      : getAdminText('errors.paymentConfirmationRequired');
   }
 
   if (code === 'CONFIRMED_CANCELLATION_WINDOW_EXPIRED') {
     return data && data.error
       ? String(data.error)
-      : 'Confirmed booking can be cancelled only up to 14 hours before seva date and time.';
+      : getAdminText('errors.confirmedCancellationWindowExpired');
   }
 
   if (code === 'SEVA_DATETIME_REQUIRED') {
     return data && data.error
       ? String(data.error)
-      : 'Seva date/time is required to validate confirmed booking cancellation window.';
+      : getAdminText('errors.sevaDatetimeRequired');
   }
 
   if (code === 'WHATSAPP_SEND_FAILED') {
     const reason = data.whatsappReason ? ' (' + data.whatsappReason + ')' : '';
     const modeConfig = getReviewModeConfig(reviewMode);
-    return 'WhatsApp send failed' + reason + '. ' + modeConfig.whatsappHelp;
+    return getAdminText('errors.whatsappFailedPrefix') + reason + '. ' + modeConfig.whatsappHelp;
   }
 
   if (code === 'INVALID_QR_IMAGE') {
-    return data.error || 'QR image is invalid.';
+    return data && data.error ? String(data.error) : getAdminText('errors.invalidQrImage');
   }
 
-  return String(data && data.error || 'Unknown server error.');
+  return String(data && data.error || getAdminText('errors.unknownServerError'));
 }
 
 function setReviewModalError(message) {

@@ -55,10 +55,22 @@
     },
     "pooja": {
       "items": [
-        { "telugu": "అర్చన", "english": "Archana" },
-        { "telugu": "అభిషేకం", "english": "Abhishekam" },
-        { "telugu": "హనుమాన్ చాలీసా పారాయణం", "english": "Hanuman Chalisa Recitation" },
-        { "telugu": "ప్రత్యేక పూజలు", "english": "Special Poojas" }
+        {
+          "telugu": "అర్చన",
+          "english": "Archana"
+        },
+        {
+          "telugu": "అభిషేకం",
+          "english": "Abhishekam"
+        },
+        {
+          "telugu": "హనుమాన్ చాలీసా పారాయణం",
+          "english": "Hanuman Chalisa Recitation"
+        },
+        {
+          "telugu": "ప్రత్యేక పూజలు",
+          "english": "Special Poojas"
+        }
       ]
     },
     "location": {
@@ -88,5 +100,364 @@
     "english": "© 2026 Sri Sri Sri Varadhanjaneya Swamy Temple | Danapuram, L. B. Nagar, Hyderabad-74, Telangana.",
     "phone": "040-12345678",
     "email": "svanjaneya.temple@gmail.com"
+  },
+  "admin": {
+    "defaultLanguage": "telugu",
+    "languages": {
+      "telugu": {
+        "documentTitle": "బుకింగ్ అడ్మిన్ — శ్రీ వరధాంజనేయ స్వామి ఆలయం",
+        "loader": {
+          "kicker": "దయచేసి వేచి ఉండండి",
+          "preparingTitle": "అడ్మిన్ పేజీ సిద్ధమవుతోంది",
+          "refreshingTitle": "బుకింగ్స్ రిఫ్రెష్ అవుతున్నాయి",
+          "almostReady": "దాదాపు సిద్ధమైంది...",
+          "almostRefreshed": "దాదాపు రిఫ్రెష్ అయింది..."
+        },
+        "auth": {
+          "subtitle": "బుకింగ్ అడ్మిన్ పోర్టల్ — అనుమతి ఉన్నవారికే",
+          "note": "ఆలయ అడ్మిన్ గూగుల్ ఖాతాతో సైన్ ఇన్ చేయండి.<br>అనధికార ఖాతాలు తిరస్కరించబడతాయి.",
+          "denied": "అయ్యో... ప్రవేశం నిరాకరించబడింది.",
+          "invalidCredential": "సైన్-ఇన్ వివరాలు చదవలేకపోయాం. మళ్లీ ప్రయత్నించండి."
+        },
+        "dashboard": {
+          "portalSubtitle": "బుకింగ్ అడ్మిన్ పోర్టల్",
+          "heading": "సేవా బుకింగ్స్",
+          "refresh": "↻ రిఫ్రెష్",
+          "loadingButton": "లోడ్ అవుతోంది…",
+          "loadingBookings": "బుకింగ్స్ లోడ్ అవుతున్నాయి…",
+          "signOut": "సైన్ అవుట్",
+          "noRecords": "స్ప్రెడ్షీట్‌లో బుకింగ్ రికార్డులు లేవు.",
+          "noRowsForDate": "ఈ తేదీకి బుకింగ్స్ లేవు.",
+          "bookingCount": "{count} బుకింగ్(లు)"
+        },
+        "summary": {
+          "totalBookings": "మొత్తం బుకింగ్స్",
+          "totalAmount": "మొత్తం రుసుము",
+          "submitted": "సమర్పించబడింది",
+          "reviewed": "పరిశీలించబడింది",
+          "confirmed": "ధృవీకరించబడింది",
+          "cancelled": "రద్దు"
+        },
+        "table": {
+          "index": "#",
+          "ref": "రిఫ్",
+          "bookingRequest": "బుకింగ్ అభ్యర్థన",
+          "devotee": "భక్తుడు",
+          "gotram": "గోత్రం",
+          "whatsapp": "వాట్సాప్",
+          "seva": "సేవ",
+          "timing": "సమయం",
+          "slot": "స్లాట్",
+          "amount": "మొత్తం",
+          "status": "స్థితి"
+        },
+        "status": {
+          "submitted": "సమర్పించబడింది",
+          "reviewed": "పరిశీలించబడింది",
+          "confirmed": "ధృవీకరించబడింది",
+          "cancelled": "రద్దు"
+        },
+        "actions": {
+          "review": "పరిశీలించి చెల్లింపు QR వాట్సాప్ పంపండి",
+          "confirm": "ధృవీకరించి తుది వాట్సాప్ సందేశం పంపండి",
+          "cancel": "బుకింగ్‌ను రద్దు చేసి వాట్సాప్‌లో తెలియజేయండి",
+          "cancelConfirmed": "ధృవీకరించిన బుకింగ్‌ను రద్దు చేయండి (సేవ సమయానికి 14 గంటల ముందు మాత్రమే)"
+        },
+        "modal": {
+          "bookingRef": "బుకింగ్ రిఫరెన్స్",
+          "devotee": "భక్తుడు",
+          "sevaDate": "సేవ తేదీ",
+          "whatsappNumber": "వాట్సాప్ నంబర్",
+          "messageLanguage": "సందేశ భాష",
+          "optionTelugu": "తెలుగు",
+          "optionEnglish": "English",
+          "textMessage": "టెక్స్ట్ సందేశం",
+          "messagePlaceholder": "భక్తుడికి ఐచ్ఛికంగా అదనపు సందేశం",
+          "phonePlaceholder": "బుకింగ్ నుండి ఆటో-ఫిల్ అవుతుంది",
+          "qrImage": "QR కోడ్ చిత్రం",
+          "qrMetaRequired": "ఈ వాట్సాప్ సందేశంతో పంపడానికి QR చిత్రం అప్లోడ్ చేయండి.",
+          "qrMetaNotRequired": "ఈ ట్రాన్సిషన్‌కు QR చిత్రం అవసరం లేదు.",
+          "paymentAck": "ఈ బుకింగ్‌కు చెల్లింపు రసీదు వచ్చినట్లు ధృవీకరిస్తున్నాను.",
+          "close": "మూసివేయి",
+          "sending": "పంపిస్తోంది...",
+          "completed": "ట్రాన్సిషన్ పూర్తయింది ✓",
+          "refundLineConfirmedCancellation": "చెల్లించిన మొత్తం తదుపరి 5 రోజుల్లో తిరిగి చెల్లించబడుతుంది.",
+          "selectedFilePrefix": "ఎంచుకున్నది:",
+          "mode": {
+            "reviewed": {
+              "title": "Submitted -> Reviewed",
+              "submit": "వాట్సాప్ పంపి Reviewed గా మార్చు",
+              "success": "✓ బుకింగ్ Reviewed కి మార్చబడింది, వాట్సాప్ సందేశం విజయవంతంగా పంపబడింది.",
+              "note": "సబ్మిట్ చేసిన వెంటనే QRతో వాట్సాప్ పంపి స్టేటస్‌ను Reviewed కు అప్డేట్ చేస్తుంది.",
+              "whatsappHelp": "వాట్సాప్ టోకెన్, ఫోన్ నంబర్ ID, QR చిత్రం సరిచూడండి.",
+              "missingQr": "దయచేసి QR కోడ్ చిత్రం అప్లోడ్ చేయండి."
+            },
+            "confirmed": {
+              "title": "Reviewed -> Confirmed",
+              "submit": "వాట్సాప్ పంపి Confirmed గా మార్చు",
+              "success": "✓ బుకింగ్ Confirmed కి మార్చబడింది, తుది వాట్సాప్ సందేశం విజయవంతంగా పంపబడింది.",
+              "note": "చెల్లింపు రసీదు వచ్చిన తర్వాత మాత్రమే Confirm చేయండి. ఇది తుది ధృవీకరణ వాట్సాప్ పంపుతుంది.",
+              "whatsappHelp": "వాట్సాప్ టోకెన్ మరియు ఫోన్ నంబర్ ID సరిచూడండి.",
+              "paymentRequired": "Confirmed గా మార్చే ముందు చెల్లింపు రసీదు ధృవీకరించండి."
+            },
+            "cancelled": {
+              "title": "బుకింగ్‌ను Cancelled గా మార్చు",
+              "submit": "వాట్సాప్ పంపి Cancelled గా మార్చు",
+              "success": "✓ బుకింగ్ Cancelled కి మార్చబడింది, వాట్సాప్ సందేశం విజయవంతంగా పంపబడింది.",
+              "note": "ఇది రద్దు సమాచారం వాట్సాప్‌లో పంపి స్టేటస్‌ను Cancelled కి మార్చుతుంది. Confirmed బుకింగ్‌లు సేవ సమయానికి 14 గంటల ముందు మాత్రమే రద్దు చేయవచ్చు.",
+              "whatsappHelp": "వాట్సాప్ టోకెన్ మరియు ఫోన్ నంబర్ ID సరిచూడండి."
+            }
+          }
+        },
+        "errors": {
+          "webhookNotConfigured": "Webhook URL <code>assets/data/content.json</code> లో కాన్ఫిగర్ కాలేదు.",
+          "failedLoadBookingsPrefix": "బుకింగ్స్ లోడ్ చేయడం విఫలమైంది:",
+          "unknownServerError": "తెలియని సర్వర్ లోపం.",
+          "unknownError": "తెలియని లోపం.",
+          "sessionExpired": "సెషన్ ముగిసింది. మళ్లీ సైన్ ఇన్ చేయండి.",
+          "invalidTransition": "ఈ ట్రాన్సిషన్ అనుమతించబడలేదు.",
+          "invalidTransitionCurrent": "ఈ బుకింగ్ ప్రస్తుతం {currentStatus} లో ఉంది. సరైన ట్రాన్సిషన్ ఎంచుకోండి.",
+          "invalidTransitionTarget": "ఈ బుకింగ్ ప్రస్తుతం {currentStatus} లో ఉంది. దీనిని {targetStatus} కి మార్చలేం.",
+          "paymentConfirmationRequired": "Confirmed గా మార్చే ముందు చెల్లింపు రసీదు ధృవీకరించండి.",
+          "confirmedCancellationWindowExpired": "Confirmed బుకింగ్ సేవ తేదీ/సమయానికి 14 గంటల ముందు వరకే రద్దు చేయవచ్చు.",
+          "sevaDatetimeRequired": "Confirmed రద్దు విండోను చెక్ చేయడానికి సేవ తేదీ/సమయం అవసరం.",
+          "whatsappFailedPrefix": "WhatsApp పంపడం విఫలమైంది",
+          "invalidQrImage": "QR చిత్రం సరైనది కాదు.",
+          "selectQrImageFile": "దయచేసి QR కోసం చిత్రం ఫైల్ ఎంచుకోండి.",
+          "qrImageTooLarge": "QR చిత్రం 4MB కంటే ఎక్కువ కాకూడదు.",
+          "qrReadFailed": "QR చిత్రం చదవలేకపోయాం. మళ్లీ ప్రయత్నించండి.",
+          "whatsappRequired": "వాట్సాప్ నంబర్ అవసరం.",
+          "missingWebhook": "Webhook URL కాన్ఫిగర్ కాలేదు.",
+          "transitionFailedPrefix": "ట్రాన్సిషన్ విఫలమైంది:"
+        }
+      },
+      "english": {
+        "documentTitle": "Booking Admin — Sri Varadhanjaneya Swamy Temple",
+        "loader": {
+          "kicker": "Please wait",
+          "preparingTitle": "Preparing admin page",
+          "refreshingTitle": "Refreshing bookings",
+          "almostReady": "Almost ready...",
+          "almostRefreshed": "Almost refreshed..."
+        },
+        "auth": {
+          "subtitle": "Booking Admin Portal — Authorised access only",
+          "note": "Sign in with the temple administrator Google account.<br>Unauthorised accounts will be rejected.",
+          "denied": "Oops... Access denied.",
+          "invalidCredential": "Could not read sign-in credentials. Please try again."
+        },
+        "dashboard": {
+          "portalSubtitle": "Booking Admin Portal",
+          "heading": "Seva Bookings",
+          "refresh": "↻ Refresh",
+          "loadingButton": "Loading…",
+          "loadingBookings": "Loading bookings…",
+          "signOut": "Sign out",
+          "noRecords": "No booking records found in the spreadsheet.",
+          "noRowsForDate": "No bookings for this date.",
+          "bookingCount": "{count} booking(s)"
+        },
+        "summary": {
+          "totalBookings": "Total Bookings",
+          "totalAmount": "Total Amount",
+          "submitted": "Submitted",
+          "reviewed": "Reviewed",
+          "confirmed": "Confirmed",
+          "cancelled": "Cancelled"
+        },
+        "table": {
+          "index": "#",
+          "ref": "Ref",
+          "bookingRequest": "Booking Request",
+          "devotee": "Devotee",
+          "gotram": "Gotram",
+          "whatsapp": "WhatsApp",
+          "seva": "Seva",
+          "timing": "Timing",
+          "slot": "Slot",
+          "amount": "Amount",
+          "status": "Status"
+        },
+        "status": {
+          "submitted": "Submitted",
+          "reviewed": "Reviewed",
+          "confirmed": "Confirmed",
+          "cancelled": "Cancelled"
+        },
+        "actions": {
+          "review": "Review and send payment QR on WhatsApp",
+          "confirm": "Confirm booking and send final WhatsApp message",
+          "cancel": "Cancel booking and notify on WhatsApp",
+          "cancelConfirmed": "Cancel confirmed booking (allowed only before 14 hours of seva time)"
+        },
+        "modal": {
+          "bookingRef": "Booking Reference",
+          "devotee": "Devotee",
+          "sevaDate": "Seva Date",
+          "whatsappNumber": "WhatsApp Number",
+          "messageLanguage": "Message Language",
+          "optionTelugu": "Telugu",
+          "optionEnglish": "English",
+          "textMessage": "Text Message",
+          "messagePlaceholder": "Optional additional note for the devotee",
+          "phonePlaceholder": "Auto-filled from booking",
+          "qrImage": "QR Code Image",
+          "qrMetaRequired": "Please upload the QR image to send with this WhatsApp message.",
+          "qrMetaNotRequired": "QR image is not required for this transition.",
+          "paymentAck": "I confirm payment receipt has been received for this booking.",
+          "close": "Close",
+          "sending": "Sending...",
+          "completed": "Transition Complete ✓",
+          "refundLineConfirmedCancellation": "Amount paid will be refunded in next 5 days.",
+          "selectedFilePrefix": "Selected:",
+          "mode": {
+            "reviewed": {
+              "title": "Submitted -> Reviewed",
+              "submit": "Send WhatsApp & Mark Reviewed",
+              "success": "✓ Booking transitioned to Reviewed and WhatsApp message sent successfully.",
+              "note": "When submitted, this sends WhatsApp with booking reference + uploaded QR image and updates status to Reviewed.",
+              "whatsappHelp": "Verify WhatsApp token, phone number ID, and QR image.",
+              "missingQr": "Please upload the QR code image."
+            },
+            "confirmed": {
+              "title": "Reviewed -> Confirmed",
+              "submit": "Send WhatsApp & Mark Confirmed",
+              "success": "✓ Booking transitioned to Confirmed and final WhatsApp message sent successfully.",
+              "note": "Confirm only after payment receipt is received. This sends final confirmation on WhatsApp.",
+              "whatsappHelp": "Verify WhatsApp token and phone number ID.",
+              "paymentRequired": "Please confirm payment receipt before marking as Confirmed."
+            },
+            "cancelled": {
+              "title": "Mark Booking as Cancelled",
+              "submit": "Send WhatsApp & Mark Cancelled",
+              "success": "✓ Booking transitioned to Cancelled and WhatsApp message sent successfully.",
+              "note": "This sends cancellation information on WhatsApp and updates booking status to Cancelled. Confirmed bookings can be cancelled only when seva time is more than 14 hours away.",
+              "whatsappHelp": "Verify WhatsApp token and phone number ID."
+            }
+          }
+        },
+        "errors": {
+          "webhookNotConfigured": "Webhook URL not configured in <code>assets/data/content.json</code>.",
+          "failedLoadBookingsPrefix": "Failed to load bookings:",
+          "unknownServerError": "Unknown server error.",
+          "unknownError": "Unknown error.",
+          "sessionExpired": "Session expired. Please sign in again.",
+          "invalidTransition": "This transition is not allowed.",
+          "invalidTransitionCurrent": "This booking is currently {currentStatus}. Refresh and try a valid transition.",
+          "invalidTransitionTarget": "This booking is currently {currentStatus}. It cannot be moved to {targetStatus}.",
+          "paymentConfirmationRequired": "Please confirm payment receipt before marking as Confirmed.",
+          "confirmedCancellationWindowExpired": "Confirmed booking can be cancelled only up to 14 hours before seva date and time.",
+          "sevaDatetimeRequired": "Seva date/time is required to validate confirmed booking cancellation window.",
+          "whatsappFailedPrefix": "WhatsApp send failed",
+          "invalidQrImage": "QR image is invalid.",
+          "selectQrImageFile": "Please select an image file for the QR code.",
+          "qrImageTooLarge": "QR image must be 4MB or smaller.",
+          "qrReadFailed": "Could not read QR image. Please try again.",
+          "whatsappRequired": "WhatsApp number is required.",
+          "missingWebhook": "Webhook URL is not configured.",
+          "transitionFailedPrefix": "Transition failed:"
+        }
+      }
+    },
+    "modalTemplates": {
+      "reviewed": {
+        "telugu": [
+          "నమస్తే, *{devoteeName}*,",
+          "",
+          "మేము మీ సేవ * {sevaName}* బుకింగ్ అభ్యర్థనను పరిశీలించాము.",
+          "",
+          "బుకింగ్ రిఫరెన్స్: {bookingRef}",
+          "సేవ తేదీ: {sevaDate}",
+          "",
+          "*_దయచేసి జత చేసిన QR కోడ్ ద్వారా సేవ రుసుము: {paymentAmount} చెల్లింపు పూర్తి చేయండి._*",
+          "",
+          "చెల్లింపు పూర్తయ్యాక, మేము మీ బుకింగ్‌ను ధృవీకరిస్తాము.",
+          "",
+          "🙏 *జై శ్రీరామ్* 🙏",
+          "*ధన్యవాదాలు మీ భక్తి మరియు శ్రీ వరధాంజనేయ స్వామి ఆలయానికి మద్దతుకు.*"
+        ],
+        "english": [
+          "Namaste, *{devoteeName}*,",
+          "",
+          "We are pleased to inform you that your seva * {sevaName}* booking request has been reviewed.",
+          "",
+          "Booking reference: {bookingRef}",
+          "Seva Date: {sevaDate}",
+          "",
+          "*_Please complete seva payment of {paymentAmount} using the attached QR code._*",
+          "",
+          "Share payment receipt/screenshot on WhatsApp, after receiving payment, we will confirm your booking.",
+          "",
+          "🙏 *Jai Sri Ram* 🙏",
+          "*Thank you for your devotion and support to Sri Varadhanjaneya Swamy Temple.*"
+        ]
+      },
+      "confirmed": {
+        "telugu": [
+          "నమస్తే, *{devoteeName}*,",
+          "",
+          "మీ సేవ బుకింగ్ చెల్లింపును మేము స్వీకరించాము.",
+          "",
+          "బుకింగ్ రిఫరెన్స్: {bookingRef}",
+          "సేవ తేదీ: {sevaDate}",
+          "సేవ: {sevaName}",
+          "",
+          "*మీ బుకింగ్ ఇప్పుడు ధృవీకరించబడింది.*",
+          "ఆలయానికి వచ్చినప్పుడు బుకింగ్ రిఫరెన్స్ చూపించండి.",
+          "",
+          "🙏 *జై శ్రీరామ్* 🙏",
+          "*ధన్యవాదాలు మీ భక్తి మరియు శ్రీ వరధాంజనేయ స్వామి ఆలయానికి మద్దతుకు.*"
+        ],
+        "english": [
+          "Namaste, *{devoteeName}*,",
+          "",
+          "We have received your payment for the seva booking.",
+          "",
+          "Booking reference: {bookingRef}",
+          "Seva Date: {sevaDate}",
+          "Seva: {sevaName}",
+          "",
+          "*Your booking is now confirmed.*",
+          "Please carry this booking reference when you visit the temple.",
+          "",
+          "🙏 *Jai Sri Ram* 🙏",
+          "*Thank you for your devotion and support to Sri Varadhanjaneya Swamy Temple.*"
+        ]
+      },
+      "cancelled": {
+        "telugu": [
+          "నమస్తే, *{devoteeName}*,",
+          "",
+          "మీ సేవ బుకింగ్ రద్దు చేయబడింది.",
+          "",
+          "బుకింగ్ రిఫరెన్స్: {bookingRef}",
+          "సేవ తేదీ: {sevaDate}",
+          "సేవ: {sevaName}",
+          "",
+          "{refundLine}",
+          "",
+          "అనుకోని పరిస్థితుల కారణంగా, మేము మీ బుకింగ్‌ను రద్దు చేయాల్సి వచ్చింది. అసౌకర్యానికి క్షమించండి.",
+          "",
+          "🙏 *జై శ్రీరామ్* 🙏",
+          "*ధన్యవాదాలు మీ భక్తి మరియు శ్రీ వరధాంజనేయ స్వామి ఆలయానికి మద్దతుకు.*"
+        ],
+        "english": [
+          "Namaste, *{devoteeName}*,",
+          "",
+          "Your seva booking has been cancelled.",
+          "",
+          "Booking reference: {bookingRef}",
+          "Seva Date: {sevaDate}",
+          "Seva: {sevaName}",
+          "",
+          "{refundLine}",
+          "",
+          "Due to unforeseen circumstances, we had to cancel your booking. Sorry for the inconvenience caused.",
+          "",
+          "🙏 *Jai Sri Ram* 🙏",
+          "*Thank you for your devotion and support to Sri Varadhanjaneya Swamy Temple.*"
+        ]
+      }
+    }
   }
 }

@@ -68,8 +68,8 @@ const defaultBookingMessages = {
       availableSlots: 'ఎంచుకున్న తేదీకి అందుబాటులో ఉన్న స్లాట్లు: {availableSlots} / {dailySlots}'
     },
     total: {
-      zero: 'మొత్తం: రూ. 0/-',
-      amount: 'మొత్తం: రూ. {totalAmount}/-'
+      zero: 'మొత్తం: ₹ 0/-',
+      amount: 'మొత్తం: ₹ {totalAmount}/-'
     },
     errors: {
       invalidDetails: 'దయచేసి సరైన వివరాలు నమోదు చేయండి. గోత్రం ఇవ్వాలి, వాట్సాప్ నంబర్ 10 అంకెలుగా ఉండాలి మరియు సేవా కార్డు ఎంచుకోవాలి.',
@@ -104,8 +104,8 @@ const defaultBookingMessages = {
       availableSlots: 'Available slots for selected date: {availableSlots} / {dailySlots}'
     },
     total: {
-      zero: 'Total: Rs. 0/-',
-      amount: 'Total: Rs. {totalAmount}/-'
+      zero: 'Total: ₹ 0/-',
+      amount: 'Total: ₹ {totalAmount}/-'
     },
     errors: {
       invalidDetails: 'Please enter valid details. Gotram is required, WhatsApp number must contain 10 digits, and a seva card must be selected.',
@@ -308,7 +308,7 @@ function getSevaOptionCards() {
 function getSevaCardTextValues(seva) {
   return {
     title: currentLang === 'telugu' ? seva.telugu : seva.english,
-    price: currentLang === 'telugu' ? `రుసుము: రూ. ${seva.price}/-` : `Price: Rs. ${seva.price}/-`,
+    price: currentLang === 'telugu' ? `రుసుము: ₹ ${seva.price}/-` : `Price: ₹ ${seva.price}/-`,
     slots: currentLang === 'telugu' ? `రోజుకు స్లాట్లు: ${seva.dailySlots}` : `Slots per day: ${seva.dailySlots}`,
     timing: currentLang === 'telugu' ? `సమయం: ${seva.timingTelugu}` : `Timing: ${seva.timingEnglish}`
   };
@@ -340,8 +340,8 @@ function renderSevaCards() {
     title.textContent = textValues.title;
 
     const price = document.createElement('p');
-    price.dataset.telugu = `రుసుము: రూ. ${seva.price}/-`;
-    price.dataset.english = `Price: Rs. ${seva.price}/-`;
+    price.dataset.telugu = `రుసుము: ₹ ${seva.price}/-`;
+    price.dataset.english = `Price: ₹ ${seva.price}/-`;
     price.textContent = textValues.price;
 
     const slots = document.createElement('p');
@@ -1280,7 +1280,7 @@ function closeLightbox() {
 }
 
 function formatCurrency(value) {
-  return currentLang === 'telugu' ? `రూ. ${value}/-` : `Rs. ${value}/-`;
+  return `₹ ${value}/-`;
 }
 
 function getStoredBookings() {
@@ -1778,7 +1778,7 @@ function buildBookingEmailLines(details) {
     `Timing: ${details.sevaTimingEnglish}`,
     `Seva Date: ${details.selectedDate}`,
     `Slot: ${details.slotNumber}`,
-    `Total: Rs. ${details.totalAmount}/-`
+    `Total: ₹ ${details.totalAmount}/-`
   ];
 }
 

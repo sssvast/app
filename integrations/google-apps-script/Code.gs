@@ -372,6 +372,27 @@ function normalizeAdminTargetStatus_(status) {
   return '';
 }
 
+function normalizeBookingStatus_(status) {
+  const normalized = String(status || '').trim().toLowerCase();
+  if (normalized === 'submitted') {
+    return BOOKING_STATUS_SUBMITTED;
+  }
+
+  if (normalized === 'reviewed') {
+    return BOOKING_STATUS_REVIEWED;
+  }
+
+  if (normalized === 'confirmed') {
+    return BOOKING_STATUS_CONFIRMED;
+  }
+
+  if (normalized === 'cancelled' || normalized === 'canceled') {
+    return BOOKING_STATUS_CANCELLED;
+  }
+
+  return String(status || '').trim();
+}
+
 function normalizeBoolean_(value) {
   if (typeof value === 'boolean') {
     return value;
@@ -411,7 +432,8 @@ function transitionBookingToReviewed_(spreadsheet, request) {
     }
 
     const row = sheet.getRange(rowIndex, 1, 1, BOOKING_HEADERS.length).getValues()[0];
-    const currentStatus = String(row[BOOKING_COL_STATUS - 1] || BOOKING_STATUS_SUBMITTED).trim() || BOOKING_STATUS_SUBMITTED;
+    const rawCurrentStatus = String(row[BOOKING_COL_STATUS - 1] || BOOKING_STATUS_SUBMITTED).trim() || BOOKING_STATUS_SUBMITTED;
+    const currentStatus = normalizeBookingStatus_(rawCurrentStatus) || BOOKING_STATUS_SUBMITTED;
     if (currentStatus !== BOOKING_STATUS_SUBMITTED) {
       throw createBookingError_(
         'INVALID_TRANSITION',
@@ -484,7 +506,8 @@ function transitionBookingToStatus_(spreadsheet, request) {
     }
 
     const row = sheet.getRange(rowIndex, 1, 1, BOOKING_HEADERS.length).getValues()[0];
-    const currentStatus = String(row[BOOKING_COL_STATUS - 1] || BOOKING_STATUS_SUBMITTED).trim() || BOOKING_STATUS_SUBMITTED;
+    const rawCurrentStatus = String(row[BOOKING_COL_STATUS - 1] || BOOKING_STATUS_SUBMITTED).trim() || BOOKING_STATUS_SUBMITTED;
+    const currentStatus = normalizeBookingStatus_(rawCurrentStatus) || BOOKING_STATUS_SUBMITTED;
     const sevaDate = String(row[BOOKING_COL_SEVA_DATE - 1] || request.selectedDate).trim();
     const sevaTiming = String(row[BOOKING_COL_SEVA_TIMING - 1] || '').trim();
 
@@ -511,6 +534,7 @@ function transitionBookingToStatus_(spreadsheet, request) {
       phone: toPhone,
       booking: bookingData,
       targetStatus: request.targetStatus,
+      currentStatus: currentStatus,
       language: request.language,
       customMessage: request.customMessage
     });
@@ -547,6 +571,9 @@ function transitionBookingToStatus_(spreadsheet, request) {
 }
 
 function validateAdminStatusTransition_(currentStatus, targetStatus, paymentReceived, bookingMeta) {
+  currentStatus = normalizeBookingStatus_(currentStatus);
+  targetStatus = normalizeBookingStatus_(targetStatus);
+
   if (targetStatus === BOOKING_STATUS_CONFIRMED) {
     if (currentStatus !== BOOKING_STATUS_REVIEWED) {
       throw createBookingError_(
@@ -994,7 +1021,8 @@ function sendAdminStatusTransitionWhatsapp_(options) {
         options.booking,
         options.targetStatus,
         options.language,
-        options.customMessage
+        options.customMessage,
+        options.currentStatus
       )
     }
   };
@@ -1164,7 +1192,7 @@ function buildReviewedTransitionMessage_(booking, language, customMessage) {
   return caption.length > 1000 ? caption.slice(0, 1000) : caption;
 }
 
-function buildAdminStatusTransitionMessage_(booking, targetStatus, language, customMessage) {
+function buildAdminStatusTransitionMessage_(booking, targetStatus, language, customMessage, currentStatus) {
   const extra = String(customMessage || '').trim();
   if (extra) {
     return extra.length > 1800 ? extra.slice(0, 1800) : extra;
@@ -1174,6 +1202,7 @@ function buildAdminStatusTransitionMessage_(booking, targetStatus, language, cus
   const sevaDate = booking && booking.sevaDate ? booking.sevaDate : '-';
   const seva = booking && booking.sevaName ? booking.sevaName : '-';
   const devotee = booking && booking.devoteeName ? booking.devoteeName : '-';
+  const includeRefundNote = targetStatus === BOOKING_STATUS_CANCELLED && normalizeBookingStatus_(currentStatus) === BOOKING_STATUS_CONFIRMED;
 
   let lines;
   if (targetStatus === BOOKING_STATUS_CONFIRMED) {
@@ -1230,6 +1259,15 @@ function buildAdminStatusTransitionMessage_(booking, targetStatus, language, cus
         '',
         'Thank you'
       ];
+
+    if (includeRefundNote) {
+      lines.splice(7, 0,
+        language === 'te'
+          ? 'చెల్లించిన మొత్తం తదుపరి 5 రోజుల్లో తిరిగి చెల్లించబడుతుంది.'
+          : 'Amount paid will be refunded in next 5 days.',
+        ''
+      );
+    }
   }
 
   const message = lines.join('\n');
@@ -1523,7 +1561,7 @@ function buildWhatsappMessage_(booking) {
     'Seva: ' + booking.sevaNameEnglish + ' (' + booking.sevaNameTelugu + ')',
     'Timing: ' + booking.sevaTimingEnglish,
     'Slot: ' + booking.slotNumber,
-    'Total: Rs. ' + booking.totalAmount + '/-',
+    'Total: ₹ ' + booking.totalAmount + '/-',
     '',
     'Devotee: ' + booking.devoteeName,
     'Gotram: ' + booking.devoteeGotram,

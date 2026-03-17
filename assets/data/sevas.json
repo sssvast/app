@@ -24,8 +24,8 @@
         "availableSlots": "ఎంచుకున్న తేదీకి అందుబాటులో ఉన్న స్లాట్లు: {availableSlots} / {dailySlots}"
       },
       "total": {
-        "zero": "మొత్తం: రూ. 0/-",
-        "amount": "మొత్తం: రూ. {totalAmount}/-"
+        "zero": "మొత్తం: ₹ 0/-",
+        "amount": "మొత్తం: ₹ {totalAmount}/-"
       },
       "errors": {
         "invalidDetails": "దయచేసి సరైన వివరాలు నమోదు చేయండి. గోత్రం ఇవ్వాలి, ఫోన్ నంబర్ 10 అంకెలుగా ఉండాలి మరియు సేవా కార్డు ఎంచుకోవాలి.",
@@ -58,8 +58,8 @@
         "availableSlots": "Available slots for selected date: {availableSlots} / {dailySlots}"
       },
       "total": {
-        "zero": "Total: Rs. 0/-",
-        "amount": "Total: Rs. {totalAmount}/-"
+        "zero": "Total: ₹ 0/-",
+        "amount": "Total: ₹ {totalAmount}/-"
       },
       "errors": {
         "invalidDetails": "Please enter valid details. Gotram is required, phone number must contain 10 digits, and a seva card must be selected.",

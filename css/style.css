@@ -21,12 +21,15 @@
   html {
     scroll-behavior: smooth;
     scroll-padding-top: 8rem;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
   }
 
   body {
     font-family: var(--font-body-en);
     margin: 0;
     min-height: 100vh;
+    min-height: 100dvh;
     overflow-x: hidden;
     background:
       radial-gradient(circle at top right, rgba(233, 182, 84, 0.22), transparent 28%),
@@ -154,6 +157,15 @@
     color: inherit;
     text-decoration: none;
     transition: transform 0.25s ease, background-color 0.25s ease, box-shadow 0.25s ease, color 0.25s ease;
+  }
+
+  a,
+  button,
+  input,
+  select,
+  textarea {
+    -webkit-tap-highlight-color: rgba(168, 84, 20, 0.16);
+    touch-action: manipulation;
   }
 
   img {
@@ -1199,6 +1211,62 @@
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff8f1' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='5' width='18' height='14' rx='2' ry='2'/%3E%3Cpath d='M3 7l9 6 9-6'/%3E%3C/svg%3E");
   }
 
+  html.is-android header {
+    backdrop-filter: blur(14px);
+  }
+
+  @media (max-width: 600px) {
+    html.is-android .header-controls {
+      min-width: 0;
+      flex-wrap: nowrap;
+      align-items: center;
+      gap: 0.38rem;
+    }
+
+    html.is-android .lang-switch {
+      min-width: 0;
+      flex: 0 1 auto;
+      overflow: hidden;
+    }
+
+    html.is-android .lang-switch button {
+      min-width: 0;
+      white-space: nowrap;
+    }
+
+    html.is-android .music-toggle-btn,
+    html.is-android .menu-toggle {
+      flex-shrink: 0;
+    }
+  }
+
+  @media (max-width: 320px) {
+    html.is-android .header-controls {
+      gap: 0.2rem;
+    }
+
+    html.is-android .lang-switch button {
+      padding: 0.24rem 0.36rem;
+      font-size: 0.7rem;
+    }
+  }
+
+  @media (max-width: 280px) {
+    html.is-android .lang-switch button {
+      padding: 0.2rem 0.28rem;
+      font-size: 0.64rem;
+    }
+  }
+
+  @media (hover: none) and (pointer: coarse) {
+    nav a:hover,
+    .music-toggle-btn:hover,
+    .menu-toggle:hover,
+    .hero-button:hover {
+      transform: none;
+    }
+  }
+
   @media (max-width: 900px) {
     html {
       scroll-padding-top: 7.2rem;
@@ -1280,7 +1348,7 @@
 
     .header-controls {
       width: 100%;
-      justify-content: space-between;
+      justify-content: flex-start;
       gap: 0.45rem;
     }
 
@@ -1303,6 +1371,7 @@
     }
 
     .music-toggle-btn {
+      margin-left: auto;
       width: 2.05rem;
       height: 2.05rem;
     }
@@ -1442,5 +1511,130 @@
 
     iframe {
       height: 230px;
+    }
+  }
+
+  @media (max-width: 360px) {
+    header {
+      padding: 0.68rem;
+      border-radius: 16px;
+    }
+
+    .header-controls {
+      gap: 0.32rem;
+      align-items: center;
+    }
+
+    .lang-switch {
+      padding: 0.16rem;
+    }
+
+    .lang-switch button {
+      padding: 0.34rem 0.5rem;
+      font-size: 0.76rem;
+    }
+
+    .music-toggle-btn {
+      width: 1.92rem;
+      height: 1.92rem;
+    }
+
+    .menu-toggle {
+      gap: 0.45rem;
+      padding: 0.42rem 0.58rem;
+      font-size: 0.76rem;
+    }
+
+    .menu-toggle-bars span {
+      width: 15px;
+    }
+  }
+
+  @media (max-width: 320px) {
+    header {
+      width: calc(100% - 8px);
+      margin-top: 4px;
+      padding: 0.62rem;
+      border-radius: 14px;
+    }
+
+    .header-controls {
+      gap: 0.24rem;
+    }
+
+    .lang-switch button {
+      padding: 0.28rem 0.42rem;
+      font-size: 0.72rem;
+    }
+
+    .music-toggle-btn {
+      width: 1.78rem;
+      height: 1.78rem;
+    }
+
+    .music-toggle-btn::before {
+      width: 0.96rem;
+      height: 0.96rem;
+    }
+
+    .menu-toggle {
+      gap: 0.34rem;
+      padding: 0.38rem 0.48rem;
+      font-size: 0.72rem;
+    }
+
+    .menu-toggle-bars span {
+      width: 13px;
+    }
+  }
+
+  @media (max-width: 280px) {
+    header {
+      width: calc(100% - 6px);
+      margin-top: 3px;
+      padding: 0.56rem;
+      border-radius: 12px;
+    }
+
+    header h1 {
+      font-size: 1rem;
+    }
+
+    .header-controls {
+      gap: 0.18rem;
+    }
+
+    .lang-switch {
+      padding: 0.12rem;
+    }
+
+    .lang-switch button {
+      padding: 0.22rem 0.3rem;
+      font-size: 0.66rem;
+    }
+
+    .music-toggle-btn {
+      width: 1.62rem;
+      height: 1.62rem;
+    }
+
+    .music-toggle-btn::before {
+      width: 0.86rem;
+      height: 0.86rem;
+    }
+
+    .menu-toggle {
+      gap: 0.24rem;
+      padding: 0.32rem 0.38rem;
+      font-size: 0.66rem;
+    }
+
+    .menu-toggle-bars span {
+      width: 11px;
+    }
+
+    html[lang="te"] .lang-switch button,
+    html[lang="te"] #menuToggleLabel {
+      line-height: 1.2;
     }
   }

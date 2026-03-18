@@ -132,7 +132,8 @@
         },
         "summary": {
           "totalBookings": "మొత్తం బుకింగ్స్",
-          "totalAmount": "మొత్తం రుసుము",
+          "totalAmount": "నికర మొత్తం",
+          "refundsTotalAmount": "రిఫండ్ మొత్తం",
           "submitted": "సమర్పించబడింది",
           "reviewed": "పరిశీలించబడింది",
           "confirmed": "ధృవీకరించబడింది",
@@ -140,7 +141,7 @@
         },
         "table": {
           "index": "#",
-          "ref": "రిఫ్",
+          "ref": "బుకింగ్ రిఫరెన్స్",
           "bookingRequest": "బుకింగ్ అభ్యర్థన",
           "devotee": "భక్తుడు",
           "gotram": "గోత్రం",
@@ -259,7 +260,8 @@
         },
         "summary": {
           "totalBookings": "Total Bookings",
-          "totalAmount": "Total Amount",
+          "totalAmount": "Net Amount",
+          "refundsTotalAmount": "Refunds Total Amount",
           "submitted": "Submitted",
           "reviewed": "Reviewed",
           "confirmed": "Confirmed",
@@ -267,7 +269,7 @@
         },
         "table": {
           "index": "#",
-          "ref": "Ref",
+          "ref": "Booking Reference",
           "bookingRequest": "Booking Request",
           "devotee": "Devotee",
           "gotram": "Gotram",

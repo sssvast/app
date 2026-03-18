@@ -1328,8 +1328,8 @@ function buildAdminStatusTransitionMessage_(booking, targetStatus, language, cus
       lines.splice(7, 0,
         language === 'te'
           ? (paymentAmount
-              ? 'చెల్లించిన మొత్తం ₹ ' + paymentAmount + ' తదుపరి 5 రోజుల్లో తిరిగి చెల్లించబడుతుంది.'
-              : 'చెల్లించిన మొత్తం తదుపరి 5 రోజుల్లో తిరిగి చెల్లించబడుతుంది.')
+              ? 'చెల్లించిన రుసుము ₹ ' + paymentAmount + ' తదుపరి 5 రోజుల్లో తిరిగి చెల్లించబడుతుంది.'
+              : 'చెల్లించిన రుసుము తదుపరి 5 రోజుల్లో తిరిగి చెల్లించబడుతుంది.')
           : (paymentAmount
               ? 'Amount paid ₹ ' + paymentAmount + ' will be refunded in next 5 days.'
               : 'Amount paid will be refunded in next 5 days.'),

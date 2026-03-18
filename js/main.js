@@ -61,15 +61,15 @@ const defaultBookingMessages = {
       selected: 'ఎంచుకున్న సేవ: {sevaName} ({sevaTiming})'
     },
     availability: {
-      selectDateAndSeva: 'తేదీ మరియు సేవా కార్డు ఎంచుకుంటే అందుబాటు స్లాట్లు కనిపిస్తాయి.',
+      selectDateAndSeva: '',
       tuesdayOnly: 'మంగళవారం అన్నదానం కోసం మంగళవారం తేదీలే ఎంచుకోవాలి.',
       loading: 'ప్రత్యక్ష అందుబాటు స్లాట్లు చూస్తున్నాం...',
       zeroSlots: 'ఎంచుకున్న తేదీకి అందుబాటులో ఉన్న స్లాట్లు: 0 / {dailySlots}',
       availableSlots: 'ఎంచుకున్న తేదీకి అందుబాటులో ఉన్న స్లాట్లు: {availableSlots} / {dailySlots}'
     },
     total: {
-      zero: 'మొత్తం: ₹ 0/-',
-      amount: 'మొత్తం: ₹ {totalAmount}/-'
+      zero: 'రుసుము: ₹ 0/-',
+      amount: 'రుసుము: ₹ {totalAmount}/-'
     },
     errors: {
       invalidDetails: 'దయచేసి సరైన వివరాలు నమోదు చేయండి. గోత్రం ఇవ్వాలి, వాట్సాప్ నంబర్ 10 అంకెలుగా ఉండాలి మరియు సేవా కార్డు ఎంచుకోవాలి.',
@@ -97,15 +97,15 @@ const defaultBookingMessages = {
       selected: 'Selected seva: {sevaName} ({sevaTiming})'
     },
     availability: {
-      selectDateAndSeva: 'Choose a date and seva card to view available slots.',
+      selectDateAndSeva: '',
       tuesdayOnly: 'For Tuesday Annadanam, only Tuesdays can be selected.',
       loading: 'Checking live availability...',
       zeroSlots: 'Available slots for selected date: 0 / {dailySlots}',
       availableSlots: 'Available slots for selected date: {availableSlots} / {dailySlots}'
     },
     total: {
-      zero: 'Total: ₹ 0/-',
-      amount: 'Total: ₹ {totalAmount}/-'
+      zero: 'Amount: ₹ 0/-',
+      amount: 'Amount: ₹ {totalAmount}/-'
     },
     errors: {
       invalidDetails: 'Please enter valid details. Gotram is required, WhatsApp number must contain 10 digits, and a seva card must be selected.',
@@ -225,8 +225,8 @@ const defaultContent = {
     titleEnglish: 'Sri Sri Sri Varadhan Janeya Swamy Temple'
   },
   nav: {
-    telugu: { about: 'ఆలయం గురించి', pooja: 'పూజలు', 'seva-booking': 'సేవా బుకింగ్', gallery: 'గ్యాలరీ', location: 'లోకేషన్' },
-    english: { about: 'About', pooja: 'Services', 'seva-booking': 'Seva Booking', gallery: 'Gallery', location: 'Location' }
+    telugu: { about: 'ఆలయం గురించి', timings: 'సమయాలు', pooja: 'పూజలు', 'seva-booking': 'సేవా బుకింగ్', gallery: 'గ్యాలరీ', location: 'లోకేషన్' },
+    english: { about: 'About', timings: 'Timings', pooja: 'Services', 'seva-booking': 'Seva Booking', gallery: 'Gallery', location: 'Location' }
   },
   hero: {
     kickerTelugu: 'శ్రీ ఆంజనేయ స్వామి ఆశీస్సులతో',
@@ -250,6 +250,12 @@ const defaultContent = {
       ]
     },
     pooja: { items: [ { telugu: 'అర్చన', english: 'Archana' }, { telugu: 'అభిషేకం', english: 'Abhishekam' }, { telugu: 'హనుమాన్ చాలీసా పారాయణం', english: 'Hanuman Chalisa Recitation' }, { telugu: 'ప్రత్యేక పూజలు', english: 'Special Poojas' } ] },
+    timings: {
+      slots: [
+        { labelTelugu: 'ఉదయం', labelEnglish: 'Morning', timeTelugu: 'ఉదయం 6:00 – 11:30', timeEnglish: '6:00 AM – 11:30 AM', icon: 'morning' },
+        { labelTelugu: 'సాయంత్రం', labelEnglish: 'Evening', timeTelugu: 'సాయంత్రం 6:00 – 8:00', timeEnglish: '6:00 PM – 8:00 PM', icon: 'evening' }
+      ]
+    },
     location: {
       mapIntroTelugu: 'Google Maps లో ఆలయ లోకేషన్:',
       mapIntroEnglish: 'Temple location on Google Maps:',
@@ -287,6 +293,7 @@ let pageTitles = {
 let navLabels = {
   telugu: {
     about: 'ఆలయం గురించి',
+    timings: 'సమయాలు',
     pooja: 'పూజలు',
     'seva-booking': 'సేవా బుకింగ్',
     gallery: 'గ్యాలరీ',
@@ -294,6 +301,7 @@ let navLabels = {
   },
   english: {
     about: 'About',
+    timings: 'Timings',
     pooja: 'Services',
     'seva-booking': 'Seva Booking',
     gallery: 'Gallery',
@@ -667,6 +675,47 @@ function deepMergeContent(base, override) {
     list.replaceChildren(frag);
   }
 
+  function renderTimingsSection() {
+    const container = document.getElementById('timingsContent');
+    if (!container) {
+      return;
+    }
+
+    const timings = siteContent.sections && siteContent.sections.timings;
+    const slots = timings && Array.isArray(timings.slots) ? timings.slots : [];
+
+    const grid = document.createElement('div');
+    grid.className = 'timings-grid';
+
+    slots.forEach(slot => {
+      const card = document.createElement('div');
+      card.className = 'timing-card timing-card--' + (slot.icon || 'morning');
+
+      const iconEl = document.createElement('div');
+      iconEl.className = 'timing-icon timing-icon--' + (slot.icon || 'morning');
+      iconEl.setAttribute('aria-hidden', 'true');
+
+      const labelEl = document.createElement('div');
+      labelEl.className = 'timing-label';
+      labelEl.dataset.telugu = slot.labelTelugu;
+      labelEl.dataset.english = slot.labelEnglish;
+      labelEl.textContent = currentLang === 'telugu' ? slot.labelTelugu : slot.labelEnglish;
+
+      const timeEl = document.createElement('div');
+      timeEl.className = 'timing-time';
+      timeEl.dataset.telugu = slot.timeTelugu;
+      timeEl.dataset.english = slot.timeEnglish;
+      timeEl.textContent = currentLang === 'telugu' ? slot.timeTelugu : slot.timeEnglish;
+
+      card.appendChild(iconEl);
+      card.appendChild(labelEl);
+      card.appendChild(timeEl);
+      grid.appendChild(card);
+    });
+
+    container.replaceChildren(grid);
+  }
+
   function renderLocationSection() {
     const introEl = document.getElementById('locationMapIntro');
     const linkEl = document.getElementById('locationMapLink');
@@ -927,6 +976,7 @@ function deepMergeContent(base, override) {
     renderHero();
     renderBanner();
     renderAboutSection();
+    renderTimingsSection();
     renderPoojaList();
     renderFestivalsList();
     renderLocationSection();
@@ -1666,6 +1716,37 @@ function showBookingMessage(type, message) {
   sevaBookingMessage.textContent = message;
 }
 
+function setAvailabilityLoadingState(isLoading) {
+  if (!sevaAvailability) {
+    return;
+  }
+
+  const loading = Boolean(isLoading);
+  sevaAvailability.classList.toggle('is-loading', loading);
+  sevaAvailability.setAttribute('aria-busy', loading ? 'true' : 'false');
+}
+
+function setBookingSubmitState(isSubmitting) {
+  if (!bookSevaBtn) {
+    return;
+  }
+
+  const submitting = Boolean(isSubmitting);
+  const defaultLabel = currentLang === 'telugu'
+    ? (bookSevaBtn.dataset.telugu || 'సేవా బుక్ చేయండి')
+    : (bookSevaBtn.dataset.english || 'Book Seva');
+  const submittingLabel = currentLang === 'telugu'
+    ? (bookSevaBtn.dataset.teluguSubmitting || 'సమర్పిస్తోంది...')
+    : (bookSevaBtn.dataset.englishSubmitting || 'Submitting...');
+
+  bookSevaBtn.classList.toggle('is-submitting', submitting);
+  bookSevaBtn.setAttribute('aria-busy', submitting ? 'true' : 'false');
+  bookSevaBtn.textContent = submitting ? submittingLabel : defaultLabel;
+  if (submitting) {
+    bookSevaBtn.disabled = true;
+  }
+}
+
 async function updateSevaBookingSummary() {
   if (!sevaTypeInput || !sevaDateInput || !sevaSlotsInput || !sevaAvailability || !sevaTotal || !bookSevaBtn) {
     return;
@@ -1673,9 +1754,10 @@ async function updateSevaBookingSummary() {
 
   const selectedSeva = getSelectedSeva();
   const selectedDate = sevaDateInput.value;
+  setAvailabilityLoadingState(false);
 
   if (!selectedSeva || !selectedDate) {
-    sevaAvailability.textContent = getBookingMessage('availability.selectDateAndSeva');
+    sevaAvailability.textContent = '';
     sevaTotal.textContent = getBookingMessage('total.zero');
     sevaSlotsInput.value = '1';
     sevaSlotsInput.disabled = true;
@@ -1716,15 +1798,15 @@ async function updateSevaBookingSummary() {
   hideBlockedDateHint();
 
   const requestId = ++bookingAvailabilityRequestId;
-  const cachedAvailability = getCachedBookingAvailability(selectedSeva.id, selectedDate);
-
-  if (isSharedAvailabilityEnabled() && !cachedAvailability) {
-    sevaAvailability.textContent = getBookingMessage('availability.loading');
-    sevaTotal.textContent = getBookingMessage('total.zero');
-    sevaSlotsInput.value = '1';
-    sevaSlotsInput.disabled = true;
-    bookSevaBtn.disabled = true;
-  }
+  sevaAvailability.textContent = getBookingMessage('availability.loading');
+  setAvailabilityLoadingState(true);
+  sevaTotal.textContent = getBookingMessage('total.zero');
+  sevaSlotsInput.value = '1';
+  sevaSlotsInput.disabled = true;
+  bookSevaBtn.disabled = true;
+  if (devoteeNameInput) devoteeNameInput.disabled = true;
+  if (devoteeGotramInput) devoteeGotramInput.disabled = true;
+  if (devoteePhoneInput) devoteePhoneInput.disabled = true;
 
   const availability = await getBookingAvailability(selectedSeva, selectedDate);
   if (requestId !== bookingAvailabilityRequestId) {
@@ -1734,6 +1816,9 @@ async function updateSevaBookingSummary() {
   if (!sevaTypeInput || sevaTypeInput.value !== selectedSeva.id || !sevaDateInput || sevaDateInput.value !== selectedDate) {
     return;
   }
+
+  setAvailabilityLoadingState(false);
+  updateFormLockState();
 
   const availableSlots = availability.availableSlots;
   sevaSlotsInput.max = String(Math.max(availableSlots, 1));
@@ -2423,82 +2508,90 @@ async function handleSevaBookingSubmit(event) {
     totalAmount
   };
 
-  if (bookSevaBtn) {
-    bookSevaBtn.disabled = true;
-  }
+  setBookingSubmitState(true);
 
   let emailResult = { sent: false, reason: 'not-attempted' };
   let webhookResult = { sent: false, reason: 'not-attempted' };
 
-  if (usesSharedAvailability) {
-    webhookResult = await sendBookingWebhook(bookingDetails);
+  try {
+    if (usesSharedAvailability) {
+      webhookResult = await sendBookingWebhook(bookingDetails);
 
-    if (!webhookResult.sent) {
-      showBookingMessage('error', getBookingSubmissionErrorMessage(webhookResult));
-      clearBookingAvailabilityCache(selectedSeva.id, selectedDate);
-      await updateSevaBookingSummary();
-      if (honeypotInput) {
-        honeypotInput.value = '';
+      if (!webhookResult.sent) {
+        showBookingMessage('error', getBookingSubmissionErrorMessage(webhookResult));
+        clearBookingAvailabilityCache(selectedSeva.id, selectedDate);
+        await updateSevaBookingSummary();
+        if (honeypotInput) {
+          honeypotInput.value = '';
+        }
+        if (bookSevaBtn) {
+          bookSevaBtn.disabled = false;
+        }
+        return;
       }
-      if (bookSevaBtn) {
-        bookSevaBtn.disabled = false;
+
+      const confirmedAvailability = normalizeBookingAvailabilityPayload(
+        webhookResult.data && webhookResult.data.availabilityAfter,
+        selectedSeva,
+        selectedDate
+      );
+
+      if (confirmedAvailability) {
+        syncBookingAvailability(confirmedAvailability);
+      } else {
+        const bookedSlots = getBookedSlots(selectedSeva.id, selectedDate);
+        setBookedSlots(selectedSeva.id, selectedDate, bookedSlots + requestedSlots);
+        clearBookingAvailabilityCache(selectedSeva.id, selectedDate);
       }
-      return;
-    }
 
-    const confirmedAvailability = normalizeBookingAvailabilityPayload(
-      webhookResult.data && webhookResult.data.availabilityAfter,
-      selectedSeva,
-      selectedDate
-    );
-
-    if (confirmedAvailability) {
-      syncBookingAvailability(confirmedAvailability);
+      const bookingRef = webhookResult.data && webhookResult.data.sheetUpdate && typeof webhookResult.data.sheetUpdate.bookingRef === 'string'
+        ? webhookResult.data.sheetUpdate.bookingRef
+        : '';
+      showBookingMessage('success', getBookingSuccessMessage(selectedSeva, bookingRef));
+      recordBookingAttempt(devoteePhone);
+      emailResult = await sendBookingEmail(bookingDetails);
     } else {
       const bookedSlots = getBookedSlots(selectedSeva.id, selectedDate);
       setBookedSlots(selectedSeva.id, selectedDate, bookedSlots + requestedSlots);
       clearBookingAvailabilityCache(selectedSeva.id, selectedDate);
+
+      showBookingMessage('success', getBookingSuccessMessage(selectedSeva));
+      recordBookingAttempt(devoteePhone);
+
+      [emailResult, webhookResult] = await Promise.all([
+        sendBookingEmail(bookingDetails),
+        sendBookingWebhook(bookingDetails)
+      ]);
     }
 
-    const bookingRef = webhookResult.data && webhookResult.data.sheetUpdate && typeof webhookResult.data.sheetUpdate.bookingRef === 'string'
-      ? webhookResult.data.sheetUpdate.bookingRef
-      : '';
-    showBookingMessage('success', getBookingSuccessMessage(selectedSeva, bookingRef));
-    recordBookingAttempt(devoteePhone);
-    emailResult = await sendBookingEmail(bookingDetails);
-  } else {
-    const bookedSlots = getBookedSlots(selectedSeva.id, selectedDate);
-    setBookedSlots(selectedSeva.id, selectedDate, bookedSlots + requestedSlots);
-    clearBookingAvailabilityCache(selectedSeva.id, selectedDate);
+    if (!emailResult.sent && emailResult.reason !== 'smtp-not-configured' && emailResult.reason !== 'not-attempted') {
+      console.warn('[Temple] Booking email send failed.', emailResult);
+    }
 
-    showBookingMessage('success', getBookingSuccessMessage(selectedSeva));
-    recordBookingAttempt(devoteePhone);
+    if (!usesSharedAvailability && !webhookResult.sent && webhookResult.reason !== 'booking-webhook-not-configured' && webhookResult.reason !== 'booking-webhook-actions-disabled') {
+      console.warn('[Temple] Booking webhook send failed.', webhookResult);
+    }
 
-    [emailResult, webhookResult] = await Promise.all([
-      sendBookingEmail(bookingDetails),
-      sendBookingWebhook(bookingDetails)
-    ]);
+    devoteeNameInput.value = '';
+    devoteeGotramInput.value = '';
+    devoteePhoneInput.value = '';
+    sevaSlotsInput.value = '1';
+    if (honeypotInput) {
+      honeypotInput.value = '';
+    }
+    if (bookSevaBtn) {
+      bookSevaBtn.disabled = false;
+    }
+    await updateSevaBookingSummary();
+  } catch (error) {
+    console.error('[Temple] Booking submission failed unexpectedly.', error);
+    showBookingMessage('error', getBookingMessage('errors.bookingUnavailable'));
+    if (bookSevaBtn) {
+      bookSevaBtn.disabled = false;
+    }
+  } finally {
+    setBookingSubmitState(false);
   }
-
-  if (!emailResult.sent && emailResult.reason !== 'smtp-not-configured' && emailResult.reason !== 'not-attempted') {
-    console.warn('[Temple] Booking email send failed.', emailResult);
-  }
-
-  if (!usesSharedAvailability && !webhookResult.sent && webhookResult.reason !== 'booking-webhook-not-configured' && webhookResult.reason !== 'booking-webhook-actions-disabled') {
-    console.warn('[Temple] Booking webhook send failed.', webhookResult);
-  }
-
-  devoteeNameInput.value = '';
-  devoteeGotramInput.value = '';
-  devoteePhoneInput.value = '';
-  sevaSlotsInput.value = '1';
-  if (honeypotInput) {
-    honeypotInput.value = '';
-  }
-  if (bookSevaBtn) {
-    bookSevaBtn.disabled = false;
-  }
-  await updateSevaBookingSummary();
 }
 
 function setActiveLink(sectionId) {
@@ -2531,6 +2624,7 @@ function switchLanguage(lang) {
 
   renderSevaCards();
   updateFormLockState();
+  setBookingSubmitState(Boolean(bookSevaBtn && bookSevaBtn.classList.contains('is-submitting')));
   updateSevaSelectedLabel();
   updateSevaSelectionHint();
   updateSevaBookingSummary();

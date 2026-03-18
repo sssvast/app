@@ -68,6 +68,7 @@
   </div>
   <nav id="primaryNav" aria-label="Primary navigation">
     <a href="#about" class="nav-link active" data-section="about">ఆలయం గురించి</a>
+    <a href="#timings" class="nav-link" data-section="timings">సమయాలు</a>
     <a href="#pooja" class="nav-link" data-section="pooja">పూజలు</a>
     <a href="#seva-booking" class="nav-link" data-section="seva-booking">సేవా బుకింగ్</a>
     <a href="#gallery" class="nav-link" data-section="gallery">గ్యాలరీ</a>
@@ -97,7 +98,11 @@
     <h2 data-telugu="ఆలయం గురించి" data-english="About Temple">ఆలయం గురించి</h2>
     <div id="aboutContent"></div>
   </section>
-
+  <!-- Temple Timings -->
+  <section id="timings">
+    <h2 data-telugu="ఆలయ సమయాలు" data-english="Temple Timings">ఆలయ సమయాలు</h2>
+    <div id="timingsContent"></div>
+  </section>
   <!-- Pooja Services -->
   <section id="pooja">
     <h2 data-telugu="పూజలు మరియు సేవలు" data-english="Pooja & Services">పూజలు మరియు సేవలు</h2>
@@ -122,13 +127,15 @@
         <form id="sevaBookingForm" class="seva-booking-form" novalidate>
           <input id="sevaType" name="sevaType" type="hidden" required />
 
+          <p id="sevaSelected" class="seva-meta seva-selected" data-telugu="ఎంచుకున్న సేవ: లేదు" data-english="Selected seva: None" hidden>ఎంచుకున్న సేవ: లేదు</p>
+
           <label class="seva-field full-width seva-date-field" for="sevaDate">
             <span class="seva-field-label" data-telugu="తేదీ" data-english="Date">తేదీ</span>
             <input id="sevaDate" name="sevaDate" type="date" required />
                       <span id="sevaDateBlockedHint" class="seva-date-blocked-hint" data-telugu="సేవ నిర్వహించబడదు" data-english="Seva not performed" hidden>సేవ నిర్వహించబడదు</span>
           </label>
 
-          <p id="sevaSelected" class="seva-meta seva-selected" data-telugu="ఎంచుకున్న సేవ: లేదు" data-english="Selected seva: None" hidden>ఎంచుకున్న సేవ: లేదు</p>
+          <p id="sevaAvailability" class="seva-meta" data-telugu="" data-english=""></p>
 
           <div class="seva-form-grid">
             <label class="seva-field full-width" for="devoteeName">
@@ -155,17 +162,13 @@
             </label>
           </div>
 
-          <p id="sevaAvailability" class="seva-meta" data-telugu="తేదీ మరియు సేవా కార్డు ఎంచుకుంటే అందుబాటు స్లాట్లు కనిపిస్తాయి." data-english="Choose a date and seva card to view available slots.">
-            తేదీ మరియు సేవా కార్డు ఎంచుకుంటే అందుబాటు స్లాట్లు కనిపిస్తాయి.
-          </p>
-          <p id="sevaTotal" class="seva-meta" data-telugu="మొత్తం: ₹ 0/-" data-english="Total: ₹ 0/-">మొత్తం: ₹ 0/-</p>
-
           <!-- Honeypot: must remain empty — bots that auto-fill fields will be silently blocked -->
           <div class="booking-honeypot" aria-hidden="true">
             <label>Leave empty <input id="bookingHoneypot" name="website" type="text" tabindex="-1" autocomplete="new-password" /></label>
           </div>
 
-          <button id="bookSevaBtn" class="book-seva-btn" type="submit" data-telugu="సేవా బుక్ చేయండి" data-english="Book Seva" disabled>సేవా బుక్ చేయండి</button>
+          <p id="sevaTotal" class="seva-meta" data-telugu="మొత్తం: ₹ 0/-" data-english="Total: ₹ 0/-">మొత్తం: ₹ 0/-</p>
+          <button id="bookSevaBtn" class="book-seva-btn" type="submit" data-telugu="సేవా బుక్ చేయండి" data-english="Book Seva" data-telugu-submitting="సమర్పిస్తోంది..." data-english-submitting="Submitting..." disabled>సేవా బుక్ చేయండి</button>
           <p id="sevaBookingMessage" class="seva-booking-message" role="status" aria-live="polite"></p>
         </form>
       </div>

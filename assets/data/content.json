@@ -6,6 +6,7 @@
   "nav": {
     "telugu": {
       "about": "ఆలయం గురించి",
+      "timings": "సమయాలు",
       "pooja": "పూజలు",
       "seva-booking": "సేవా బుకింగ్",
       "gallery": "గ్యాలరీ",
@@ -13,6 +14,7 @@
     },
     "english": {
       "about": "About",
+      "timings": "Timings",
       "pooja": "Services",
       "seva-booking": "Seva Booking",
       "gallery": "Gallery",
@@ -70,6 +72,24 @@
         {
           "telugu": "ప్రత్యేక పూజలు",
           "english": "Special Poojas"
+        }
+      ]
+    },
+    "timings": {
+      "slots": [
+        {
+          "labelTelugu": "ఉదయం",
+          "labelEnglish": "Morning",
+          "timeTelugu": "6:00 – 11:30",
+          "timeEnglish": "6:00 AM – 11:30 AM",
+          "icon": "morning"
+        },
+        {
+          "labelTelugu": "సాయంత్రం",
+          "labelEnglish": "Evening",
+          "timeTelugu": "6:00 – 8:00",
+          "timeEnglish": "6:00 PM – 8:00 PM",
+          "icon": "evening"
         }
       ]
     },

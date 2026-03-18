@@ -17,9 +17,9 @@
         "selected": "ఎంచుకున్న సేవ: {sevaName} ({sevaTiming})"
       },
       "availability": {
-        "selectDateAndSeva": "తేదీ మరియు సేవా కార్డు ఎంచుకుంటే అందుబాటు స్లాట్లు కనిపిస్తాయి.",
+        "selectDateAndSeva": "",
         "tuesdayOnly": "మంగళవారం అన్నదానం కోసం మంగళవారం తేదీలే ఎంచుకోవాలి.",
-        "loading": "ప్రత్యక్ష అందుబాటు స్లాట్లు చూస్తున్నాం...",
+        "loading": "స్లాట్ల అందుబాటును చూస్తున్నాం...",
         "zeroSlots": "ఎంచుకున్న తేదీకి అందుబాటులో ఉన్న స్లాట్లు: 0 / {dailySlots}",
         "availableSlots": "ఎంచుకున్న తేదీకి అందుబాటులో ఉన్న స్లాట్లు: {availableSlots} / {dailySlots}"
       },
@@ -34,7 +34,7 @@
         "bookingWindowRegular": "అన్ని సేవలకు కనీసం {regularAdvanceDays} రోజు ముందుగా మాత్రమే బుకింగ్ చేయవచ్చు. రాబోయే {regularWindowDays} రోజుల తేదీల్లో మాత్రమే బుకింగ్ చేయవచ్చు.",
         "onlySlotsLeft": "ఈ తేదీకి {availableSlots} స్లాట్(లు) మాత్రమే మిగిలి ఉన్నాయి.",
         "blockedDate": "ఎంచుకున్న తేదీ ఈ సేవకు అందుబాటులో లేదు. దయచేసి మరొక తేదీ ఎంచుకోండి.",
-        "bookingUnavailable": "ప్రస్తుతం ప్రత్యక్ష అందుబాటును నిర్ధారించలేకపోయాము. దయచేసి మళ్లీ ప్రయత్నించండి."
+        "bookingUnavailable": "ప్రస్తుతం స్లాట్ల అందుబాటును నిర్ధారించలేకపోయాము. దయచేసి మళ్లీ ప్రయత్నించండి."
       },
       "success": {
         "bookingReceived": "{sevaName} కోసం మీ సేవా అభ్యర్థన విజయవంతంగా స్వీకరించబడింది. ఆలయ ప్రతినిధి మీకు తుది నిర్ధారణను {nextRequestDate} సాయంత్రం 6:00 లోపు పంపిస్తారు. ధన్యవాదాలు.",
@@ -51,9 +51,9 @@
         "selected": "Selected seva: {sevaName} ({sevaTiming})"
       },
       "availability": {
-        "selectDateAndSeva": "Choose a date and seva card to view available slots.",
+        "selectDateAndSeva": "",
         "tuesdayOnly": "For Tuesday Annadanam, only Tuesdays can be selected.",
-        "loading": "Checking live availability...",
+        "loading": "Checking slots availability...",
         "zeroSlots": "Available slots for selected date: 0 / {dailySlots}",
         "availableSlots": "Available slots for selected date: {availableSlots} / {dailySlots}"
       },
@@ -68,7 +68,7 @@
         "bookingWindowRegular": "For all sevas, booking starts only from {regularAdvanceDays} day(s) ahead. Booking remains limited to the upcoming {regularWindowDays} days.",
         "onlySlotsLeft": "Only {availableSlots} slot(s) are available for this date.",
         "blockedDate": "The selected date is not available for this seva. Please choose another date.",
-        "bookingUnavailable": "We could not verify live availability right now. Please try again."
+        "bookingUnavailable": "We could not verify slots availability right now. Please try again."
       },
       "success": {
         "bookingReceived": "Your seva request for {sevaName} has been received successfully. A temple representative will share the final confirmation with you before 6:00 PM on {nextRequestDate}. Thank you.",

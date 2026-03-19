@@ -7,6 +7,7 @@ const WHATSAPP_PHONE_NUMBER_ID_KEY = 'WHATSAPP_PHONE_NUMBER_ID';
 const WHATSAPP_WEBHOOK_VERIFY_TOKEN_KEY = 'WHATSAPP_WEBHOOK_VERIFY_TOKEN';
 const ADMIN_ALLOWED_EMAIL = 'svanjaneya.temple@gmail.com';
 const ADMIN_ALLOWED_EMAIL_KEY = 'ADMIN_ALLOWED_EMAIL';
+const ADMIN_ALERT_PHONE_NUMBERS_KEY = 'ADMIN_ALERT_PHONE_NUMBERS';
 
 const BOOKING_STATUS_SUBMITTED = 'Submitted';
 const BOOKING_STATUS_REVIEWED = 'Reviewed';
@@ -144,13 +145,18 @@ function doPost(e) {
       ? sendWhatsappNotification_(booking)
       : { sent: false, reason: 'whatsapp-disabled' };
 
+    const adminAlert = sheetUpdate && sheetUpdate.updated
+      ? sendAdminNewBookingAlerts_(booking, sheetUpdate)
+      : { sent: false, reason: 'admin-alert-skipped-no-sheet-update' };
+
     return jsonResponse_({
       ok: true,
       controls,
       availabilityBefore,
       availabilityAfter,
       sheetUpdate,
-      whatsapp
+      whatsapp,
+      adminAlert
     });
   } catch (error) {
     return bookingErrorResponse_(error);
@@ -1656,6 +1662,195 @@ function buildWhatsappMessage_(booking) {
     'Gotram: ' + booking.devoteeGotram,
     'Phone: ' + booking.devoteePhone
   ].join('\n');
+}
+
+function sendAdminNewBookingAlerts_(booking, sheetUpdate) {
+  const recipients = getAdminAlertRecipients_();
+  if (!recipients.length) {
+    return {
+      sent: false,
+      reason: 'admin-alert-recipients-not-configured'
+    };
+  }
+
+  const token = getWhatsappCloudToken_();
+  const phoneNumberId = getWhatsappPhoneNumberId_();
+
+  if (!token || !phoneNumberId) {
+    const missing = [];
+    if (!token) {
+      missing.push('token');
+    }
+    if (!phoneNumberId) {
+      missing.push('phone-number-id');
+    }
+
+    return {
+      sent: false,
+      reason: 'whatsapp-not-configured:' + missing.join(',')
+    };
+  }
+
+  const textBody = buildAdminNewBookingAlertMessage_(booking, sheetUpdate);
+  const results = recipients.map(function (toNumber) {
+    const sendResult = sendWhatsappTextMessage_(phoneNumberId, token, toNumber, textBody);
+    return {
+      to: toNumber,
+      sent: !!sendResult.sent,
+      reason: String(sendResult.reason || ''),
+      messageId: String(sendResult.messageId || ''),
+      messageStatus: String(sendResult.messageStatus || ''),
+      waId: String(sendResult.waId || '')
+    };
+  });
+
+  const sentCount = results.reduce(function (count, item) {
+    return count + (item.sent ? 1 : 0);
+  }, 0);
+
+  return {
+    sent: sentCount > 0,
+    totalRecipients: recipients.length,
+    sentCount: sentCount,
+    failedCount: recipients.length - sentCount,
+    reason: sentCount > 0 ? '' : 'admin-alert-send-failed',
+    results: results
+  };
+}
+
+function getAdminAlertRecipients_() {
+  const configured = getOptionalScriptProperty_(ADMIN_ALERT_PHONE_NUMBERS_KEY);
+  if (!configured) {
+    return [];
+  }
+
+  const recipients = [];
+  const seen = {};
+
+  configured.split(',').forEach(function (entry) {
+    const normalized = toWhatsappRecipient_(entry);
+    if (!normalized || seen[normalized]) {
+      return;
+    }
+
+    seen[normalized] = true;
+    recipients.push(normalized);
+  });
+
+  return recipients;
+}
+
+function buildAdminNewBookingAlertMessage_(booking, sheetUpdate) {
+  const bookingRef = sheetUpdate && sheetUpdate.bookingRef
+    ? String(sheetUpdate.bookingRef).trim()
+    : '-';
+  const selectedDate = booking && booking.selectedDate
+    ? String(booking.selectedDate).trim()
+    : '-';
+  const sevaNameEnglish = booking && booking.sevaNameEnglish
+    ? String(booking.sevaNameEnglish).trim()
+    : '-';
+  const sevaNameTelugu = booking && booking.sevaNameTelugu
+    ? String(booking.sevaNameTelugu).trim()
+    : '-';
+  const sevaTimingEnglish = booking && booking.sevaTimingEnglish
+    ? String(booking.sevaTimingEnglish).trim()
+    : '-';
+  const sevaTimingTelugu = booking && booking.sevaTimingTelugu
+    ? String(booking.sevaTimingTelugu).trim()
+    : '';
+  const slotNumber = booking && Number.isFinite(Number(booking.slotNumber))
+    ? String(Math.trunc(Number(booking.slotNumber)))
+    : '-';
+  const amountText = formatAmountInr_(booking && booking.totalAmount) || '₹ 0';
+  const devoteeName = booking && booking.devoteeName
+    ? String(booking.devoteeName).trim()
+    : '-';
+  const devoteeGotram = booking && booking.devoteeGotram
+    ? String(booking.devoteeGotram).trim()
+    : '-';
+  const devoteePhone = booking && booking.devoteePhone
+    ? String(booking.devoteePhone).trim()
+    : '-';
+  const language = normalizeBookingLanguage_(booking && booking.language);
+  const languageLabel = language === 'telugu'
+    ? 'Telugu'
+    : (language === 'english' ? 'English' : '-');
+  const bookedAt = booking && booking.bookingTimestamp
+    ? String(booking.bookingTimestamp).trim()
+    : formatDateForScriptTimeZone_(new Date(), 'yyyy-MM-dd HH:mm:ss');
+  const timing = sevaTimingTelugu
+    ? (sevaTimingEnglish + ' (' + sevaTimingTelugu + ')')
+    : sevaTimingEnglish;
+
+  const lines = [
+    'Temple Admin Alert: New Seva Booking',
+    '',
+    'Booking Ref: ' + bookingRef,
+    'Seva Date: ' + selectedDate,
+    'Seva: ' + sevaNameEnglish + ' (' + sevaNameTelugu + ')',
+    'Timing: ' + timing,
+    'Slots: ' + slotNumber,
+    'Total: ' + amountText,
+    '',
+    'Devotee: ' + devoteeName,
+    'Gotram: ' + devoteeGotram,
+    'Phone: ' + devoteePhone,
+    'Preferred Language: ' + languageLabel,
+    'Booked At: ' + bookedAt
+  ];
+
+  const message = lines.join('\n');
+  return message.length > 1800 ? message.slice(0, 1800) : message;
+}
+
+function sendWhatsappTextMessage_(phoneNumberId, token, toNumber, textBody) {
+  const endpoint = 'https://graph.facebook.com/v22.0/' + encodeURIComponent(phoneNumberId) + '/messages';
+  const payload = {
+    messaging_product: 'whatsapp',
+    to: toNumber,
+    type: 'text',
+    text: {
+      body: String(textBody || '')
+    }
+  };
+
+  const response = UrlFetchApp.fetch(endpoint, {
+    method: 'post',
+    contentType: 'application/json',
+    headers: {
+      Authorization: 'Bearer ' + token
+    },
+    payload: JSON.stringify(payload),
+    muteHttpExceptions: true
+  });
+
+  const status = response.getResponseCode();
+  const responseBody = response.getContentText();
+  const sendMeta = parseWhatsappSendResponse_(responseBody);
+
+  if (status >= 200 && status < 300 && !sendMeta.errorMessage) {
+    return {
+      sent: true,
+      status: status,
+      to: toNumber,
+      messageId: sendMeta.messageId,
+      messageStatus: sendMeta.messageStatus,
+      waId: sendMeta.waId,
+      body: sendMeta.raw
+    };
+  }
+
+  return {
+    sent: false,
+    reason: 'whatsapp-http-' + status,
+    status: status,
+    to: toNumber,
+    messageId: sendMeta.messageId,
+    messageStatus: sendMeta.messageStatus,
+    waId: sendMeta.waId,
+    body: sendMeta.raw
+  };
 }
 
 function checkPhoneRateLimit_(phone, date) {

@@ -2,7 +2,6 @@ const header = document.querySelector('header');
 const teluguBtn = document.getElementById('teluguBtn');
 const englishBtn = document.getElementById('englishBtn');
 const menuToggle = document.getElementById('menuToggle');
-const menuToggleLabel = document.getElementById('menuToggleLabel');
 const musicToggleBtn = document.getElementById('musicToggleBtn');
 const navLinks = document.querySelectorAll('header nav a.nav-link');
 const sections = document.querySelectorAll('main section[id]');
@@ -2059,6 +2058,7 @@ function buildBookingWebhookPayload(details, controls) {
       devoteeName: details.devoteeName,
       devoteeGotram: details.devoteeGotram,
       devoteePhone: details.devoteePhone,
+      language: currentLang,
       sevaId: details.sevaId,
       sevaNameEnglish: details.sevaNameEnglish,
       sevaNameTelugu: details.sevaNameTelugu,

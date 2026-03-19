@@ -22,6 +22,7 @@ const BOOKING_COL_PHONE = 9;
 const BOOKING_COL_SLOT = 10;
 const BOOKING_COL_BOOKING_REF = 12;
 const BOOKING_COL_STATUS = 13;
+const BOOKING_COL_LANGUAGE = 14;
 
 const CONFIRMED_CANCELLATION_MIN_HOURS = 14;
 
@@ -38,7 +39,8 @@ const BOOKING_HEADERS = [
   'Slot',
   'Total Amount',
   'Booking Reference',
-  'Status'
+  'Status',
+  'Booking Language'
 ];
 
 function doGet(e) {
@@ -108,7 +110,11 @@ function doPost(e) {
       return jsonResponse_({ ok: true, email: tokenData.email, transition: transition });
     }
 
-    const bookingPayload = payload && payload.booking ? payload.booking : payload;
+    const bookingPayload = payload && payload.booking
+      ? Object.assign({}, payload.booking, {
+          language: payload.booking.language || payload.language || ''
+        })
+      : payload;
     const booking = normalizeBooking_(bookingPayload);
     const controls = normalizeControls_(payload);
 
@@ -1365,6 +1371,19 @@ function normalizeAvailabilityRequest_(params) {
   };
 }
 
+function normalizeBookingLanguage_(value) {
+  const normalized = String(value || '').trim().toLowerCase();
+  if (normalized === 'english' || normalized === 'en') {
+    return 'english';
+  }
+
+  if (normalized === 'telugu' || normalized === 'te') {
+    return 'telugu';
+  }
+
+  return '';
+}
+
 function normalizeBooking_(raw) {
   if (!raw || typeof raw !== 'object') {
     throw new Error('Booking payload is missing.');
@@ -1413,6 +1432,7 @@ function normalizeBooking_(raw) {
     devoteeName: String(raw.devoteeName || '').trim(),
     devoteeGotram: String(raw.devoteeGotram || '').trim(),
     devoteePhone: String(raw.devoteePhone || '').trim(),
+    language: normalizeBookingLanguage_(raw.language),
     dailySlots: Math.trunc(dailySlots),
     requestedSlots: Math.trunc(requestedSlots),
     slotNumber: Math.trunc(slotNumber),
@@ -1472,7 +1492,8 @@ function appendBookingToSheet_(booking, spreadsheet) {
     booking.slotNumber,
     booking.totalAmount,
     bookingRef,
-    BOOKING_STATUS_SUBMITTED
+    BOOKING_STATUS_SUBMITTED,
+    booking.language || ''
   ]);
 
   return {
@@ -2001,7 +2022,8 @@ function getAdminBookings_(spreadsheet) {
           slot: Number(row[9]) || 0,
           totalAmount: Number(row[10]) || 0,
           bookingRef: String(row[11] || ''),
-          status: String(row[12] || BOOKING_STATUS_SUBMITTED)
+          status: String(row[12] || BOOKING_STATUS_SUBMITTED),
+          language: normalizeBookingLanguage_(row[BOOKING_COL_LANGUAGE - 1])
         });
       });
     }
@@ -2017,4 +2039,50 @@ function jsonResponse_(payload) {
   return ContentService
     .createTextOutput(JSON.stringify(payload))
     .setMimeType(ContentService.MimeType.JSON);
+}
+
+/**
+ * One-time migration: fills the Booking Language column for rows that were
+ * created before language persistence was added.
+ *
+ * Since the seva-name column always contains Telugu text regardless of the
+ * UI language the devotee used, language cannot be reliably inferred from the
+ * row data.  This function defaults all unfilled rows to 'telugu', which is
+ * the primary booking language for this temple.  If a specific booking needs
+ * a different language, update it manually in the sheet.
+ *
+ * Run manually from the Apps Script editor (click ▶ beside this function).
+ * Results appear in View > Logs.
+ */
+function backfillBookingLanguage() {
+  const spreadsheet  = SpreadsheetApp.getActiveSpreadsheet();
+  const datePattern  = /^\d{4}-\d{2}-\d{2}$/;
+  const DEFAULT_LANG = 'telugu';
+  const COL_LANG     = BOOKING_COL_LANGUAGE;  // 14
+  let totalUpdated   = 0;
+
+  spreadsheet.getSheets().forEach(function (sheet) {
+    const sheetName = sheet.getName();
+    if (!datePattern.test(sheetName)) return;
+
+    const lastRow = sheet.getLastRow();
+    if (lastRow < 2) return;
+
+    const numRows  = lastRow - 1;
+    const langVals = sheet.getRange(2, COL_LANG, numRows, 1).getValues();
+    let sheetUpdated = 0;
+
+    for (let i = 0; i < numRows; i++) {
+      if (normalizeBookingLanguage_(langVals[i][0]) !== '') continue;
+      sheet.getRange(i + 2, COL_LANG).setValue(DEFAULT_LANG);
+      sheetUpdated++;
+    }
+
+    if (sheetUpdated > 0) {
+      totalUpdated += sheetUpdated;
+      Logger.log('Sheet %s → %d row(s) backfilled with "%s"', sheetName, sheetUpdated, DEFAULT_LANG);
+    }
+  });
+
+  Logger.log('backfillBookingLanguage complete — %d row(s) updated', totalUpdated);
 }

@@ -945,6 +945,10 @@
     line-height: 1.4;
   }
 
+  .modal-head .lang-switch button {
+    min-width: 72px;
+  }
+
   .field-static {
     padding: 0.74rem 0.75rem;
     margin-top: 0.22rem;
@@ -1541,6 +1545,10 @@
   <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="reviewModalTitle">
     <div class="modal-head">
       <h3 id="reviewModalTitle"></h3>
+      <div class="lang-switch" id="reviewModalLanguageSwitch" role="group" aria-label="Message Language">
+        <button type="button" id="reviewModalTeluguBtn" aria-pressed="false"></button>
+        <button type="button" id="reviewModalEnglishBtn" aria-pressed="false"></button>
+      </div>
       <button type="button" class="btn-modal-close" id="reviewCloseBtn" aria-label="">&times;</button>
     </div>
     <div class="modal-body">
@@ -1549,6 +1557,8 @@
           <label for="reviewPhone" id="reviewLabelPhone"><span class="wa-icon wa-icon-small" aria-hidden="true"></span> <span id="reviewLabelPhoneText"></span></label>
           <input id="reviewPhone" type="text" inputmode="tel" placeholder="" readonly disabled />
         </div>
+
+
       </div>
 
       <div class="field">
@@ -1599,6 +1609,7 @@ const ADMIN_GOOGLE_CLIENT_ID = '526573444187-ha7resl17svcp1f7dmosa07jquom2f62.ap
 
 const ADMIN_ALLOWED_EMAIL = 'svanjaneya.temple@gmail.com';
 const CONTENT_JSON_URL    = 'assets/data/content.json';
+const SEVAS_JSON_URL      = 'assets/data/sevas.json';
 
 const DEFAULT_ADMIN_CONTENT = {
   defaultLanguage: 'english',
@@ -1666,6 +1677,9 @@ const DEFAULT_ADMIN_CONTENT = {
       modal: {
         close: 'Close',
         whatsappNumber: 'WhatsApp Number',
+        messageLanguage: 'Message Language',
+        optionTelugu: 'Telugu',
+        optionEnglish: 'English',
         phonePlaceholder: 'Auto-filled from booking',
         textMessage: 'Text Message',
         messagePlaceholder: 'Optional additional note for the devotee',
@@ -1712,8 +1726,10 @@ let bookingLookup   = {};
 let lastBookingsData = [];
 let reviewContext   = null;
 let reviewMode      = 'reviewed';
+let reviewModalLanguage = 'en';
 let reviewQrDataUrl = '';
 let reviewQrFileName = '';
+let reviewQrFileSize = 0;
 let reviewWired     = false;
 let reviewRefreshPending = false;
 let reviewSubmitInProgress = false;
@@ -1725,6 +1741,7 @@ let adminLoaderCountdownDone = false;
 let adminLoaderWorkDone = false;
 let languageToggleWired = false;
 let adminContent = JSON.parse(JSON.stringify(DEFAULT_ADMIN_CONTENT));
+let adminSevaCatalogById = {};
 let currentAdminLanguage = 'english';
 
 // ── Boot ───────────────────────────────────────────────────────────────────────
@@ -1745,6 +1762,15 @@ let currentAdminLanguage = 'english';
   } catch (_) {
     adminContent = normalizeAdminContent_(null);
     currentAdminLanguage = normalizeAdminLanguage_(adminContent.defaultLanguage);
+  }
+
+  try {
+    const sevaResp = await fetch(SEVAS_JSON_URL, { cache: 'no-store' });
+    if (sevaResp.ok) {
+      adminSevaCatalogById = normalizeAdminSevaCatalogPayload_(await sevaResp.json());
+    }
+  } catch (_) {
+    adminSevaCatalogById = {};
   }
 
   wireLanguageToggleEvents_();
@@ -1886,7 +1912,43 @@ function deepMergeObjects_(base, incoming) {
 }
 
 function normalizeAdminLanguage_(value) {
-  return String(value || '').trim().toLowerCase() === 'english' ? 'english' : 'telugu';
+  const normalized = String(value || '').trim().toLowerCase();
+  return normalized === 'english' || normalized === 'en' ? 'english' : 'telugu';
+}
+
+function normalizeAdminSevaCatalogItem_(item) {
+  if (!item || typeof item !== 'object') {
+    return null;
+  }
+
+  const id = typeof item.id === 'string' ? item.id.trim() : '';
+  const telugu = typeof item.telugu === 'string' ? item.telugu.trim() : '';
+  const english = typeof item.english === 'string' ? item.english.trim() : '';
+
+  if (!id || !telugu || !english) {
+    return null;
+  }
+
+  return {
+    id: id,
+    telugu: telugu,
+    english: english
+  };
+}
+
+function normalizeAdminSevaCatalogPayload_(payload) {
+  const list = Array.isArray(payload)
+    ? payload
+    : (payload && Array.isArray(payload.sevas) ? payload.sevas : []);
+
+  return list.reduce(function (result, item) {
+    const normalized = normalizeAdminSevaCatalogItem_(item);
+    if (normalized && !Object.prototype.hasOwnProperty.call(result, normalized.id)) {
+      result[normalized.id] = normalized;
+    }
+
+    return result;
+  }, {});
 }
 
 function getPathValue_(source, path) {
@@ -1928,15 +1990,36 @@ function getAdminText(path, replacements) {
   return getAdminTextForLanguage_(currentAdminLanguage, path, replacements);
 }
 
-function getStatusLabel_(status) {
+function getModalText(path, replacements) {
+  return getAdminTextForLanguage_(reviewModalLanguage, path, replacements);
+}
+
+function getStatusLabelForLanguage_(language, status) {
   const key = String(status || '').trim().toLowerCase();
-  const label = key ? getAdminText('status.' + key) : '';
+  const label = key ? getAdminTextForLanguage_(language, 'status.' + key) : '';
   return label || String(status || '');
+}
+
+function getStatusLabel_(status) {
+  return getStatusLabelForLanguage_(currentAdminLanguage, status);
 }
 
 function resolveTemplateLanguage_(value) {
   const normalized = String(value || '').trim().toLowerCase();
   return normalized === 'en' || normalized === 'english' ? 'english' : 'telugu';
+}
+
+function resolveBookingLanguageCode_(value) {
+  const normalized = String(value || '').trim().toLowerCase();
+  if (normalized === 'english' || normalized === 'en') {
+    return 'en';
+  }
+
+  if (normalized === 'telugu' || normalized === 'te') {
+    return 'te';
+  }
+
+  return '';
 }
 
 function getDefaultReviewModeCopy_(mode, _language) {
@@ -2030,8 +2113,9 @@ function getModalTemplateLines_(mode, language) {
   return getDefaultModalTemplateLines_(normalizedMode, langKey);
 }
 
-function getPreferredModalLanguage_() {
-  return normalizeAdminLanguage_(currentAdminLanguage) === 'telugu' ? 'te' : 'en';
+function getPreferredModalLanguage_(bookingLanguage) {
+  return resolveBookingLanguageCode_(bookingLanguage)
+    || (normalizeAdminLanguage_(currentAdminLanguage) === 'telugu' ? 'te' : 'en');
 }
 
 function syncLanguageToggleUi_() {
@@ -2053,6 +2137,83 @@ function syncLanguageToggleUi_() {
     enBtn.classList.toggle('active', !isTelugu);
     enBtn.setAttribute('aria-pressed', String(!isTelugu));
   });
+}
+
+function syncReviewModalLanguageToggleUi_() {
+  const teBtn = document.getElementById('reviewModalTeluguBtn');
+  const enBtn = document.getElementById('reviewModalEnglishBtn');
+  if (!teBtn || !enBtn) {
+    return;
+  }
+
+  const isTelugu = resolveTemplateLanguage_(reviewModalLanguage) === 'telugu';
+  teBtn.classList.toggle('active', isTelugu);
+  teBtn.setAttribute('aria-pressed', String(isTelugu));
+  enBtn.classList.toggle('active', !isTelugu);
+  enBtn.setAttribute('aria-pressed', String(!isTelugu));
+}
+
+function applyReviewModalLanguage(language, options) {
+  const settings = options || {};
+  reviewModalLanguage = getPreferredModalLanguage_(language);
+
+  const closeText = getModalText('modal.close');
+  const reviewCloseBtn = document.getElementById('reviewCancelBtn');
+  if (reviewCloseBtn) {
+    reviewCloseBtn.textContent = closeText;
+  }
+
+  const reviewCloseIconBtn = document.getElementById('reviewCloseBtn');
+  if (reviewCloseIconBtn) {
+    reviewCloseIconBtn.setAttribute('aria-label', closeText);
+  }
+
+  const reviewLabelPhoneText = document.getElementById('reviewLabelPhoneText');
+  if (reviewLabelPhoneText) {
+    reviewLabelPhoneText.textContent = getModalText('modal.whatsappNumber');
+  }
+
+  const reviewModalTeluguBtn = document.getElementById('reviewModalTeluguBtn');
+  if (reviewModalTeluguBtn) {
+    reviewModalTeluguBtn.textContent = getModalText('modal.optionTelugu');
+  }
+
+  const reviewModalEnglishBtn = document.getElementById('reviewModalEnglishBtn');
+  if (reviewModalEnglishBtn) {
+    reviewModalEnglishBtn.textContent = getModalText('modal.optionEnglish');
+  }
+
+  const reviewPhone = document.getElementById('reviewPhone');
+  if (reviewPhone) {
+    reviewPhone.placeholder = getModalText('modal.phonePlaceholder');
+  }
+
+  const reviewLabelTextMessage = document.getElementById('reviewLabelTextMessage');
+  if (reviewLabelTextMessage) {
+    reviewLabelTextMessage.textContent = getModalText('modal.textMessage');
+  }
+
+  const reviewMessage = document.getElementById('reviewMessage');
+  if (reviewMessage) {
+    reviewMessage.placeholder = getModalText('modal.messagePlaceholder');
+  }
+
+  const reviewLabelQrCode = document.getElementById('reviewLabelQrCode');
+  if (reviewLabelQrCode) {
+    reviewLabelQrCode.textContent = getModalText('modal.qrImage');
+  }
+
+  const reviewPaymentAckText = document.getElementById('reviewPaymentAckText');
+  if (reviewPaymentAckText) {
+    reviewPaymentAckText.textContent = getModalText('modal.paymentAck');
+  }
+
+  syncReviewModalLanguageToggleUi_();
+  applyReviewModeConfig(reviewMode, reviewModalLanguage);
+
+  if (settings.syncMessage === true && reviewContext && reviewMessage) {
+    reviewMessage.value = buildDefaultReviewMessage(reviewMode, reviewModalLanguage, reviewContext);
+  }
 }
 
 function applyAdminLanguage(language, options) {
@@ -2099,61 +2260,14 @@ function applyAdminLanguage(language, options) {
       : getAdminText('dashboard.refresh');
   }
 
-  const reviewCloseBtn = document.getElementById('reviewCancelBtn');
-  if (reviewCloseBtn) {
-    reviewCloseBtn.textContent = getAdminText('modal.close');
-  }
-
-  const reviewCloseIconBtn = document.getElementById('reviewCloseBtn');
-  if (reviewCloseIconBtn) {
-    reviewCloseIconBtn.setAttribute('aria-label', getAdminText('modal.close'));
-  }
-
-  const reviewLabelPhoneText = document.getElementById('reviewLabelPhoneText');
-  if (reviewLabelPhoneText) {
-    reviewLabelPhoneText.textContent = getAdminText('modal.whatsappNumber');
-  }
-
-  const reviewPhone = document.getElementById('reviewPhone');
-  if (reviewPhone) {
-    reviewPhone.placeholder = getAdminText('modal.phonePlaceholder');
-  }
-
-  const reviewLabelTextMessage = document.getElementById('reviewLabelTextMessage');
-  if (reviewLabelTextMessage) {
-    reviewLabelTextMessage.textContent = getAdminText('modal.textMessage');
-  }
-
-  const reviewMessage = document.getElementById('reviewMessage');
-  if (reviewMessage) {
-    reviewMessage.placeholder = getAdminText('modal.messagePlaceholder');
-  }
-
-  const reviewLabelQrCode = document.getElementById('reviewLabelQrCode');
-  if (reviewLabelQrCode) {
-    reviewLabelQrCode.textContent = getAdminText('modal.qrImage');
-  }
-
-  const reviewPaymentAckText = document.getElementById('reviewPaymentAckText');
-  if (reviewPaymentAckText) {
-    reviewPaymentAckText.textContent = getAdminText('modal.paymentAck');
-  }
-
   syncLanguageToggleUi_();
   updateAdminPageLoaderText();
+  applyReviewModalLanguage(reviewContext ? reviewModalLanguage : getPreferredModalLanguage_(), {
+    syncMessage: settings.syncModalMessage === true
+  });
 
   if (settings.rerender !== false && Array.isArray(lastBookingsData) && lastBookingsData.length && document.getElementById('dashboardView').style.display === 'flex') {
     renderBookings(lastBookingsData);
-  }
-
-  if (settings.syncModalMessage !== false) {
-    const language = getPreferredModalLanguage_();
-
-    if (reviewContext) {
-      document.getElementById('reviewMessage').value = buildDefaultReviewMessage(reviewMode, language, reviewContext);
-    }
-
-    applyReviewModeConfig(reviewMode);
   }
 }
 
@@ -2671,9 +2785,15 @@ function wireReviewModalEvents() {
   const modal = document.getElementById('reviewModal');
   document.getElementById('reviewCloseBtn').addEventListener('click', closeReviewModal);
   document.getElementById('reviewCancelBtn').addEventListener('click', closeReviewModal);
+  document.getElementById('reviewModalTeluguBtn').addEventListener('click', function () {
+    applyReviewModalLanguage('te', { syncMessage: true });
+  });
+  document.getElementById('reviewModalEnglishBtn').addEventListener('click', function () {
+    applyReviewModalLanguage('en', { syncMessage: true });
+  });
   document.getElementById('reviewQrInput').addEventListener('change', onReviewQrInputChange);
   document.getElementById('reviewPaymentAck').addEventListener('change', function () {
-    const modeConfig = getReviewModeConfig(reviewMode);
+    const modeConfig = getReviewModeConfig(reviewMode, reviewModalLanguage);
     updateReviewSubmitButtonState(modeConfig);
 
     if (modeConfig.requiresPaymentAck && document.getElementById('reviewPaymentAck').checked) {
@@ -2704,41 +2824,42 @@ function normalizeReviewMode(mode) {
   return 'reviewed';
 }
 
-function getReviewModeConfig(mode) {
+function getReviewModeConfig(mode, language) {
   const normalized = normalizeReviewMode(mode);
+  const textLanguage = language || reviewModalLanguage;
   const basePath = 'modal.mode.' + normalized;
   const targetStatus = normalized === 'confirmed'
     ? 'Confirmed'
     : (normalized === 'cancelled' ? 'Cancelled' : 'Reviewed');
   const requiresQr = normalized === 'reviewed';
   const requiresPaymentAck = normalized === 'confirmed';
-  const fallbackCopy = getDefaultReviewModeCopy_(normalized, currentAdminLanguage);
+  const fallbackCopy = getDefaultReviewModeCopy_(normalized, textLanguage);
 
   return {
     mode: normalized,
-    title: getAdminText(basePath + '.title') || fallbackCopy.title,
-    submitText: getAdminText(basePath + '.submit') || fallbackCopy.submit,
-    sendingText: getAdminText('modal.sending'),
-    completedText: getAdminText('modal.completed'),
-    successText: getAdminText(basePath + '.success') || fallbackCopy.success,
-    note: getAdminText(basePath + '.note') || fallbackCopy.note,
+    title: getAdminTextForLanguage_(textLanguage, basePath + '.title') || fallbackCopy.title,
+    submitText: getAdminTextForLanguage_(textLanguage, basePath + '.submit') || fallbackCopy.submit,
+    sendingText: getAdminTextForLanguage_(textLanguage, 'modal.sending'),
+    completedText: getAdminTextForLanguage_(textLanguage, 'modal.completed'),
+    successText: getAdminTextForLanguage_(textLanguage, basePath + '.success') || fallbackCopy.success,
+    note: getAdminTextForLanguage_(textLanguage, basePath + '.note') || fallbackCopy.note,
     action: normalized === 'reviewed' ? 'admin-transition-reviewed' : 'admin-transition-status',
     targetStatus: targetStatus,
     requiresQr: requiresQr,
     requiresPaymentAck: requiresPaymentAck,
-    qrMeta: getAdminText(requiresQr ? 'modal.qrMetaRequired' : 'modal.qrMetaNotRequired'),
+    qrMeta: getAdminTextForLanguage_(textLanguage, requiresQr ? 'modal.qrMetaRequired' : 'modal.qrMetaNotRequired'),
     missingQrError: requiresQr
-      ? (getAdminText('modal.mode.reviewed.missingQr') || fallbackCopy.missingQr)
+      ? (getAdminTextForLanguage_(textLanguage, 'modal.mode.reviewed.missingQr') || fallbackCopy.missingQr)
       : '',
     paymentRequiredError: requiresPaymentAck
-      ? (getAdminText('modal.mode.confirmed.paymentRequired') || fallbackCopy.paymentRequired)
+      ? (getAdminTextForLanguage_(textLanguage, 'modal.mode.confirmed.paymentRequired') || fallbackCopy.paymentRequired)
       : '',
-    whatsappHelp: getAdminText(basePath + '.whatsappHelp') || fallbackCopy.whatsappHelp
+    whatsappHelp: getAdminTextForLanguage_(textLanguage, basePath + '.whatsappHelp') || fallbackCopy.whatsappHelp
   };
 }
 
 function updateReviewSubmitButtonState(modeConfig) {
-  const config = modeConfig || getReviewModeConfig(reviewMode);
+  const config = modeConfig || getReviewModeConfig(reviewMode, reviewModalLanguage);
   const submitBtn = document.getElementById('reviewSubmitBtn');
   if (!submitBtn) {
     return;
@@ -2761,7 +2882,7 @@ function updateReviewSubmitButtonState(modeConfig) {
 }
 
 function setReviewModalCloseState_(disabled) {
-  ['reviewCloseBtn', 'reviewCancelBtn'].forEach(function (id) {
+  ['reviewCloseBtn', 'reviewCancelBtn', 'reviewModalTeluguBtn', 'reviewModalEnglishBtn'].forEach(function (id) {
     const el = document.getElementById(id);
     if (!el) {
       return;
@@ -2783,8 +2904,23 @@ function animateReviewModalNote_() {
   noteEl.classList.add('is-animating');
 }
 
-function applyReviewModeConfig(mode) {
-  const config = getReviewModeConfig(mode);
+function updateReviewQrMeta_(modeConfig) {
+  const config = modeConfig || getReviewModeConfig(reviewMode, reviewModalLanguage);
+  const qrMeta = document.getElementById('reviewQrMeta');
+  if (!qrMeta) {
+    return;
+  }
+
+  if (!config.requiresQr || !reviewQrDataUrl || !reviewQrFileName) {
+    qrMeta.textContent = config.qrMeta;
+    return;
+  }
+
+  qrMeta.textContent = getModalText('modal.selectedFilePrefix') + ' ' + reviewQrFileName + ' (' + formatBytes(reviewQrFileSize) + ')';
+}
+
+function applyReviewModeConfig(mode, language) {
+  const config = getReviewModeConfig(mode, language || reviewModalLanguage);
 
   document.getElementById('reviewModalTitle').textContent = config.title;
   const noteEl = document.getElementById('reviewModalNote');
@@ -2798,14 +2934,16 @@ function applyReviewModeConfig(mode) {
   const qrPreview = document.getElementById('reviewQrPreview');
 
   qrSection.style.display = config.requiresQr ? 'grid' : 'none';
-  qrMeta.textContent = config.qrMeta;
+  updateReviewQrMeta_(config);
 
   if (!config.requiresQr) {
     reviewQrDataUrl = '';
     reviewQrFileName = '';
+    reviewQrFileSize = 0;
     qrInput.value = '';
     qrPreview.style.display = 'none';
     qrPreview.src = '';
+    qrMeta.textContent = config.qrMeta;
   }
 
   const paymentWrap = document.getElementById('reviewPaymentWrap');
@@ -2835,28 +2973,33 @@ function openReviewModalByKey(key, mode, currentStatusHint) {
     status: resolvedStatus,
     devoteeName: String(item.row.devoteeName || ''),
     phone: String(item.row.phone || ''),
+    sevaId: String(item.row.sevaId || ''),
     sevaName: String(item.row.sevaName || ''),
+    sevaNameTelugu: String(item.row.sevaName || ''),
+    sevaNameEnglish: '',
+    preferredLanguage: String(item.row.language || ''),
     sevaDate: String(item.row.sevaDate || item.selectedDate || ''),
     totalAmount: Number(item.row.totalAmount) || 0
   };
 
   reviewQrDataUrl = '';
   reviewQrFileName = '';
+  reviewQrFileSize = 0;
   reviewRefreshPending = false;
   reviewSubmitInProgress = false;
 
-  const modeConfig = applyReviewModeConfig(reviewMode);
+  reviewModalLanguage = getPreferredModalLanguage_(reviewContext.preferredLanguage);
+  applyReviewModalLanguage(reviewModalLanguage, { syncMessage: true });
+  const modeConfig = applyReviewModeConfig(reviewMode, reviewModalLanguage);
 
   document.getElementById('reviewPhone').value = reviewContext.phone || '';
-  const modalLanguage = getPreferredModalLanguage_();
-  document.getElementById('reviewMessage').value = buildDefaultReviewMessage(reviewMode, modalLanguage, reviewContext);
   document.getElementById('reviewQrInput').value = '';
   document.getElementById('reviewPaymentAck').checked = false;
 
   const preview = document.getElementById('reviewQrPreview');
   preview.style.display = 'none';
   preview.src = '';
-  document.getElementById('reviewQrMeta').textContent = modeConfig.qrMeta;
+  updateReviewQrMeta_(modeConfig);
 
   setReviewModalError('');
   setReviewModalStatus('');
@@ -2890,8 +3033,10 @@ function closeReviewModal(forceClose) {
 
   reviewContext = null;
   reviewMode = 'reviewed';
+  reviewModalLanguage = getPreferredModalLanguage_();
   reviewQrDataUrl = '';
   reviewQrFileName = '';
+  reviewQrFileSize = 0;
 
   const input = document.getElementById('reviewQrInput');
   if (input) {
@@ -2907,7 +3052,8 @@ function closeReviewModal(forceClose) {
     submit.textContent = '';
     submit.disabled = false;
   }
-  const modeConfig = applyReviewModeConfig(reviewMode);
+  applyReviewModalLanguage(reviewModalLanguage, { syncMessage: false });
+  const modeConfig = applyReviewModeConfig(reviewMode, reviewModalLanguage);
   if (submit) {
     updateReviewSubmitButtonState(modeConfig);
   }
@@ -2925,10 +3071,36 @@ function closeReviewModal(forceClose) {
   }
 }
 
+function getLocalizedReviewSevaName_(context, language) {
+  const langKey = resolveTemplateLanguage_(language);
+  const sevaId = String(context && context.sevaId || '').trim();
+  const catalogItem = sevaId && Object.prototype.hasOwnProperty.call(adminSevaCatalogById, sevaId)
+    ? adminSevaCatalogById[sevaId]
+    : null;
+
+  if (langKey === 'english') {
+    return String(
+      context && context.sevaNameEnglish
+      || (catalogItem && catalogItem.english)
+      || context && context.sevaName
+      || context && context.sevaNameTelugu
+      || ''
+    ).trim();
+  }
+
+  return String(
+    context && context.sevaNameTelugu
+    || (catalogItem && catalogItem.telugu)
+    || context && context.sevaName
+    || context && context.sevaNameEnglish
+    || ''
+  ).trim();
+}
+
 function buildDefaultReviewMessage(mode, language, context) {
   const activeMode = normalizeReviewMode(mode);
   const langKey = resolveTemplateLanguage_(language);
-  const sevaDateText = fmtSevaDateSimple(context && context.sevaDate ? context.sevaDate : '');
+  const sevaDateText = fmtSevaDateSimple(context && context.sevaDate ? context.sevaDate : '', language);
   const rawAmount = formatAmountInr(context && context.totalAmount);
   const paymentAmount = rawAmount === '-' ? '-' : ('\u20B9 ' + rawAmount);
   const bookingStatus = String(context && context.status || '').trim().toLowerCase();
@@ -2951,7 +3123,7 @@ function buildDefaultReviewMessage(mode, language, context) {
     devoteeName: context && context.devoteeName ? context.devoteeName : '',
     bookingRef: context && context.bookingRef ? context.bookingRef : '',
     sevaDate: sevaDateText,
-    sevaName: context && context.sevaName ? context.sevaName : '',
+    sevaName: getLocalizedReviewSevaName_(context, language),
     paymentAmount: paymentAmount,
     refundLine: refundLine
   };
@@ -3025,7 +3197,7 @@ function formatAmountInr(value) {
 }
 
 function onReviewQrInputChange(event) {
-  const modeConfig = getReviewModeConfig(reviewMode);
+  const modeConfig = getReviewModeConfig(reviewMode, reviewModalLanguage);
   const input = event && event.target ? event.target : null;
   const file = input && input.files && input.files[0] ? input.files[0] : null;
   const preview = document.getElementById('reviewQrPreview');
@@ -3033,6 +3205,7 @@ function onReviewQrInputChange(event) {
 
   reviewQrDataUrl = '';
   reviewQrFileName = '';
+  reviewQrFileSize = 0;
   preview.style.display = 'none';
   preview.src = '';
 
@@ -3047,14 +3220,14 @@ function onReviewQrInputChange(event) {
   }
 
   if (!/^image\//.test(file.type || '')) {
-    setReviewModalError(getAdminText('errors.selectQrImageFile'));
+    setReviewModalError(getModalText('errors.selectQrImageFile'));
     input.value = '';
     meta.textContent = modeConfig.qrMeta;
     return;
   }
 
   if (file.size > 4 * 1024 * 1024) {
-    setReviewModalError(getAdminText('errors.qrImageTooLarge'));
+    setReviewModalError(getModalText('errors.qrImageTooLarge'));
     input.value = '';
     meta.textContent = modeConfig.qrMeta;
     return;
@@ -3063,20 +3236,21 @@ function onReviewQrInputChange(event) {
   const reader = new FileReader();
   reader.onload = function () {
     if (typeof reader.result !== 'string') {
-      setReviewModalError(getAdminText('errors.qrReadFailed'));
+      setReviewModalError(getModalText('errors.qrReadFailed'));
       return;
     }
 
     reviewQrDataUrl = reader.result;
     reviewQrFileName = file.name || 'qr-code.png';
+    reviewQrFileSize = file.size;
     preview.src = reviewQrDataUrl;
     preview.style.display = 'block';
-    meta.textContent = getAdminText('modal.selectedFilePrefix') + ' ' + reviewQrFileName + ' (' + formatBytes(file.size) + ')';
+    meta.textContent = getModalText('modal.selectedFilePrefix') + ' ' + reviewQrFileName + ' (' + formatBytes(file.size) + ')';
     setReviewModalError('');
   };
 
   reader.onerror = function () {
-    setReviewModalError(getAdminText('errors.qrReadFailed'));
+    setReviewModalError(getModalText('errors.qrReadFailed'));
     meta.textContent = modeConfig.qrMeta;
   };
 
@@ -3089,29 +3263,29 @@ async function submitReviewTransition() {
   }
 
   if (!webhookUrl) {
-    setReviewModalError(getAdminText('errors.missingWebhook'));
+    setReviewModalError(getModalText('errors.missingWebhook'));
     return;
   }
 
   const phone = String(document.getElementById('reviewPhone').value || '').trim();
   if (!phone) {
-    setReviewModalError(getAdminText('errors.whatsappRequired'));
+    setReviewModalError(getModalText('errors.whatsappRequired'));
     return;
   }
 
-  const modeConfig = getReviewModeConfig(reviewMode);
+  const modeConfig = getReviewModeConfig(reviewMode, reviewModalLanguage);
   if (modeConfig.requiresQr && !reviewQrDataUrl) {
-    setReviewModalError(modeConfig.missingQrError || getAdminText('errors.selectQrImageFile'));
+    setReviewModalError(modeConfig.missingQrError || getModalText('errors.selectQrImageFile'));
     return;
   }
 
   const paymentAck = document.getElementById('reviewPaymentAck');
   if (modeConfig.requiresPaymentAck && (!paymentAck || !paymentAck.checked)) {
-    setReviewModalError(modeConfig.paymentRequiredError || getAdminText('errors.paymentConfirmationRequired'));
+    setReviewModalError(modeConfig.paymentRequiredError || getModalText('errors.paymentConfirmationRequired'));
     return;
   }
 
-  const language = getPreferredModalLanguage_();
+  const language = reviewModalLanguage;
   const customMessage = String(document.getElementById('reviewMessage').value || '').trim();
   const submitBtn = document.getElementById('reviewSubmitBtn');
   reviewSubmitInProgress = true;
@@ -3171,7 +3345,7 @@ async function submitReviewTransition() {
     reviewSubmitInProgress = false;
     setReviewModalCloseState_(false);
   } catch (error) {
-    setReviewModalError(getAdminText('errors.transitionFailedPrefix') + ' ' + String(error.message || getAdminText('errors.unknownError')));
+    setReviewModalError(getModalText('errors.transitionFailedPrefix') + ' ' + String(error.message || getModalText('errors.unknownError')));
     reviewSubmitInProgress = false;
     setReviewModalCloseState_(false);
     submitBtn.disabled = false;
@@ -3184,60 +3358,60 @@ function formatTransitionError(data) {
 
   if (code === 'ADMIN_UNAUTHORIZED') {
     signOut();
-    return getAdminText('errors.sessionExpired');
+    return getModalText('errors.sessionExpired');
   }
 
   if (code === 'INVALID_TRANSITION') {
     const currentStatus = String(data && data.currentStatus || '').trim();
     const targetStatus = String(data && data.targetStatus || '').trim();
-    const currentStatusLabel = currentStatus ? getStatusLabel_(currentStatus) : '';
-    const targetStatusLabel = targetStatus ? getStatusLabel_(targetStatus) : '';
+    const currentStatusLabel = currentStatus ? getStatusLabelForLanguage_(reviewModalLanguage, currentStatus) : '';
+    const targetStatusLabel = targetStatus ? getStatusLabelForLanguage_(reviewModalLanguage, targetStatus) : '';
 
     if (currentStatusLabel && targetStatusLabel) {
-      return getAdminText('errors.invalidTransitionTarget', {
+      return getModalText('errors.invalidTransitionTarget', {
         currentStatus: currentStatusLabel,
         targetStatus: targetStatusLabel
       });
     }
 
     if (currentStatusLabel) {
-      return getAdminText('errors.invalidTransitionCurrent', {
+      return getModalText('errors.invalidTransitionCurrent', {
         currentStatus: currentStatusLabel
       });
     }
 
-    return String(data && data.error || getAdminText('errors.invalidTransition'));
+    return String(data && data.error || getModalText('errors.invalidTransition'));
   }
 
   if (code === 'PAYMENT_CONFIRMATION_REQUIRED') {
     return data && data.error
       ? String(data.error)
-      : getAdminText('errors.paymentConfirmationRequired');
+      : getModalText('errors.paymentConfirmationRequired');
   }
 
   if (code === 'CONFIRMED_CANCELLATION_WINDOW_EXPIRED') {
     return data && data.error
       ? String(data.error)
-      : getAdminText('errors.confirmedCancellationWindowExpired');
+      : getModalText('errors.confirmedCancellationWindowExpired');
   }
 
   if (code === 'SEVA_DATETIME_REQUIRED') {
     return data && data.error
       ? String(data.error)
-      : getAdminText('errors.sevaDatetimeRequired');
+      : getModalText('errors.sevaDatetimeRequired');
   }
 
   if (code === 'WHATSAPP_SEND_FAILED') {
     const reason = data.whatsappReason ? ' (' + data.whatsappReason + ')' : '';
-    const modeConfig = getReviewModeConfig(reviewMode);
-    return getAdminText('errors.whatsappFailedPrefix') + reason + '. ' + modeConfig.whatsappHelp;
+    const modeConfig = getReviewModeConfig(reviewMode, reviewModalLanguage);
+    return getModalText('errors.whatsappFailedPrefix') + reason + '. ' + modeConfig.whatsappHelp;
   }
 
   if (code === 'INVALID_QR_IMAGE') {
-    return data && data.error ? String(data.error) : getAdminText('errors.invalidQrImage');
+    return data && data.error ? String(data.error) : getModalText('errors.invalidQrImage');
   }
 
-  return String(data && data.error || getAdminText('errors.unknownServerError'));
+  return String(data && data.error || getModalText('errors.unknownServerError'));
 }
 
 function setReviewModalError(message) {
@@ -3296,7 +3470,7 @@ function fmtBookingRequest(value) {
   });
 }
 
-function fmtSevaDateSimple(value) {
+function fmtSevaDateSimple(value, language) {
   const raw = String(value || '').trim();
   if (!raw) {
     return '\u2014';
@@ -3310,7 +3484,8 @@ function fmtSevaDateSimple(value) {
     return raw;
   }
 
-  return d.toLocaleDateString('en-GB', {
+  const locale = resolveTemplateLanguage_(language) === 'english' ? 'en-IN' : 'te-IN';
+  return d.toLocaleDateString(locale, {
     weekday: 'long',
     day: 'numeric',
     month: 'long',
